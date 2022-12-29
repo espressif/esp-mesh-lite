@@ -1,0 +1,123 @@
+stages:
+  - build
+  - deploy
+
+# global variables
+variables: &global-variables
+  GIT_STRATEGY: clone
+  PYTHON_VER: 3
+
+default:
+  retry:
+    max: 2
+    # In case of a runner failure we could hop to another one, or a network error could go away.
+    when: always
+
+.setup_esp_idf: &setup_esp_idf
+  - cd $IDF_PATH
+  - git fetch origin ${idf_branch}
+  - git checkout ${idf_branch}
+  - git submodule update --init --recursive
+  - ./install.sh
+  - . ./export.sh
+  - cd -
+
+.before_script_preparation: &before_script_preparation
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - echo -n $GITLAB_KEY >> ~/.ssh/id_rsa_base64
+  - base64 --decode --ignore-garbage ~/.ssh/id_rsa_base64 > ~/.ssh/id_rsa
+  - chmod 600 ~/.ssh/id_rsa
+  - echo -e "Host gitlab.espressif.cn\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+  - export IDF_PATH=/opt/esp/idf
+
+.build_example: &build_example
+  - cd examples/mesh_local_control
+  - idf.py build
+
+
+build_template:
+  stage: build
+  tags:
+    - build
+
+  variables:
+    <<: *global-variables
+    idf_target: ""
+
+  artifacts:
+
+  before_script:
+    - *before_script_preparation
+
+  rules:
+    - if: $idf_target != ""
+
+  script:
+    - *setup_esp_idf
+    - *build_example
+
+esp32_v5.0_build:
+  stage: build
+  image: espressif/idf:release-v5.0
+
+  variables:
+    idf_target: esp32
+    idf_branch: release/v5.0
+  extends: build_template
+
+esp32c3_v5.0_build:
+  stage: build
+  image: espressif/idf:release-v5.0
+
+  variables:
+    idf_target: esp32c3
+    idf_branch: release/v5.0
+  extends: build_template
+
+esp32s2_v5.0_build:
+  stage: build
+  image: espressif/idf:release-v5.0
+
+  variables:
+    idf_target: esp32s2
+    idf_branch: release/v5.0
+  extends: build_template
+
+esp32s3_v5.0_build:
+  stage: build
+  image: espressif/idf:release-v5.0
+
+  variables:
+    idf_target: esp32s3
+    idf_branch: release/v5.0
+  extends: build_template
+
+push_master_to_github:
+  stage: deploy
+  only:
+    - master
+    - /^release\/v/
+#  when: on_success
+  image: $CI_DOCKER_REGISTRY/esp32-ci-env
+  variables:
+    GIT_STRATEGY: clone
+    GITHUB_PUSH_REFS: refs/remotes/origin/release refs/remotes/origin/master
+  before_script:
+    - echo "skip default before_script"
+  script:
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo -n $GH_PUSH_KEY >> ~/.ssh/id_rsa_base64
+    - base64 --decode --ignore-garbage ~/.ssh/id_rsa_base64 > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+    - git remote add github git@github.com:espressif/esp-mesh-lite.git
+    # What the next line of script does: goes through the list of refs for all branches we push to github,
+    # generates a snippet of shell which is evaluated. The snippet checks CI_BUILD_REF against the SHA
+    # (aka objectname) at tip of each branch, and if any SHAs match then it checks out the local branch
+    # and then pushes that ref to a corresponding github branch
+    #
+    # NB: In gitlab 9.x, CI_BUILD_REF was deprecated. New name is CI_COMMIT_REF. If below command suddenly
+    # generates bash syntax errors, this is probably why.
+    - eval $(git for-each-ref --shell bash --format 'if [ $CI_BUILD_REF == %(objectname) ]; then git checkout -B %(refname:strip=3); git push --follow-tags github %(refname:strip=3); fi;' $GITHUB_PUSH_REFS)
