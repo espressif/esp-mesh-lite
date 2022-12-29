@@ -1,0 +1,10 @@
+## IDF Component Manager Manifest File
+dependencies:
+  # espressif/button: "==2.2.0"
+  ## Required IDF version
+  idf:
+    version: ">=4.4"
+  
+  mesh_lite:
+    version: "*"
+    override_path: "../../../components/mesh_lite"

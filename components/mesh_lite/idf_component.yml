@@ -1,0 +1,13 @@
+version: "0.1.0"
+description: esp mesh lite based on Wi-Fi protocol
+url: https://github.com/espressif/esp-mesh-lite/tree/master/components/mesh_lite
+
+## IDF Component Manager Manifest File
+dependencies:
+  # espressif/esp-iot-bridge: ">=0.0.1"
+  ## Required IDF version
+  idf:
+    version: ">=4.4.0"
+
+  espressif/iot_bridge:
+    version: "*"
