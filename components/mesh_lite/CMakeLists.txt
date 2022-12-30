@@ -1,5 +1,5 @@
 set(srcs)
-set(require_components "json" "esp_wifi" "iot_bridge")
+set(require_components "json" "esp_wifi")
 
 if (CONFIG_MESH_LITE_ENABLE)
     list(APPEND srcs "src/esp_mesh_lite.c")

@@ -1,6 +1,6 @@
 - [English Version](./README.md)
 
-# Mwifi 路由器示例
+# Mesh-Lite 局域网控制示例
 
 ## 介绍
 

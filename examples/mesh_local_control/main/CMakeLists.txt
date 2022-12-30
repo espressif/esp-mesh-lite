@@ -1,4 +1,2 @@
-idf_component_register(SRCS "./router_example.c"
-                    INCLUDE_DIRS ""
-                    REQUIRES mesh_lite nvs_flash
-)
+idf_component_register(SRCS "local_control.c"
+                       INCLUDE_DIRS ".")
