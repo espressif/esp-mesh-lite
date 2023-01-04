@@ -247,6 +247,16 @@ uint8_t esp_mesh_lite_get_allowed_level(void);
  */
 uint8_t esp_mesh_lite_get_disallowed_level(void);
 
+/**
+ * @brief  Scan all available APs.
+ *
+ * @attention  If you want to scan externally, don't call esp_wifi_scan_start directly, please call this interface.
+ *
+ * @return
+ *    - 0: scan start successful
+ */
+esp_err_t esp_mesh_lite_wifi_scan_start(uint32_t timeout);
+
 
 /*****************************************************/
 /********* ESP Wi-Fi Mesh Lite Communication *********/
