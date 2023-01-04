@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <inttypes.h>
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -136,9 +137,9 @@ static void print_system_info_timercb(void *timer)
     esp_wifi_get_channel(&primary, &second);
 
     ESP_LOGI(TAG, "System information, channel: %d, layer: %d, self mac: " MACSTR ", parent bssid: " MACSTR
-             ", parent rssi: %d, free heap: %lu", primary,
+             ", parent rssi: %d, free heap: %"PRIu32"", primary,
              esp_mesh_lite_get_level(), MAC2STR(sta_mac), MAC2STR(ap_info.bssid),
-             (ap_info.rssi != 0 ? ap_info.rssi : -120), (long unsigned int)esp_get_free_heap_size());
+             (ap_info.rssi != 0 ? ap_info.rssi : -120), esp_get_free_heap_size());
 
     for (int i = 0; i < wifi_sta_list.num; i++) {
         ESP_LOGI(TAG, "Child mac: " MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));

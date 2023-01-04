@@ -31,67 +31,90 @@ default:
   - echo -e "Host gitlab.espressif.cn\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - export IDF_PATH=/opt/esp/idf
 
-.build_example: &build_example
+.build_mesh_local_control_example: &build_mesh_local_control_example
   - cd examples/mesh_local_control
+  - rm -rf build sdkconfig
+  - idf.py set-target ${idf_target}
   - idf.py build
+  - cd -
 
+.build_rainmaker_led_light_example: &build_rainmaker_led_light_example
+  - cd examples/rainmaker_led_light
+  - rm -rf build sdkconfig
+  - idf.py set-target ${idf_target}
+  - idf.py build
+  - cd -
 
-build_template:
+esp32_v5.0_build:
   stage: build
+  image: espressif/idf:release-v5.0
   tags:
     - build
 
   variables:
     <<: *global-variables
-    idf_target: ""
-
-  artifacts:
+    idf_target: esp32
+    idf_branch: release/v5.0
 
   before_script:
     - *before_script_preparation
 
-  rules:
-    - if: $idf_target != ""
-
   script:
-    - *setup_esp_idf
-    - *build_example
-
-esp32_v5.0_build:
-  stage: build
-  image: espressif/idf:release-v5.0
-
-  variables:
-    idf_target: esp32
-    idf_branch: release/v5.0
-  extends: build_template
+    - *build_mesh_local_control_example
+    - *build_rainmaker_led_light_example
 
 esp32c3_v5.0_build:
   stage: build
   image: espressif/idf:release-v5.0
+  tags:
+    - build
 
   variables:
+    <<: *global-variables
     idf_target: esp32c3
     idf_branch: release/v5.0
-  extends: build_template
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_mesh_local_control_example
+    - *build_rainmaker_led_light_example
 
 esp32s2_v5.0_build:
   stage: build
   image: espressif/idf:release-v5.0
+  tags:
+    - build
 
   variables:
+    <<: *global-variables
     idf_target: esp32s2
     idf_branch: release/v5.0
-  extends: build_template
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_mesh_local_control_example
 
 esp32s3_v5.0_build:
   stage: build
   image: espressif/idf:release-v5.0
+  tags:
+    - build
 
   variables:
+    <<: *global-variables
     idf_target: esp32s3
     idf_branch: release/v5.0
-  extends: build_template
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_mesh_local_control_example
+    - *build_rainmaker_led_light_example
 
 push_master_to_github:
   stage: deploy
