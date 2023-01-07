@@ -1,16 +1,8 @@
-// Copyright 2022 Espressif Systems (Shanghai) PTE LTD
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * SPDX-FileCopyrightText: 2022-2023 Espressif Systems (Shanghai) CO LTD
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #pragma once
 
@@ -19,13 +11,14 @@ extern "C"
 {
 #endif
 
-#include "esp_wifi_types.h"
 #include "cJSON.h"
+#include "esp_wifi_types.h"
 
 extern const char* ESP_MESH_LITE_EVENT;
 
 #define MAC_MAX_LEN                   (18)
 #define IP_MAX_LEN                    (16)
+#define DEVICE_CATEGORY               (32)
 
 /* Definitions for error constants. */
 #define ESP_ERR_DUPLICATE_ADDITION    0x110   /*!< Duplicate addition */
@@ -36,16 +29,28 @@ extern const char* ESP_MESH_LITE_EVENT;
 #define ESP_MESH_LITE_SOFTAP_SSID_END_WITH_THE_MAC 0
 #endif
 
+#ifdef CONFIG_JOIN_MESH_IGNORE_ROUTER_STATUS
+#define JOIN_MESH_IGNORE_ROUTER_STATUS CONFIG_JOIN_MESH_IGNORE_ROUTER_STATUS
+#else
+#define JOIN_MESH_IGNORE_ROUTER_STATUS 0
+#endif
+
 #ifdef CONFIG_JOIN_MESH_WITHOUT_CONFIGURED_WIFI_INFO
 #define JOIN_MESH_WITHOUT_CONFIGURED_WIFI_INFO CONFIG_JOIN_MESH_WITHOUT_CONFIGURED_WIFI_INFO
 #else
 #define JOIN_MESH_WITHOUT_CONFIGURED_WIFI_INFO 0
 #endif
 
-#ifdef CONFIG_JOIN_MESH_IGNORE_ROUTER_STATUS
-#define JOIN_MESH_IGNORE_ROUTER_STATUS CONFIG_JOIN_MESH_IGNORE_ROUTER_STATUS
+#ifdef CONFIG_OTA_DATA_LEN
+#define OTA_DATA_LEN CONFIG_OTA_DATA_LEN
 #else
-#define JOIN_MESH_IGNORE_ROUTER_STATUS 0
+#define OTA_DATA_LEN 0
+#endif
+
+#ifdef CONFIG_OTA_WND_DEFAULT
+#define OTA_WND_DEFAULT CONFIG_OTA_WND_DEFAULT
+#else
+#define OTA_WND_DEFAULT 0
 #endif
 
 #if ESP_MESH_LITE_SOFTAP_SSID_END_WITH_THE_MAC
@@ -67,8 +72,11 @@ STATIC_ASSERT(sizeof(CONFIG_ESP_BRIDGE_SOFTAP_PASSWORD) < (63 + 2))
     .end_with_mac = ESP_MESH_LITE_SOFTAP_SSID_END_WITH_THE_MAC, \
     .join_mesh_ignore_router_status = JOIN_MESH_IGNORE_ROUTER_STATUS, \
     .join_mesh_without_configured_wifi = JOIN_MESH_WITHOUT_CONFIGURED_WIFI_INFO, \
+    .ota_data_len = OTA_DATA_LEN, \
+    .ota_wnd = OTA_WND_DEFAULT, \
     .softap_ssid = CONFIG_ESP_BRIDGE_SOFTAP_SSID, \
-    .softap_password = CONFIG_ESP_BRIDGE_SOFTAP_PASSWORD \
+    .softap_password = CONFIG_ESP_BRIDGE_SOFTAP_PASSWORD, \
+    .device_category = CONFIG_DEVICE_CATEGORY \
 }
 
 /**
@@ -94,10 +102,14 @@ typedef struct {
     bool end_with_mac;                      /**< Whether to add Mac information to the suffix of softap ssid */
     bool join_mesh_ignore_router_status;    /**< Join Mesh no matter whether the node is connected to router */
     bool join_mesh_without_configured_wifi; /**< Join Mesh without configured with information */
+    uint32_t ota_data_len;                  /**< The maximum length of an OTA data transmission */
+    uint16_t ota_wnd;                       /**< OTA data transfer window size */
     const char* softap_ssid;                /**< SoftAP SSID */
     const char* softap_password;            /**< SoftAP Password */
+    const char* device_category;            /**< Device Category */
 } esp_mesh_lite_config_t;
 
+typedef esp_err_t (*extern_url_ota_cb_t)(void);
 typedef cJSON* (*msg_process_cb_t)(cJSON *payload, uint32_t seq);
 
 /**
@@ -139,6 +151,32 @@ esp_err_t esp_mesh_lite_core_init(esp_mesh_lite_config_t* config);
  * 
  */
 void esp_mesh_lite_connect(void);
+
+/**
+ * @brief Start Mesh-Lite OTA
+ *
+ * @param[in] filesize: The size of the firmware file to be updated.
+ * 
+ * @param[in] fw_version: The version of the firmware file to be updated.
+ * 
+ * @param[in] extern_url_ota_cb: The callback function of ota from the external url, 
+ *                               when the local area network ota cannot be performed,
+ *                               the callback function will be called to perform ota.
+ * 
+ */
+esp_err_t esp_mesh_lite_ota_start(int filesize, char *fw_version, extern_url_ota_cb_t extern_url_ota_cb);
+
+/**
+ * @brief Notify the child node to suspend the OTA process
+ *
+ */
+esp_err_t esp_mesh_lite_ota_notify_child_node_pause(void);
+
+/**
+ * @brief Notify the child node to restart the OTA process
+ *
+ */
+esp_err_t esp_mesh_lite_ota_notify_child_node_restart(void);
 
 /**
  * @brief Set the mesh_lite_id
@@ -257,6 +295,14 @@ uint8_t esp_mesh_lite_get_allowed_level(void);
  *      - disallowed_level
  */
 uint8_t esp_mesh_lite_get_disallowed_level(void);
+
+/**
+ * @brief  Get the device category
+ *
+ * @return
+ *      - device category
+ */
+char *esp_mesh_lite_get_device_category(void);
 
 /**
  * @brief  Scan all available APs.

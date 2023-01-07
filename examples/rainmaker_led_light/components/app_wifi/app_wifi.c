@@ -650,7 +650,7 @@ esp_err_t app_wifi_start(app_wifi_pop_type_t pop_type)
         wifi_prov_mgr_deinit();
 
         /* Start Wi-Fi station */
-        app_wifi_network_connect();
+        // app_wifi_network_connect();
         xEventGroupSetBits(wifi_event_group, WIFI_CONNECTED_EVENT);
     }
     /* Wait for Wi-Fi connection */

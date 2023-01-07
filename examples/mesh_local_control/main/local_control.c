@@ -201,7 +201,6 @@ void app_main()
      * @brief Set the log level for serial port printing.
      */
     esp_log_level_set("*", ESP_LOG_INFO);
-    esp_log_level_set(TAG, ESP_LOG_DEBUG);
 
     esp_storage_init();
 
