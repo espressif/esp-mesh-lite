@@ -1,10 +1,12 @@
+- [English Version](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/README.md)
+
 # ESP-MESH-LITE
 
 本指南提供有关 Mesh-Lite 协议的介绍。
 
 ## 概述
 
-ESP-MESH-LITE 是一套建立在 Wi-Fi 协议之上的网络协议。ESP-MESH-LITE 允许分布在大范围区域内（室内和室外）的大量设备（下文称节点）在同一个 WLAN（无线局域网）中相互连接。ESP-MESH-LITE 与 ESP-MESH（又称 ESP-WIFI-MESH） 最大的不同是 ESP-MESH-LITE 允许组网内的子设备独立访问外部网络，传输信息对于父节点无感，大大降低了应用层开发难度，ESP-MESH-LITE 具有自组网和自修复的特性，也就是说 mesh 网络可以自主地构建和维护。
+ESP-MESH-LITE 是一套建立在 Wi-Fi 协议之上的网络协议。ESP-MESH-LITE 允许分布在大范围区域内（室内和室外）的大量设备（下文称节点）在同一个 WLAN（无线局域网）中相互连接。ESP-MESH-LITE 与 [ESP-MESH](https://docs.espressif.com/projects/esp-idf/zh_CN/v5.0/esp32/api-guides/esp-wifi-mesh.html)（又称 ESP-WIFI-MESH）最大的不同是 ESP-MESH-LITE 允许组网内的子设备独立访问外部网络，传输信息对于父节点无感，大大降低了应用层开发难度，ESP-MESH-LITE 具有自组网和自修复的特性，也就是说 Mesh 网络可以自主地构建和维护。
 
 本 ESP-MESH-LITE 指南分为以下几个部分：
 
@@ -36,12 +38,6 @@ ESP-MESH-LITE 是一套建立在 Wi-Fi 协议之上的网络协议。ESP-MESH-LI
 <center>ESP-MESH-LITE 网络架构示意图</center>
 
 ESP-MESH-LITE 与传统 Wi-Fi 网络的不同之处在于：网络中的节点不需要连接到中心节点，而是可以与相邻节点连接。各节点均通过桥接的方式负责相邻节点的数据转发。由于无需受限于距离中心节点的位置，所有节点仍可互连，因此 ESP-MESH-LITE 网络的覆盖区域更广。类似地，由于不再受限于中心节点的容量限制，ESP-MESH-LITE 允许更多节点接入，也不易于超载。同时每个节点会获得由父节点所分配得到 IP 地址，故可以像单个设备接入路由器一样访问网络，其父节点对该数据只做网络层的转发，对应用层无感。
-
-### ESP-MESH-LITE 示例
-
-- [Router](https://github.com/espressif/esp-mdf/tree/master/examples/mesh_lite/router/)：ESP-MESH-LITE 组网示例，本示例仅简单演示设备组网，以及 TCP 通信，不包含复杂的网络应用，用户可基于此示例进行二次开发。
-- [Rainmaker](https://github.com/espressif/esp-mdf/tree/master/examples/mesh_lite/rainmaker/)：本示例演示 ESP-MESH-LITE 对接 ESP-Rainmaker 云平台，组网内所有设备均可单独接入云，并通过 [Nova Home](https://play.google.com/store/apps/details?id=com.espressif.novahome) APP 进行控制，用户可基于此示例进行云应用的二次开发或者移植别的云平台。
-
 
 
 ## <span id = "2">ESP-MESH-LITE 概念</span>

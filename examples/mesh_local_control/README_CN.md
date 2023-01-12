@@ -1,4 +1,4 @@
-[[EN]](./README.md)
+- [English Version](./README.md)
 
 # Mwifi 路由器示例
 

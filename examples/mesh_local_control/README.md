@@ -1,4 +1,4 @@
-[[中文]](./README_cn.md)
+- [中文版本](./README_CN.md)
 
 # Mwifi Router Example
 
