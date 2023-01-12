@@ -1,0 +1,2 @@
+# ESP RainMaker Config
+CONFIG_ESP_RMAKER_SELF_CLAIM=y
