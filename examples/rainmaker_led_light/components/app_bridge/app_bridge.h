@@ -16,7 +16,7 @@ typedef enum {
     ESP_MESH_LITE_EVENT_CHILD_NODE_LEAVE,
 } mesh_lite_event_child_node_info_t;
 
-/* Enable ESP Iot Bridge in the application
+/* Enable ESP IoT Bridge in the application
  *
  * @return ESP_OK on success.
  * @return error in case of failure.
