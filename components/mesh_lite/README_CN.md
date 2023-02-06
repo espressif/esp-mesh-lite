@@ -28,16 +28,16 @@ ESP-MESH-LITE 是一套建立在 Wi-Fi 协议之上的网络协议。ESP-MESH-LI
 
 <center>传统 Wi-Fi 网络架构</center>
 
-传统基础设施 Wi-Fi 网络是一个“单点对多点”的网络。这种网络架构的中心节点为接入点 (AP)，其他节点 (station) 均与 AP 直接相连。其中，AP 负责各个 station 之间的仲裁和转发，一些 AP 还会通过路由器与外部 IP 网络交换数据。在传统 Wi-Fi 网络架构中，
+传统基础设施 Wi-Fi 网络是一个“单点对多点”的网络。这种网络架构的中心节点为接入点 (AP)，其他节点 (station) 均与 AP 直接相连。其中，AP 负责各个 station 之间的仲裁和转发，一些 AP 还会通过路由器与外部 IP 网络交换数据。在传统 Wi-Fi 网络架构中：
 
-1. 由于所有 station 均需与 AP 直接相连，不能距离 AP 太远，因此覆盖区域相对有限；
-2. 受到 AP 容量的限制，因此网络中允许的 station 数量相对有限，很容易超载。
+1. 由于所有 station 均需与 AP 直接相连，不能距离 AP 太远，因此覆盖区域相对有限。
+2. 受到 AP 容量的限制，网络中允许的 station 数量相对有限，很容易超载。
 
 ![ESP-MESH-LITE 网络架构示意图](https://docs.espressif.com/projects/esp-idf/zh_CN/v4.4.2/esp32/_images/mesh-esp-wifi-mesh-network-architecture.png)
 
 <center>ESP-MESH-LITE 网络架构示意图</center>
 
-ESP-MESH-LITE 与传统 Wi-Fi 网络的不同之处在于：网络中的节点不需要连接到中心节点，而是可以与相邻节点连接。各节点均通过桥接的方式负责相邻节点的数据转发。由于无需受限于距离中心节点的位置，所有节点仍可互连，因此 ESP-MESH-LITE 网络的覆盖区域更广。类似地，由于不再受限于中心节点的容量限制，ESP-MESH-LITE 允许更多节点接入，也不易于超载。同时每个节点会获得由父节点所分配得到 IP 地址，故可以像单个设备接入路由器一样访问网络，其父节点对该数据只做网络层的转发，对应用层无感。
+ESP-MESH-LITE 与传统 Wi-Fi 网络的不同之处在于：网络中的节点不需要连接到中心节点，而是可以与相邻节点连接。各节点均通过桥接的方式负责相邻节点的数据转发。由于无需受限于距离中心节点的位置，ESP-MESH-LITE 网络的覆盖区域更广。类似地，由于不再受限于中心节点的容量限制，ESP-MESH-LITE 允许更多节点接入，也不易于超载。同时，每个节点会由父节点分配得到 IP 地址，故可以像单个设备接入路由器一样访问网络，其父节点对该数据只做网络层的转发，对应用层无感。
 
 
 ## <span id = "2">ESP-MESH-LITE 概念</span>
@@ -81,9 +81,9 @@ ESP-MESH-LITE 网络中的大小（节点总数）取决于网络中允许的最
 
 <center>ESP-MESH-LITE 节点类型</center>
 
-**根节点**： 指网络顶部的节点，是 ESP-MESH-LITE 网络和外部 IP 网络之间的唯一接口。根节点直接连接至传统的 Wi-Fi 路由器，在 ESP-MESH-LITE 网络的节点和外部 IP 网络之间起桥接作用。 **正常情况下，ESP-MESH-LITE 网络中只能有一个根节点**，且根节点的上行连接只能是路由器。如上图所示，节点 A 即为该 ESP-MESH-LITE 网络的根节点。
+**根节点**：网络顶部的节点，是 ESP-MESH-LITE 网络和外部 IP 网络之间的唯一接口。根节点直接连接至传统的 Wi-Fi 路由器，在 ESP-MESH-LITE 网络的节点和外部 IP 网络之间起桥接作用。 **正常情况下，ESP-MESH-LITE 网络中只能有一个根节点**，且根节点的上行连接只能是路由器。如上图所示，节点 A 即为该 ESP-MESH-LITE 网络的根节点。
 
-**叶子节点**： 指不允许拥有任何子节点（即无下行连接）的节点。如果节点处于 ESP-MESH-LITE 网络的最大允许层级，则该节点将成为叶子节点。叶子节点不会再产生下行连接，这可以防止节点继续生成下行连接，从而确保网络层级不会超出限制。由于建立下行连接必须使用 SoftAP 接口，因此一些没有 SoftAP 接口的节点（仅有 station 接口）也将被分配为叶子节点。如上图所示，位于网络最外层的 L/M/N 节点即为叶子节点。
+**叶子节点**：不允许拥有任何子节点（即无下行连接）的节点。如果节点处于 ESP-MESH-LITE 网络的最大允许层级，则该节点将成为叶子节点。叶子节点不会再产生下行连接，确保网络层级不会超出限制。由于建立下行连接必须使用 SoftAP 接口，因此一些没有 SoftAP 接口的节点（仅有 station 接口）也将被分配为叶子节点。如上图所示，位于网络最外层的 L/M/N 节点即为叶子节点。
 
 **中间父节点**：既不是属于根节点也不属于叶子节点的节点即为中间父节点。中间父节点必须有且仅有一个上行连接（即一个父节点），但可以具有 0 个或多个下行连接（即 0 个或多个子节点）。因此，中间父节点可以发送和接收自己的数据包，也可以转发其上行和下行连接的数据包。如上图所示，节点 B 到 J 即为中间父节点。 **注意，E/F/G/I/J 等没有下行连接的中间父节点并不等同于叶子节点**，原因在于这些节点仍允许形成下行连接。
 
@@ -113,15 +113,13 @@ ESP-MESH-LITE 中能够形成下行连接的每个节点（即具有 SoftAP 接�
 
 <center>首选父节点选择
 
+**上图（A 侧）** 展示了空闲节点 G 如何在 B/C/D/E/F 五个候选父节点中选择首选父节点。首先，B/C 节点优于 D/E/F 节点，因为这两个节点所处的层级更浅。其次，C 节点优于 B 节点，因为 C 节与 G 节点距离更近，RSSI 信号强度更优。
 
-**上图（A 侧）** 展示了空闲节点 G 如何在 B/C/D/E/F 五个候选父节点中选择首选父节点：首先，B/C 节点优于 D/E/F 节点，因为这两个节点所处的层级更浅。其次，C 节点优于 B 节点，因为 C 节与 G 节点距离更近，RSSI 信号强度更优。
-
-**上图（B 侧）** 展示了空闲节点 G 如何在根节点 A 和其他候选父节点中选择首选父节点，此时根节点 A 处于空闲节点 G 范围之内（即空闲节点 G 接收到的根节点 A 信标帧 RSSI 强度高于预设阈值）：由于根节点 A 处于网络中最浅的层，因此将成为首选父节点。
+**上图（B 侧）** 展示了空闲节点 G 如何在根节点 A 和其他候选父节点中选择首选父节点。此时，根节点 A 处于空闲节点 G 范围之内（即空闲节点 G 接收到的根节点 A 信标帧 RSSI 强度高于预设阈值），由于根节点 A 处于网络中最浅的层，因此将成为首选父节点。
 
 **备注**
 
-用户还可以自行定义选择节点固定哪个层级或者禁用哪个层级（见 [Mesh-Lite API 详解 ](https://github.com/espressif/esp-mdf/tree/master/components/mesh_lite/include/esp_mesh_lite_core.h#L139-L157))。
-
+用户还可以通过 `esp_mesh_lite_set_allowed_level` 和 `esp_mesh_lite_set_disallowed_level` 自行定义选择节点固定哪个层级或者禁用哪个层级（见 [Mesh-Lite API 详解](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/include/esp_mesh_lite_core.h)）。
 
 
 ## <span id = "3">建立网络</span>
@@ -130,14 +128,13 @@ ESP-MESH-LITE 中能够形成下行连接的每个节点（即具有 SoftAP 接�
 
 警告
 
-ESP-MESH-LITE 正式开始构建网络前，必须确保网络中所有节点具有相同的配置（见 [`esp_mesh_lite_config_t`](https://github.com/espressif/esp-mdf/tree/master/components/mesh_lite/include/esp_mesh_lite_core.h#L81-L92)）。每个节点必须配置 **相同 MESH_LITE 网络 ID、最大层级数量和 SoftAP 配置**。
+ESP-MESH-LITE 正式开始构建网络前，必须确保网络中所有节点具有相同的配置（见 [`esp_mesh_lite_config_t`](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/include/esp_mesh_lite_core.h)）。每个节点必须配置 **相同 MESH_LITE 网络 ID、最大层级数量和 SoftAP 配置**。
 
-ESP-MESH-LITE 网络将首先选择根节点，然后逐层形成下行连接，直到所有节点均加入网络。网络的布局可能取决于诸如根节点选择、父节点选择和异步上电复位等因素。但简单来说，一个 ESP-MESH-LITE 网络的构建过程可以概括为以下步骤： 
+ESP-MESH-LITE 网络将首先选择根节点，然后逐层形成下行连接，直到所有节点均加入网络。网络的布局可能取决于诸如根节点选择、父节点选择和异步上电复位等因素。但简单来说，一个 ESP-MESH-LITE 网络的构建过程可以概括为以下步骤：
 
 ![ESP-MESH-LITE 网络构建过程示意图](https://docs.espressif.com/projects/esp-idf/zh_CN/v4.4.2/esp32/_images/mesh-network-building.png)
 
 <center>ESP-MESH-LITE 网络构建过程
-
 
 #### 1. 根节点选择
 
@@ -161,11 +158,11 @@ ESP-MESH-LITE 网络将首先选择根节点，然后逐层形成下行连接，
 
 ESP-MESH-LITE 默认首先上电的设备作为根节点，若存在多个设备同时上电，每个设备将首先连接至已配置的 Wi-Fi 路由器，之后每个设备将通过向路由器发出竞选广播，其中带有自己的 MAC 地址以及路由器 RSSI 值，**MAC 地址可以表示网络中的唯一节点**，而 **路由器 RSSI 值** 代表相对于路由器的信号强度。
 
-所有连接到同一路由器的 Mesh-Lite 设备（满足同一 Mesh-Lite ID）收到后，如果节点检测到具有更强的路由器 RSSI 的广播，则停止发送，即**“弃权”**。经过一定的等待时间后（默认 10s），所有弃权的设备将与路由器断开连接，重新扫描潜在父节点并选出首选父节点形成上行连接（即连接到根节点上作为二级节点，若二级节点连满，相应的会作为三级节点）。
+所有连接到同一路由器的 Mesh-Lite 设备（满足同一 Mesh-Lite ID）收到后，如果节点检测到具有更强的路由器 RSSI 的广播，则停止发送，即 **“弃权”**。经过一定的等待时间后（默认 10 s），所有弃权的设备将与路由器断开连接，重新扫描潜在父节点并选出首选父节点形成上行连接（即连接到根节点上作为二级节点，若二级节点连满，相应的会作为三级节点）。
 
 **提示**
 
-- 该方案也同时可解决根节点冲突，若在 Mesh-Lite 组网建立连接成功之后，出现了同一配置的设备连接连接到了同一路由器上（手动指定或者意外连接），那么也将通过该方式解决根节点冲突
+- 该方案也同时可解决根节点冲突。若在 Mesh-Lite 组网建立连接成功之后，出现了同一配置的设备连接连接到了同一路由器上（手动指定或者意外连接），那么也将通过该方式解决根节点冲突
 - 若想避免大量设备同时去连接路由器，建议将子节点上电和根节点上电时间错开，待根节点成功上电之后，再大批量上电子节点，这样子节点就能够及时发现根节点并形成连接。
 
 下图展示了在 ESP-MESH-LITE 网络中，根节点的自动选择过程。
@@ -175,11 +172,11 @@ ESP-MESH-LITE 默认首先上电的设备作为根节点，若存在多个设备
 <center>根节点选举示例
 
 
-**1.** 节点 A B C 同时上电后连接到路由器上，通过竞选，节点 C 具有最强的路由器 RSSI 值(-10 dB)。
+**1.** 节点 A/B/C 同时上电后连接到路由器上，通过竞选，节点 C 具有最强的路由器 RSSI 值 (-10 dB)。
 
-**2.** 节点 A B 从路由器上断开，重新扫描潜在父节点，节点 C 将成为节点 A/B 的首选父节点，并与之连接。节点 A/B 将形成网络的第二层。
+**2.** 节点 A/B 从路由器上断开，重新扫描潜在父节点，节点 C 将成为节点 A/B 的首选父节点，并与之连接。节点 A/B 将形成网络的第二层。
 
-**3.** 节点 D E 上电后，首先扫描是否存在潜在父节点，节点 C 将成为节点 D/E 的首选父节点（即最浅的节点），并与这些节点连接。节点 A/B/D/E 形成网络的第二层。
+**3.** 节点 D/E 上电后，首先扫描是否存在潜在父节点，节点 C 将成为节点 D/E 的首选父节点（即最浅的节点），并与这些节点连接。节点 A/B/D/E 形成网络的第二层。
 
 **4.** 节点 F 和节点 G 分别连接节点 D 和节点 E，并完成网络构建过程。
 
@@ -196,7 +193,7 @@ ESP-MESH-LITE 默认首先上电的设备作为根节点，若存在多个设备
 
 **2.** 节点 C 和节点 D 将节点 A 选为自己的首选父节点，并与其形成连接。这两个节点将形成网络的第二层。
 
-**3.** 类似地，节点 B 和节点 E 扫描到有合适的父节点节点 C ，将与节点 C 连接，节点 F 将与节点 D 连接。这三个节点将形成网络的第三层。
+**3.** 类似地，节点 B 和节点 E 扫描到有合适的父节点节点 C，将与节点 C 连接，节点 F 将与节点 D 连接。这三个节点将形成网络的第三层。
 
 **4.** 节点 G 将与节点 E 连接，形成网络的第四层。然而，由于该网络的最大允许层级已配置为 4，因此节点 G 将成为叶子节点，以防止形成任何新层。
 
@@ -210,7 +207,7 @@ ESP-MESH-LITE 网络构建可能会受到节点上电顺序的影响。如果网
 
 **规则 1**：如果网络中已存在根节点，则延迟节点上电后即使自身的路由器 RSSI 更强也不会尝试去连接路由器。相反，延迟节点与任何其他空闲节点无异，将通过与首选父节点连接来加入网络。如果该延迟节点为用户指定的根节点，其会直接连接至路由器，源根节点（非用户指定根节点，仅仅是 Mesh 组网逻辑竞选出的根节点）便会从路由器断开作为新根节点的子节点。
 
-**规则 2**：如果空闲节点的被用户指定层级，则该空闲节点在没有找到指定层级上一层的父节点之前不会尝试形成任何上行连接。空闲节点将无限期地保持空闲，直到其寻找到满足自己所指定层级的父节点。
+**规则 2**：如果空闲节点被用户指定层级，则该空闲节点在没有找到指定层级上一层的父节点之前不会尝试形成任何上行连接。空闲节点将无限期地保持空闲，直到其寻找到满足自己所指定层级的父节点。
 
 下方示例展示了异步上电对网络构建的影响。
 
@@ -229,7 +226,7 @@ ESP-MESH-LITE 网络构建可能会受到节点上电顺序的影响。如果网
 
 ### 环路避免、检测和处理
 
-环路是指特定节点与其后代节点（特定节点子网中的节点）形成上行连接的情况。因此产生的循环连接路径将打破 mesh 网络的树型拓扑结构。ESP-MESH-LITE 内部具有一定的环路检测机制来避免意外情况下节点与其子网中的节点建立上行连接并形成环路。
+环路是指特定节点与其后代节点（特定节点子网中的节点）形成上行连接的情况。因此产生的循环连接路径将打破 Mesh 网络的树型拓扑结构。ESP-MESH-LITE 内部具有一定的环路检测机制来避免意外情况下节点与其子网中的节点建立上行连接并形成环路。
 
 
 
@@ -325,7 +322,7 @@ ESP-MESH-LITE 网络的常见性能指标如下表所示：
 
     子节点断开：< 45 秒
 
-- 每条延迟：8 到 12 毫秒
+- 每跳延迟：8 到 12 毫秒
 
 **备注**
 
@@ -346,9 +343,11 @@ ESP-MESH-LITE 网络的常见性能指标如下表所示：
 ## <span id = "7">ESP-MESH-LITE 与 [ESP-MESH](https://docs.espressif.com/projects/esp-idf/zh_CN/v4.4.2/esp32/api-guides/esp-wifi-mesh.html) 差异</span>
 
 - ESP-MESH-LITE 相较于 ESP-MESH 会节省出更多的内存空间，但 ESP-MESH 的自组网和自修复的特性相对来说更加完善。
+
 - ESP-MESH-LITE 跟 ESP-MESH 自动选择父节点方式不同。
     - ESP-MESH：在上电后所有设备处于空闲节点的时候进行竞选，根据 RSSI 选出根节点，之后根节点再连接路由器。
     - ESP-MESH-LITE：默认首先配网完上电的设备作为根节点，若同时有多个设备上电，设备都连到路由器上面后，所有设备开始广播路由器 RSSI，RSSI 最好的作为根节点，其余节点断开与路由器的连接，开始重新扫描发现新的父节点。
+
 - ESP-MESH 只有根节点使能 LWIP 堆栈，所有子节点设备想要与外部网络通信都需要通过根节点的转发。
 
 
@@ -395,7 +394,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 
 **备注**
 
-具体配网代码修改请参考 [Wi-Fi Provisioning](https://github.com/espressif/esp-mdf/tree/master/examples/mesh_lite/rainmaker/common/app_wifi/app_wifi.c#L194-L227)
+具体配网代码修改请参考 [Wi-Fi Provisioning](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker_led_light/components/app_wifi/app_wifi.c)
 
 除了配网连接部分的修改，其余的网络应用（Socket、MQTT、HTTP 等）均不需要修改
 
@@ -404,6 +403,6 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 ## <span id = "9">更多注意事项</span>
 
 - 数据传输使用 Wi-Fi WPA2-PSK 加密（SoftAP 需设置密码）
-- Mesh 网络内部节点间通信可选择使用 AES 加密（见 [Mesh-Lite API 详解](https://github.com/espressif/esp-mdf/tree/master/components/mesh_lite/include/esp_mesh_lite_core.h#L285-L297)）
+- Mesh 网络内部节点间通信可以通过 `esp_mesh_lite_aes_set_key` 选择使用 AES128 加密（见 [Mesh-Lite API 详解](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/include/esp_mesh_lite_core.h)）
 
 本文图片中使用的路由器与互联网图标来自 [www.flaticon.com](https://smashicons.com/) 的 [Smashicons](https://smashicons.com/)。
