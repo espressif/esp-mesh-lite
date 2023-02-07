@@ -351,17 +351,19 @@ esp_err_t app_rmaker_mesh_lite_service_create(void)
         esp_rmaker_device_add_param(service, random_param);
 
         /* Get Wi-Fi Station configuration */
-        char ssid_temp[32];
-        char psw_temp[64];
-        memset(ssid_temp, 0x0, 32);
-        memset(psw_temp, 0x0, 64);
+        char softap_ssid[32];
+        char softap_psw[64];
+        memset(softap_ssid, 0x0, 32);
+        memset(softap_psw, 0x0, 64);
 
-        esp_mesh_lite_nvs_get_str("softap_ssid", ssid_temp);
-        ssid_param = esp_rmaker_param_create(ESP_RMAKER_MESH_LITE_SERVICE_SSID, "esp.param.ssid", esp_rmaker_str((const char*)ssid_temp), PROP_FLAG_READ);
+        size_t softap_ssid_len = sizeof(softap_ssid);
+        esp_mesh_lite_get_softap_ssid_from_nvs(softap_ssid, &softap_ssid_len);
+        ssid_param = esp_rmaker_param_create(ESP_RMAKER_MESH_LITE_SERVICE_SSID, "esp.param.ssid", esp_rmaker_str((const char*)softap_ssid), PROP_FLAG_READ);
         esp_rmaker_device_add_param(service, ssid_param);
 
-        esp_mesh_lite_nvs_get_str("softap_psw", psw_temp);
-        password_param = esp_rmaker_param_create(ESP_RMAKER_MESH_LITE_SERVICE_PASSWORD, "esp.param.password", esp_rmaker_str((const char*)psw_temp), PROP_FLAG_READ);
+        size_t softap_psw_len = sizeof(softap_psw);
+        esp_mesh_lite_get_softap_psw_from_nvs(softap_psw, &softap_psw_len);
+        password_param = esp_rmaker_param_create(ESP_RMAKER_MESH_LITE_SERVICE_PASSWORD, "esp.param.password", esp_rmaker_str((const char*)softap_psw), PROP_FLAG_READ);
         esp_rmaker_device_add_param(service, password_param);
 
         char* self_ip_string = esp_rmaker_mesh_lite_self_ip_format(NULL, NULL);
@@ -401,10 +403,12 @@ esp_err_t app_rmaker_enable_bridge(void)
 
     wifi_config_t wifi_cfg;
     memset(&wifi_cfg, 0x0, sizeof(wifi_config_t));
-    if (esp_mesh_lite_nvs_get_str("softap_ssid", (char *)wifi_cfg.ap.ssid) != ESP_OK) {
+    size_t softap_ssid_len = sizeof(wifi_cfg.ap.ssid);
+    if (esp_mesh_lite_get_softap_ssid_from_nvs((char *)wifi_cfg.ap.ssid, &softap_ssid_len) != ESP_OK) {
         snprintf((char *)wifi_cfg.ap.ssid, sizeof(wifi_cfg.ap.ssid), "%s", CONFIG_ESP_BRIDGE_SOFTAP_SSID);
     }
-    if (esp_mesh_lite_nvs_get_str("softap_psw", (char *)wifi_cfg.ap.password) != ESP_OK) {
+    size_t softap_psw_len = sizeof(wifi_cfg.ap.password);
+    if (esp_mesh_lite_get_softap_psw_from_nvs((char *)wifi_cfg.ap.password, &softap_psw_len) != ESP_OK) {
         strlcpy((char *)wifi_cfg.ap.password, CONFIG_ESP_BRIDGE_SOFTAP_PASSWORD, sizeof(wifi_cfg.ap.password));
     }
     esp_bridge_wifi_set(WIFI_MODE_AP, (char *)wifi_cfg.ap.ssid, (char *)wifi_cfg.ap.password, NULL);
