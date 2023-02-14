@@ -58,20 +58,23 @@ extern const char* ESP_MESH_LITE_EVENT;
 STATIC_ASSERT((sizeof(CONFIG_ESP_BRIDGE_SOFTAP_SSID) + SSID_MAC_LEN) < (32 + 2))
 STATIC_ASSERT(sizeof(CONFIG_ESP_BRIDGE_SOFTAP_PASSWORD) < (63 + 2))
 
-#define ESP_MESH_LITE_DEFAULT_INIT()                                                           \
-    {                                                                                          \
-        .vendor_id = {CONFIG_MESH_LITE_VENDOR_ID_0, CONFIG_MESH_LITE_VENDOR_ID_1},             \
-        .mesh_id = CONFIG_MESH_LITE_ID,                                                        \
-        .max_connect_number = CONFIG_ESP_BRIDGE_SOFTAP_MAX_CONNECT_NUMBER,                     \
-        .max_router_number = CONFIG_MESH_LITE_MAX_ROUTER_NUMBER,                               \
-        .max_level = CONFIG_MESH_LITE_MAXIMUM_LEVEL_ALLOWED,                                   \
-        .end_with_mac = ESP_MESH_LITE_SOFTAP_SSID_END_WITH_THE_MAC,                            \
-        .join_mesh_ignore_router_status = JOIN_MESH_IGNORE_ROUTER_STATUS,                      \
-        .join_mesh_without_configured_wifi = JOIN_MESH_WITHOUT_CONFIGURED_WIFI_INFO,           \
-        .softap_ssid = CONFIG_ESP_BRIDGE_SOFTAP_SSID,                                          \
-        .softap_password = CONFIG_ESP_BRIDGE_SOFTAP_PASSWORD,                                  \
-    }
+#define ESP_MESH_LITE_DEFAULT_INIT() { \
+    .vendor_id = {CONFIG_MESH_LITE_VENDOR_ID_0, CONFIG_MESH_LITE_VENDOR_ID_1}, \
+    .mesh_id = CONFIG_MESH_LITE_ID, \
+    .max_connect_number = CONFIG_ESP_BRIDGE_SOFTAP_MAX_CONNECT_NUMBER, \
+    .max_router_number = CONFIG_MESH_LITE_MAX_ROUTER_NUMBER, \
+    .max_level = CONFIG_MESH_LITE_MAXIMUM_LEVEL_ALLOWED, \
+    .end_with_mac = ESP_MESH_LITE_SOFTAP_SSID_END_WITH_THE_MAC, \
+    .join_mesh_ignore_router_status = JOIN_MESH_IGNORE_ROUTER_STATUS, \
+    .join_mesh_without_configured_wifi = JOIN_MESH_WITHOUT_CONFIGURED_WIFI_INFO, \
+    .softap_ssid = CONFIG_ESP_BRIDGE_SOFTAP_SSID, \
+    .softap_password = CONFIG_ESP_BRIDGE_SOFTAP_PASSWORD \
+}
 
+/**
+ * @brief Mesh-Lite event declarations
+ *
+ */
 typedef enum {
     ESP_MESH_LITE_EVENT_CORE_STARTED,
     ESP_MESH_LITE_EVENT_CORE_INHERITED_NET_SEGMENT_CHANGED,
@@ -79,25 +82,33 @@ typedef enum {
     ESP_MESH_LITE_EVENT_CORE_MAX,
 } esp_mesh_lite_event_core_t;
 
+/**
+ * @brief Mesh-Lite configuration parameters passed to esp_mesh_lite_core_init call.
+ */
 typedef struct {
-    uint8_t vendor_id[2];
-    uint8_t mesh_id;
-    uint8_t max_connect_number;
-    uint8_t max_router_number;
-    uint8_t max_level;
-    bool end_with_mac;
-    bool join_mesh_ignore_router_status;
-    bool join_mesh_without_configured_wifi;
-    const char* softap_ssid;
-    const char* softap_password;
+    uint8_t vendor_id[2];                   /**< The VID_1, VID_2 of Mesh-Lite */
+    uint8_t mesh_id;                        /**< The Mesh_ID of Mesh-Lite */
+    uint8_t max_connect_number;             /**< Max number of stations allowed to connect in */
+    uint8_t max_router_number;              /**< Maximum number of trace router number */
+    uint8_t max_level;                      /**< The maximum level allowed of Mesh-Lite */
+    bool end_with_mac;                      /**< Whether to add Mac information to the suffix of softap ssid */
+    bool join_mesh_ignore_router_status;    /**< Join Mesh no matter whether the node is connected to router */
+    bool join_mesh_without_configured_wifi; /**< Join Mesh without configured with information */
+    const char* softap_ssid;                /**< SoftAP SSID */
+    const char* softap_password;            /**< SoftAP Password */
 } esp_mesh_lite_config_t;
 
 typedef cJSON* (*msg_process_cb_t)(cJSON *payload, uint32_t seq);
 
+/**
+ * @brief Mesh-Lite message action parameters passed to esp_mesh_lite_msg_action_list_register call.
+ */
 typedef struct esp_mesh_lite_msg_action {
-    const char* type;
-    const char* rsp_type;
-    msg_process_cb_t process;
+    const char* type;         /**< The type of message sent */
+    const char* rsp_type;     /**< The message type expected to be received*/
+                              /**< When a message of the expected type is received, stop retransmitting*/
+                              /**< If set to NULL, it will be sent until the maximum number of retransmissions is reached*/
+    msg_process_cb_t process; /**< The callback function when receiving the 'type' message, The cjson information in the type message can be processed in this cb*/
 } esp_mesh_lite_msg_action_t;
 
 
@@ -106,12 +117,12 @@ typedef struct esp_mesh_lite_msg_action {
 /*****************************************************/
 
 /**
-  * @brief Check if the network segment is used to avoid conflicts.
-  * 
-  * @return
-  *     - true :be used
-  *     - false:not used
-  */
+ * @brief Check if the network segment is used to avoid conflicts.
+ *
+ * @return
+ *     - true :be used
+ *     - false:not used
+ */
 bool esp_mesh_lite_network_segment_is_used(uint32_t ip);
 
 /**
@@ -320,7 +331,7 @@ esp_err_t esp_mesh_lite_try_sending_msg(char* send_msg,
 /**
  * @brief Register custom message reception and recovery logic
  * 
- * @attention  Please refer to examples/rainmaker/common/app_bridge/app_bridge.c
+ * @attention  Please refer to components/mesh_lite/src/esp_mesh_lite.c
  *
  * @param[in] msg_action
  * 
@@ -330,7 +341,7 @@ esp_err_t esp_mesh_lite_msg_action_list_register(const esp_mesh_lite_msg_action_
 /**
  * @brief Register custom message reception and recovery logic
  * 
- * @attention  Please refer to examples/rainmaker/common/app_bridge/app_bridge.c
+ * @attention  Please refer to components/mesh_lite/src/esp_mesh_lite.c
  *
  * @param[in] msg_action
  * 

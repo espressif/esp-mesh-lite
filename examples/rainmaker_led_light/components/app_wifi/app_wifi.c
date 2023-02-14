@@ -316,13 +316,13 @@ static esp_err_t rainmaker_mesh_lite_handler(uint32_t session_id, const uint8_t 
     item = cJSON_GetObjectItem(root, "password");
     if (item) {
         strlcpy((char *)config.password, item->valuestring, sizeof(config.password));
-        esp_mesh_lite_nvs_set_str("softap_psw", (char *)config.password);
+        esp_mesh_lite_set_softap_psw_to_nvs((char *)config.password);
         ESP_LOGI(TAG, "[SoftAP psw]: %s", config.password);
     }
 
     item = cJSON_GetObjectItem(root, "ssid");
     if (item) {
-        esp_mesh_lite_nvs_set_str("softap_ssid", item->valuestring);
+        esp_mesh_lite_set_softap_ssid_to_nvs(item->valuestring);
         esp_mesh_lite_set_softap_info(item->valuestring, (char*)config.password, true);
 
         char softap_ssid[33];

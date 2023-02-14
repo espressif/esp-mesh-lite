@@ -37,8 +37,6 @@ static const char *TAG = "router_example";
  */
 static int socket_tcp_client_create(const char *ip, uint16_t port)
 {
-    // MDF_PARAM_CHECK(ip);
-
     ESP_LOGI(TAG, "Create a tcp client, ip: %s, port: %d", ip, port);
 
     esp_err_t ret = ESP_OK;
@@ -192,10 +190,12 @@ static esp_err_t wifi_init(void)
 
     // Softap
     memset(&wifi_config, 0x0, sizeof(wifi_config_t));
-    if (esp_mesh_lite_nvs_get_str("softap_ssid", (char *)wifi_config.ap.ssid) != ESP_OK) {
+    size_t softap_ssid_len = sizeof(wifi_config.ap.ssid);
+    if (esp_mesh_lite_get_softap_ssid_from_nvs((char *)wifi_config.ap.ssid, &softap_ssid_len) != ESP_OK) {
         snprintf((char *)wifi_config.ap.ssid, sizeof(wifi_config.ap.ssid), "%s", CONFIG_ESP_BRIDGE_SOFTAP_SSID);
     }
-    if (esp_mesh_lite_nvs_get_str("softap_psw", (char *)wifi_config.ap.password) != ESP_OK) {
+    size_t softap_psw_len = sizeof(wifi_config.ap.password);
+    if (esp_mesh_lite_get_softap_psw_from_nvs((char *)wifi_config.ap.password, &softap_psw_len) != ESP_OK) {
         strlcpy((char *)wifi_config.ap.password, CONFIG_ESP_BRIDGE_SOFTAP_PASSWORD, sizeof(wifi_config.ap.password));
     }
     esp_bridge_wifi_set(WIFI_MODE_AP, (char *)wifi_config.ap.ssid, (char *)wifi_config.ap.password, NULL);
