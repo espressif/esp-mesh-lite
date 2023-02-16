@@ -1,16 +1,8 @@
-// Copyright 2017 Espressif Systems (Shanghai) PTE LTD
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*
+ * SPDX-FileCopyrightText: 2022-2023 Espressif Systems (Shanghai) CO LTD
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #include <inttypes.h>
 #include "esp_log.h"
@@ -30,7 +22,7 @@
 #define PAYLOAD_LEN       (1456) /**< Max payload size(in bytes) */
 
 static int g_sockfd    = -1;
-static const char *TAG = "router_example";
+static const char *TAG = "local_control";
 
 /**
  * @brief Create a tcp client
@@ -121,7 +113,7 @@ void tcp_client_write_task(void *arg)
 /**
  * @brief Timed printing system information
  */
-static void print_system_info_timercb(void *timer)
+static void print_system_info_timercb(TimerHandle_t timer)
 {
     uint8_t primary                 = 0;
     uint8_t sta_mac[6]              = {0};

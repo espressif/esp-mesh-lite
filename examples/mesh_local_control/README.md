@@ -1,6 +1,6 @@
 - [中文版本](./README_CN.md)
 
-# Mwifi Router Example
+# Mesh Local Control Example
 
 ## Introduction
 
