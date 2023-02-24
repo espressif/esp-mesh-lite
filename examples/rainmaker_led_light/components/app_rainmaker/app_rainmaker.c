@@ -5,25 +5,14 @@
  */
 
 #include <string.h>
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
 #include <esp_log.h>
-#include <esp_rmaker_core.h>
 #include <esp_rmaker_standard_params.h>
-#include <esp_rmaker_standard_devices.h>
 #include <esp_rmaker_ota.h>
-#include <esp_rmaker_schedule.h>
 #include <esp_rmaker_common_events.h>
-#include <esp_rmaker_user_mapping.h>
 
-#include <app_wifi.h>
-#include <app_insights.h>
+#include <cJSON.h>
 #include <app_light.h>
-
-#include "cJSON.h"
-#include "esp_mesh_lite.h"
-#include "esp_rmaker_mqtt.h"
-#include "esp_rmaker_mqtt_glue.h"
+#include <app_rainmaker_ota.h>
 
 static const char *TAG = "app_rainmaker";
 
@@ -93,9 +82,11 @@ static void event_handler(void* arg, esp_event_base_t event_base,
             case RMAKER_MQTT_EVENT_PUBLISHED: {
                 static uint8_t resubscribe = 3;
                 if (resubscribe) {
-                    char subscribe_topic[150];
-                    snprintf(subscribe_topic, sizeof(subscribe_topic), "node/%s/params/remote",
-                                esp_rmaker_get_node_id());
+                    // "params/remote" topic resubscribe
+                    char subscribe_topic[MQTT_TOPIC_BUFFER_SIZE];
+                    memset(subscribe_topic, 0, sizeof(subscribe_topic));
+                    snprintf(subscribe_topic, sizeof(subscribe_topic), "node/%s/%s",
+                                esp_rmaker_get_node_id(), NODE_PARAMS_REMOTE_TOPIC_SUFFIX);
                     esp_err_t err = esp_rmaker_mqtt_unsubscribe(subscribe_topic);
                     if (err == ESP_OK) {
                         err = esp_rmaker_mqtt_subscribe(subscribe_topic, esp_rmaker_app_set_params_callback, RMAKER_MQTT_QOS1, NULL);
@@ -103,8 +94,12 @@ static void event_handler(void* arg, esp_event_base_t event_base,
                             ESP_LOGE(TAG, "Failed to subscribe to %s. Error %d", subscribe_topic, err);
                         }
                     }
+
+                    // "otaurl" topic resubscribe
+                    esp_rmaker_mesh_lite_ota_subscribe_topic();
+
                     resubscribe--;
-                    ESP_LOGI(TAG, "MQTT resubscribe");
+                    ESP_LOGI(TAG, "MQTT Resubscribe [%s]", NODE_PARAMS_REMOTE_TOPIC_SUFFIX);
                 }
                 break;
             }
@@ -254,8 +249,11 @@ void app_rainmaker_start(void)
     /* Enable OTA */
     esp_rmaker_ota_config_t ota_config = {
         .server_cert = ota_server_cert,
+        .ota_cb      = esp_rmaker_mesh_lite_ota_cb,
     };
     esp_rmaker_ota_enable(&ota_config, OTA_USING_TOPICS);
+
+    esp_rmaker_mesh_lite_ota_init(&ota_config);
 
     /* Enable timezone service which will be require for setting appropriate timezone
      * from the phone apps for scheduling to work correctly.
