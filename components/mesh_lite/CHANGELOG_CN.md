@@ -1,14 +1,18 @@
-# v0.1.1
+# ChangeLog
 
-适配 iot_bridge(0.2.0) 组件
+## v0.1.1 - 2023-3-1
 
-# v0.1.0
+### 功能:
+
+适配 iot_bridge(0.*) 组件
+
+## v0.1.0 - 2023-2-7
 
 这是 mesh-lite 组件的第一个发布版本，更多关于项目的详细说明，请参考 [ESP-MESH-LITE](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/README_CN.md).
 
-## Feature
+### 功能:
 
-### Mesh
+#### Mesh
 
 - 支持 mesh 网络自修复
 - 支持即使在没有连接路由器的情况下根节点也可以建立 mesh 网络
@@ -25,14 +29,14 @@
 - 支持对 mesh 网络间的数据通信进行加密
 - 支持 mesh 网络内部 OTA 升级
 
-## 支持的芯片
+#### 支持的芯片
 
 - ESP32
 - ESP32-C3
 - ESP32-S2
 - ESP32-S3
 
-## 支持的 ESP-IDF 版本
+#### 支持的 ESP-IDF 版本
 
 - v4.4
 - v5.0

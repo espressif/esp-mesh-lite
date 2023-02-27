@@ -1,4 +1,4 @@
-- [中文版本](./README_CN.md)
+- [中文版本](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker_led_light/README_CN.md)
 
 # LED Light Example(Nove Home)
 
@@ -29,7 +29,7 @@ Refer to [README](https://github.com/espressif/esp-iot-bridge/blob/master/compon
 ### 4. Mesh-Lite function
 
 - You can choose whether to enable the Mesh-Lite function in the menuconfig `Bridge Configuration -> The Interface used to provide network data forwarding for other devices -> Enable Mesh-Lite`. This example enables this function by default.
-- If the Mesh-Lite function is enabled, the first networked device will connect to the target router and serve as the root node, and subsequent devices will be connected to the root node device and act as child nodes to form a Mesh-Lite network. For details, please refer to [Mesh-Lite](../../../components/mesh_lite/README_CN.md).
+- If the Mesh-Lite function is enabled, the first networked device will connect to the target router and serve as the root node, and subsequent devices will be connected to the root node device and act as child nodes to form a Mesh-Lite network. For details, please refer to [Mesh-Lite](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/User_Guide.md).
 
 ### 5. Build & Flash
 
