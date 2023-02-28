@@ -77,11 +77,6 @@ dependencies:
     git: https://github.com/espressif/esp-rainmaker.git
     version: 4f5a886
 
-  ws2812_led:
-    path: components/ws2812_led
-    git: https://github.com/espressif/esp-rainmaker.git
-    version: 4f5a886
-
   app_insights:
     path: examples/common/app_insights
     git: https://github.com/espressif/esp-rainmaker.git
