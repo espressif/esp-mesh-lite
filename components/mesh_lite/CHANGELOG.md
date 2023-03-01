@@ -1,3 +1,9 @@
+- [中文版本](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/CHANGELOG_CN.md)
+
+# v0.1.1
+
+Adapt to iot_bridge(0.2.0) component.
+
 # v0.1.0
 
 This is the first released version for mesh-lite component, more detailed descriptions about the project, please refer to [ESP-MESH-LITE](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/README.md).
@@ -19,6 +25,7 @@ This is the first released version for mesh-lite component, more detailed descri
   - Child node sends message to parent node
   - Parent node sends broadcast message to child nodes
 - Support encryption of data communication between mesh network
+- Support OTA upgrade within the mesh network
 
 ## Supported Socs
 

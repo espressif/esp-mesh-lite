@@ -333,7 +333,7 @@ static esp_err_t rainmaker_mesh_lite_handler(uint32_t session_id, const uint8_t 
         ESP_LOGI(TAG, "[SoftAP ssid]: %s", (char *)config.ssid);
     }
 
-    config.max_connection = CONFIG_ESP_BRIDGE_SOFTAP_MAX_CONNECT_NUMBER;
+    config.max_connection = CONFIG_BRIDGE_SOFTAP_MAX_CONNECT_NUMBER;
     config.authmode = strlen((char*)config.password) < 8 ? WIFI_AUTH_OPEN : WIFI_AUTH_WPA2_PSK;
     ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, (wifi_config_t*)&config));
 

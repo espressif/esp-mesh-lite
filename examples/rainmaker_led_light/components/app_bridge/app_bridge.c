@@ -43,7 +43,7 @@ static const char *TAG = "app_bridge";
 #define ESP_RMAKER_MESH_LITE_SERVICE_CHILD_MAC  "child_mac"
 #define ESP_RMAKER_MESH_LITE_SERVICE_MESH_GROUP "mesh_group"
 
-#define MAX_STATION CONFIG_ESP_BRIDGE_SOFTAP_MAX_CONNECT_NUMBER
+#define MAX_STATION CONFIG_BRIDGE_SOFTAP_MAX_CONNECT_NUMBER
 
 static esp_rmaker_param_t *level_param;
 static esp_rmaker_param_t *mesh_id_param;
@@ -405,11 +405,11 @@ esp_err_t app_rmaker_enable_bridge(void)
     memset(&wifi_cfg, 0x0, sizeof(wifi_config_t));
     size_t softap_ssid_len = sizeof(wifi_cfg.ap.ssid);
     if (esp_mesh_lite_get_softap_ssid_from_nvs((char *)wifi_cfg.ap.ssid, &softap_ssid_len) != ESP_OK) {
-        snprintf((char *)wifi_cfg.ap.ssid, sizeof(wifi_cfg.ap.ssid), "%s", CONFIG_ESP_BRIDGE_SOFTAP_SSID);
+        snprintf((char *)wifi_cfg.ap.ssid, sizeof(wifi_cfg.ap.ssid), "%s", CONFIG_BRIDGE_SOFTAP_SSID);
     }
     size_t softap_psw_len = sizeof(wifi_cfg.ap.password);
     if (esp_mesh_lite_get_softap_psw_from_nvs((char *)wifi_cfg.ap.password, &softap_psw_len) != ESP_OK) {
-        strlcpy((char *)wifi_cfg.ap.password, CONFIG_ESP_BRIDGE_SOFTAP_PASSWORD, sizeof(wifi_cfg.ap.password));
+        strlcpy((char *)wifi_cfg.ap.password, CONFIG_BRIDGE_SOFTAP_PASSWORD, sizeof(wifi_cfg.ap.password));
     }
     esp_bridge_wifi_set(WIFI_MODE_AP, (char *)wifi_cfg.ap.ssid, (char *)wifi_cfg.ap.password, NULL);
     esp_mesh_lite_config_t mesh_lite_config = ESP_MESH_LITE_DEFAULT_INIT();

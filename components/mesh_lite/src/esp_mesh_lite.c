@@ -208,6 +208,8 @@ esp_err_t esp_web_wifi_connect(wifi_sta_config_t *conf)
 
 void esp_mesh_lite_init(esp_mesh_lite_config_t* config)
 {
+    ESP_LOGI(TAG, "esp-mesh-lite component version: %d.%d.%d", MESH_LITE_VER_MAJOR, MESH_LITE_VER_MINOR, MESH_LITE_VER_PATCH);
+
     esp_bridge_network_segment_check_register(esp_mesh_lite_network_segment_is_used);
     esp_event_handler_instance_register(ESP_MESH_LITE_EVENT, ESP_EVENT_ANY_ID, &esp_mesh_lite_event_ip_changed_handler, NULL, NULL);
 

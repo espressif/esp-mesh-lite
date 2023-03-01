@@ -60,13 +60,13 @@ extern const char* ESP_MESH_LITE_EVENT;
 #endif
 
 #define STATIC_ASSERT(condition) typedef char p__LINE__[ (condition) ? 1 : -1];
-STATIC_ASSERT((sizeof(CONFIG_ESP_BRIDGE_SOFTAP_SSID) + SSID_MAC_LEN) < (32 + 2))
-STATIC_ASSERT(sizeof(CONFIG_ESP_BRIDGE_SOFTAP_PASSWORD) < (63 + 2))
+STATIC_ASSERT((sizeof(CONFIG_BRIDGE_SOFTAP_SSID) + SSID_MAC_LEN) < (32 + 2))
+STATIC_ASSERT(sizeof(CONFIG_BRIDGE_SOFTAP_PASSWORD) < (63 + 2))
 
 #define ESP_MESH_LITE_DEFAULT_INIT() { \
     .vendor_id = {CONFIG_MESH_LITE_VENDOR_ID_0, CONFIG_MESH_LITE_VENDOR_ID_1}, \
     .mesh_id = CONFIG_MESH_LITE_ID, \
-    .max_connect_number = CONFIG_ESP_BRIDGE_SOFTAP_MAX_CONNECT_NUMBER, \
+    .max_connect_number = CONFIG_BRIDGE_SOFTAP_MAX_CONNECT_NUMBER, \
     .max_router_number = CONFIG_MESH_LITE_MAX_ROUTER_NUMBER, \
     .max_level = CONFIG_MESH_LITE_MAXIMUM_LEVEL_ALLOWED, \
     .end_with_mac = ESP_MESH_LITE_SOFTAP_SSID_END_WITH_THE_MAC, \
@@ -74,8 +74,8 @@ STATIC_ASSERT(sizeof(CONFIG_ESP_BRIDGE_SOFTAP_PASSWORD) < (63 + 2))
     .join_mesh_without_configured_wifi = JOIN_MESH_WITHOUT_CONFIGURED_WIFI_INFO, \
     .ota_data_len = OTA_DATA_LEN, \
     .ota_wnd = OTA_WND_DEFAULT, \
-    .softap_ssid = CONFIG_ESP_BRIDGE_SOFTAP_SSID, \
-    .softap_password = CONFIG_ESP_BRIDGE_SOFTAP_PASSWORD, \
+    .softap_ssid = CONFIG_BRIDGE_SOFTAP_SSID, \
+    .softap_password = CONFIG_BRIDGE_SOFTAP_PASSWORD, \
     .device_category = CONFIG_DEVICE_CATEGORY \
 }
 
