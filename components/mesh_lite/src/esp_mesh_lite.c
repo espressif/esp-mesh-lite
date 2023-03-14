@@ -186,26 +186,6 @@ static void esp_mesh_lite_event_ip_changed_handler(void *arg, esp_event_base_t e
     }
 }
 
-#if defined(CONFIG_ESP_BRIDGE_PROV_TRANSPORT)
-esp_err_t wifi_prov_wifi_connect(wifi_sta_config_t *conf)
-{
-    esp_err_t ret = esp_mesh_lite_set_router_config(conf);
-    esp_mesh_lite_connect();
-
-    return ret;
-}
-#endif
-
-#if defined(CONFIG_BRIDGE_USE_WEB_SERVER)
-esp_err_t esp_web_wifi_connect(wifi_sta_config_t *conf)
-{
-    esp_err_t ret = esp_mesh_lite_set_router_config(conf);
-    esp_mesh_lite_connect();
-
-    return ret;
-}
-#endif
-
 void esp_mesh_lite_init(esp_mesh_lite_config_t* config)
 {
     ESP_LOGI(TAG, "esp-mesh-lite component version: %d.%d.%d", MESH_LITE_VER_MAJOR, MESH_LITE_VER_MINOR, MESH_LITE_VER_PATCH);
