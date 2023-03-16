@@ -1,4 +1,4 @@
-- [English Version](./README.md)
+- [English Version](https://github.com/espressif/esp-mesh-lite/blob/master/examples/mesh_local_control/README.md)
 
 # Mesh-Lite 局域网控制示例
 

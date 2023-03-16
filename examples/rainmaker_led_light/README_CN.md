@@ -1,4 +1,4 @@
-- [English Version](./README.md)
+- [English Version](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker_led_light/README.md)
 
 # LED Light 示例(Nove Home)
 
@@ -31,7 +31,7 @@
 
 - 可以在 menuconfig 配置 `Bridge Configuration -> The Interface used to provide network data forwarding for other devices -> Enable Mesh-Lite` 中选择是否使能 Mesh-Lite 功能，本示例默认使能该功能。
 
-- 若开启 Mesh-Lite 功能，第一个配网的设备会连接至目标路由器并作为 Root 根结点，之后的设备均会连接至根结点设备并作为子节点组成一个 Mesh-Lite 网络，详情请参考 [Mesh-Lite](../../../components/mesh_lite/README_CN.md)。
+- 若开启 Mesh-Lite 功能，第一个配网的设备会连接至目标路由器并作为 Root 根结点，之后的设备均会连接至根结点设备并作为子节点组成一个 Mesh-Lite 网络，详情请参考 [Mesh-Lite](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/User_Guide_CN.md)。
 
 ### 5. 固件编译 & 烧录
 

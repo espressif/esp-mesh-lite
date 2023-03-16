@@ -1,4 +1,4 @@
-- [中文版本](./README_CN.md)
+- [中文版本](https://github.com/espressif/esp-mesh-lite/blob/master/examples/mesh_local_control/README_CN.md)
 
 # Mesh Local Control Example
 
