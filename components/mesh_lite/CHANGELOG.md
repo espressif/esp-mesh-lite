@@ -2,11 +2,17 @@
 
 # ChangeLog
 
+## v0.1.2 - 2023-3-26
+
+#### Supported ESP-IDF Version
+
+- Add v4.3
+
 ## v0.1.1 - 2023-3-1
 
 ### Enhancements:
 
-Adapt to iot_bridge(0.*) component.
+- Adapt to iot_bridge(0.*) component.
 
 ## v0.1.0 - 2023-2-7
 
