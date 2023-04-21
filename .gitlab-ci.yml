@@ -45,6 +45,41 @@ default:
   - idf.py build
   - cd -
 
+esp32_v4.3_build:
+  stage: build
+  image: espressif/idf:release-v4.3
+  tags:
+    - build
+
+  variables:
+    <<: *global-variables
+    idf_target: esp32
+    idf_branch: release/v4.3
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_mesh_local_control_example
+
+esp32_v4.4_build:
+  stage: build
+  image: espressif/idf:release-v4.4
+  tags:
+    - build
+
+  variables:
+    <<: *global-variables
+    idf_target: esp32
+    idf_branch: release/v4.4
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_mesh_local_control_example
+    - *build_rainmaker_led_light_example
+
 esp32_v5.0_build:
   stage: build
   image: espressif/idf:release-v5.0
@@ -55,6 +90,41 @@ esp32_v5.0_build:
     <<: *global-variables
     idf_target: esp32
     idf_branch: release/v5.0
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_mesh_local_control_example
+    - *build_rainmaker_led_light_example
+
+esp32c3_v4.3_build:
+  stage: build
+  image: espressif/idf:release-v4.3
+  tags:
+    - build
+
+  variables:
+    <<: *global-variables
+    idf_target: esp32c3
+    idf_branch: release/v4.3
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_mesh_local_control_example
+
+esp32c3_v4.4_build:
+  stage: build
+  image: espressif/idf:release-v4.4
+  tags:
+    - build
+
+  variables:
+    <<: *global-variables
+    idf_target: esp32c3
+    idf_branch: release/v4.4
 
   before_script:
     - *before_script_preparation
@@ -81,6 +151,40 @@ esp32c3_v5.0_build:
     - *build_mesh_local_control_example
     - *build_rainmaker_led_light_example
 
+esp32s2_v4.3_build:
+  stage: build
+  image: espressif/idf:release-v4.3
+  tags:
+    - build
+
+  variables:
+    <<: *global-variables
+    idf_target: esp32s2
+    idf_branch: release/v4.3
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_mesh_local_control_example
+
+esp32s2_v4.4_build:
+  stage: build
+  image: espressif/idf:release-v4.4
+  tags:
+    - build
+
+  variables:
+    <<: *global-variables
+    idf_target: esp32s2
+    idf_branch: release/v4.4
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_mesh_local_control_example
+
 esp32s2_v5.0_build:
   stage: build
   image: espressif/idf:release-v5.0
@@ -97,6 +201,24 @@ esp32s2_v5.0_build:
 
   script:
     - *build_mesh_local_control_example
+
+esp32s3_v4.4_build:
+  stage: build
+  image: espressif/idf:release-v4.4
+  tags:
+    - build
+
+  variables:
+    <<: *global-variables
+    idf_target: esp32s3
+    idf_branch: release/v4.4
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_mesh_local_control_example
+    - *build_rainmaker_led_light_example
 
 esp32s3_v5.0_build:
   stage: build

@@ -10,11 +10,13 @@
 #include "freertos/task.h"
 #include "freertos/timers.h"
 
-#include "esp_mac.h"
 #include "esp_wifi.h"
 #include "nvs_flash.h"
-
 #include <sys/socket.h>
+
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+#include "esp_mac.h"
+#endif
 
 #include "esp_bridge.h"
 #include "esp_mesh_lite.h"

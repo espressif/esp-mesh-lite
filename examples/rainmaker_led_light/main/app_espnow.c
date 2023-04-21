@@ -11,9 +11,12 @@
 #include "freertos/semphr.h"
 #include "esp_log.h"
 #include "cJSON.h"
-#include "esp_mac.h"
 #include "app_espnow.h"
 #include "esp_mesh_lite.h"
+
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+#include "esp_mac.h"
+#endif
 
 #define ESPNOW_MAXDELAY 512
 #define GROUP_CONTROL_PAYLOAD_LEN  250
