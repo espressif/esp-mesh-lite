@@ -470,32 +470,6 @@ pop_err:
     return NULL;
 }
 
-void app_wifi_init(void)
-{
-    /* Initialize TCP/IP */
-#ifdef ESP_NETIF_SUPPORTED
-    esp_netif_init();
-#else
-    tcpip_adapter_init();
-#endif
-
-    /* Initialize the event loop */
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
-    wifi_event_group = xEventGroupCreate();
-
-    /* Register our event handler for Wi-Fi, IP and Provisioning related events */
-    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_PROV_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL));
-    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL));
-    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler, NULL));
-
-    /* Initialize Wi-Fi including netif with default config */
-#ifdef ESP_NETIF_SUPPORTED
-    esp_netif_create_default_wifi_sta();
-#endif
-    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-}
-
 static void app_wifi_prov_stop(void *priv)
 {
     ESP_LOGW(TAG, "Provisioning timed out. Please reboot device to restart provisioning.");
@@ -553,7 +527,11 @@ esp_err_t app_wifi_start(app_wifi_pop_type_t pop_type)
          * to take care of this automatically. This can be set to
          * WIFI_PROV_EVENT_HANDLER_NONE when using wifi_prov_scheme_softap*/
 #ifdef CONFIG_APP_WIFI_PROV_TRANSPORT_BLE
+#ifdef IDF_TARGET_ESP32
         .scheme_event_handler = WIFI_PROV_SCHEME_BLE_EVENT_HANDLER_FREE_BTDM
+#else
+        .scheme_event_handler = WIFI_PROV_SCHEME_BLE_EVENT_HANDLER_FREE_BLE
+#endif
 #else /* CONFIG_APP_WIFI_PROV_TRANSPORT_SOFTAP */
         .scheme_event_handler = WIFI_PROV_EVENT_HANDLER_NONE,
 #endif /* CONFIG_APP_WIFI_PROV_TRANSPORT_BLE */
@@ -656,7 +634,6 @@ esp_err_t app_wifi_start(app_wifi_pop_type_t pop_type)
     /* Wait for Wi-Fi connection */
     xEventGroupWaitBits(wifi_event_group, WIFI_CONNECTED_EVENT, false, true, portMAX_DELAY);
 
-    ESP_ERROR_CHECK(esp_event_handler_unregister(WIFI_PROV_EVENT, ESP_EVENT_ANY_ID, &event_handler));
     ESP_ERROR_CHECK(esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler));
     ESP_ERROR_CHECK(esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler));
 

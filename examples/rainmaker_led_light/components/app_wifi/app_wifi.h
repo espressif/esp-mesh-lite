@@ -38,7 +38,6 @@ typedef enum {
     POP_TYPE_NONE
 } app_wifi_pop_type_t;
 
-void app_wifi_init();
 esp_err_t app_wifi_start(app_wifi_pop_type_t pop_type);
 
 #ifdef __cplusplus

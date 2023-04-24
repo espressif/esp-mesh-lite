@@ -1,0 +1,3 @@
+dependencies:
+  espressif/lightbulb_driver:
+    version: "0.2.2"
