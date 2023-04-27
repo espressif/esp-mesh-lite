@@ -50,12 +50,18 @@ static EventGroupHandle_t wifi_event_group;
 
 #define PROV_TRANSPORT_SOFTAP   "softap"
 #define PROV_TRANSPORT_BLE      "ble"
-#define QRCODE_BASE_URL     "https://rainmaker.espressif.com/qrcode.html"
+#define QRCODE_BASE_URL         "https://rainmaker.espressif.com/qrcode.html"
 
 #define CREDENTIALS_NAMESPACE   "rmaker_creds"
 #define RANDOM_NVS_KEY          "random"
 
-#define POP_STR_SIZE    9
+#define WIFI_MAC_ADDR_LEN       (6)
+#define MAX_SSID_LEN            (32)
+#define MAX_PASSWORD_LEN        (64)
+#define DEFAULT_SSID_PREFIX     "Nova_"
+#define DEFAULT_PASSWORD        "espressif"
+
+#define POP_STR_SIZE            (9)
 static esp_timer_handle_t prov_stop_timer;
 /* Timeout period in minutes */
 #define APP_WIFI_PROV_TIMEOUT_PERIOD   CONFIG_APP_WIFI_PROV_TIMEOUT_PERIOD
@@ -294,10 +300,17 @@ static esp_err_t rainmaker_mesh_lite_handler(uint32_t session_id, const uint8_t 
     ESP_LOGI(TAG, "Received data from APP: %.*s", inlen, (char *)inbuf);
     cJSON *root = cJSON_Parse((const char*)inbuf);
     cJSON *item = NULL;
+    char *out_data = NULL;
+    char *out_ssid = NULL;
+    char *out_password = NULL;
+    char softap_ssid[MAX_SSID_LEN + 1];
+    uint8_t softap_mac[WIFI_MAC_ADDR_LEN];
     uint8_t mesh_id = 0;
     uint32_t argot = 0;
     wifi_ap_config_t config;
     memset(&config, 0x0, sizeof(config));
+
+    esp_wifi_get_mac(WIFI_IF_AP, softap_mac);
 
     item = cJSON_GetObjectItem(root, "meshId");
     if (item) {
@@ -316,34 +329,64 @@ static esp_err_t rainmaker_mesh_lite_handler(uint32_t session_id, const uint8_t 
     item = cJSON_GetObjectItem(root, "password");
     if (item) {
         strlcpy((char *)config.password, item->valuestring, sizeof(config.password));
-        esp_mesh_lite_set_softap_psw_to_nvs((char *)config.password);
-        ESP_LOGI(TAG, "[SoftAP psw]: %s", config.password);
+    } else {
+        out_password = (char *) calloc(1, MAX_PASSWORD_LEN);
+        snprintf(out_password, MAX_PASSWORD_LEN, DEFAULT_PASSWORD);
+        strlcpy((char *)config.password, out_password, MAX_PASSWORD_LEN);
     }
+    esp_mesh_lite_set_softap_psw_to_nvs((char *)config.password);
+    ESP_LOGI(TAG, "[SoftAP psw]: %s", config.password);
 
     item = cJSON_GetObjectItem(root, "ssid");
     if (item) {
         esp_mesh_lite_set_softap_ssid_to_nvs(item->valuestring);
         esp_mesh_lite_set_softap_info(item->valuestring, (char*)config.password, true);
 
-        char softap_ssid[33];
-        uint8_t mac[6];
-        esp_wifi_get_mac(WIFI_IF_AP, mac);
-        snprintf(softap_ssid, sizeof(softap_ssid), "%.25s_%02x%02x%02x", item->valuestring, mac[3], mac[4], mac[5]);
+        snprintf(softap_ssid, sizeof(softap_ssid), "%.25s_%02x%02x%02x", item->valuestring, softap_mac[3], softap_mac[4], softap_mac[5]);
         memcpy((char *)config.ssid, softap_ssid, sizeof(config.ssid));
-        ESP_LOGI(TAG, "[SoftAP ssid]: %s", (char *)config.ssid);
+    } else {
+        out_ssid = (char *) calloc(1, MAX_SSID_LEN);
+        snprintf(out_ssid, MAX_SSID_LEN, DEFAULT_SSID_PREFIX "%02x%02x%02x", softap_mac[3], softap_mac[4], softap_mac[5]);
+        esp_mesh_lite_set_softap_ssid_to_nvs(out_ssid);
+        esp_mesh_lite_set_softap_info(out_ssid, (char*)config.password, true);
+
+        snprintf(softap_ssid, sizeof(softap_ssid), "%.25s_%02x%02x%02x", out_ssid, softap_mac[3], softap_mac[4], softap_mac[5]);
+        memcpy((char *)config.ssid, softap_ssid, sizeof(config.ssid));
+    }
+    ESP_LOGI(TAG, "[SoftAP ssid]: %s", (char *)config.ssid);
+
+    if (out_ssid && out_password) {
+        cJSON *out_json = cJSON_CreateObject();
+        if (out_json) {
+            cJSON_AddStringToObject(out_json, "ssid", out_ssid);
+            cJSON_AddStringToObject(out_json, "password", out_password);
+            out_data = cJSON_PrintUnformatted(out_json);
+
+            free(out_ssid);
+            out_ssid = NULL;
+            free(out_password);
+            out_password = NULL;
+            cJSON_Delete(out_json);
+        }
+    } else {
+        out_data = (char *) calloc(1, 8);
+        snprintf(out_data, 8, "SUCCESS");
     }
 
-    config.max_connection = CONFIG_BRIDGE_SOFTAP_MAX_CONNECT_NUMBER;
-    config.authmode = strlen((char*)config.password) < 8 ? WIFI_AUTH_OPEN : WIFI_AUTH_WPA2_PSK;
-    ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, (wifi_config_t*)&config));
-
-    char response[] = "SUCCESS";
-    *outbuf = (uint8_t *)strdup(response);
+    *outbuf = (uint8_t *)strdup(out_data);
     if (*outbuf == NULL) {
         ESP_LOGE(TAG, "System out of memory");
         return ESP_ERR_NO_MEM;
     }
-    *outlen = strlen(response) + 1; /* +1 for NULL terminating byte */
+    *outlen = strlen(out_data) + 1; /* +1 for NULL terminating byte */
+    ESP_LOGI(TAG, "Response len %d, packet: %s", *outlen, *outbuf);
+
+    free(out_data);
+    out_data = NULL;
+
+    config.max_connection = CONFIG_BRIDGE_SOFTAP_MAX_CONNECT_NUMBER;
+    config.authmode = strlen((char*)config.password) < 8 ? WIFI_AUTH_OPEN : WIFI_AUTH_WPA2_PSK;
+    ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, (wifi_config_t*)&config));
 
     ESP_LOGW("heap", "free heap %d, minimum %d", esp_get_free_heap_size(), esp_get_minimum_free_heap_size());
 
@@ -391,9 +434,9 @@ static esp_err_t get_device_service_name(char *service_name, size_t max)
     const char *ssid_prefix = CONFIG_APP_WIFI_PROV_NAME_PREFIX;
     size_t nvs_random_size = 0;
     if ((read_random_bytes_from_nvs(&nvs_random, &nvs_random_size) != ESP_OK) || nvs_random_size < 3) {
-        uint8_t eth_mac[6];
-        esp_wifi_get_mac(WIFI_IF_STA, eth_mac);
-        snprintf(service_name, max, "%s_%02x%02x%02x", ssid_prefix, eth_mac[3], eth_mac[4], eth_mac[5]);
+        uint8_t sta_mac[WIFI_MAC_ADDR_LEN];
+        esp_wifi_get_mac(WIFI_IF_STA, sta_mac);
+        snprintf(service_name, max, "%s_%02x%02x%02x", ssid_prefix, sta_mac[3], sta_mac[4], sta_mac[5]);
     } else {
         snprintf(service_name, max, "%s_%02x%02x%02x", ssid_prefix, nvs_random[nvs_random_size - 3],
                 nvs_random[nvs_random_size - 2], nvs_random[nvs_random_size - 1]);
@@ -441,10 +484,10 @@ static char *get_device_pop(app_wifi_pop_type_t pop_type)
     }
 
     if (pop_type == POP_TYPE_MAC) {
-        uint8_t eth_mac[6];
-        esp_err_t err = esp_wifi_get_mac(WIFI_IF_STA, eth_mac);
+        uint8_t sta_mac[WIFI_MAC_ADDR_LEN];
+        esp_err_t err = esp_wifi_get_mac(WIFI_IF_STA, sta_mac);
         if (err == ESP_OK) {
-            snprintf(pop, POP_STR_SIZE, "%02x%02x%02x%02x", eth_mac[2], eth_mac[3], eth_mac[4], eth_mac[5]);
+            snprintf(pop, POP_STR_SIZE, "%02x%02x%02x%02x", sta_mac[2], sta_mac[3], sta_mac[4], sta_mac[5]);
             return pop;
         } else {
             ESP_LOGE(TAG, "Failed to get MAC address to generate PoP.");
