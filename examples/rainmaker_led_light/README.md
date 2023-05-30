@@ -1,8 +1,8 @@
 - [中文版本](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker_led_light/README_CN.md)
 
-# LED Light Example(Nove Home)
+# LED Light Example(Nova Home)
 
-This example uses the Rainmaker cloud platform to demonstrate the ESP-IoT-Bridge **Wi-Fi router** function. User can configure the device through the `Nove Home` APP and successfully connect to the Rainmaker cloud. The device is connected to the cloud based on Rainmaker, It can also provide other devices with the ability to surf the Internet wirelessly, and form a network with the Mesh-Lite function, which greatly reduces the load on the router and expands the wireless communication range.
+This example uses the Rainmaker cloud platform to demonstrate the ESP-IoT-Bridge **Wi-Fi router** function. User can configure the device through the `Nova Home` APP and successfully connect to the Rainmaker cloud. The device is connected to the cloud based on Rainmaker, It can also provide other devices with the ability to surf the Internet wirelessly, and form a network with the Mesh-Lite function, which greatly reduces the load on the router and expands the wireless communication range.
 
 ## Get Start
 
@@ -42,9 +42,9 @@ $ idf.py build
 $ idf.py flash
 ```
 
-### 6. Add devices to Nove Home
+### 6. Add devices to Nova Home
 
-- Open `Nove Home`, the APP will automatically search for the device to be configured
+- Open `Nova Home`, the APP will automatically search for the device to be configured
 
 <img src="./_static/find_devices.jpg" alt="find_devices" width="25%" div align=center />
 
@@ -70,4 +70,4 @@ $ idf.py flash
 
 ### 7. Precautions
 
-- Currently `Nove Home` only supports Wi-Fi Provisioning over Bluetooth Low Energy, so this example does not support ESP32-S2 chip currently.
+- Currently `Nova Home` only supports Wi-Fi Provisioning over Bluetooth Low Energy, so this example does not support ESP32-S2 chip currently.

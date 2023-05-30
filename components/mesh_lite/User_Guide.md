@@ -10,17 +10,17 @@ ESP-MESH-LITE is a Wi-Fi networking application of [IoT-Bridge](https://github.c
 
 This ESP-MESH-LITE guide contains the following sections:
 
-1. [Introduction](#1)
-2. [Concept of ESP-MESH-LITE](#2)
-3. [Establish Network](#3)
-4. [Manage Network](#4)
-5. [Data Transmission](#5)
-6. [Performance](#6)
-7. [Difference between ESP-MESH-LITE and ESP-MESH](#7)
-7. [Migration Guides](#8)
-8. [Further Notes](#9)
+1. [Introduction](#introduction)
+2. [Concept of ESP-MESH-LITE](#concept-of-esp-mesh-lite)
+3. [Establish Network](#establish-network)
+4. [Manage Network](#manage-network)
+5. [Data Transmission](#data-transmission)
+6. [Performance](#performance)
+7. [Difference between ESP-MESH-LITE and ESP-MESH](#difference-between-esp-mesh-lite-and-esp-mesh)
+7. [Migration Guides](#migration-guides)
+8. [Further Notes](#further-notes)
 
-## <span id = "1">Introduction</span>
+## Introduction
 
 ESP-Mesh-Lite is supported by various Espressif chips, as shown in the table below:
 
@@ -30,7 +30,7 @@ ESP-Mesh-Lite is supported by various Espressif chips, as shown in the table bel
 | ESP32-C3 | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) |
 | ESP32-S2 | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) |
 | ESP32-S3 | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) |
-| ESP32-C2 | *N/A*                                                        | *N/A*                                                        | TODO                                                         |
+| ESP32-C2 | *N/A* | *N/A* | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) |
 
 ![Traditional Network Architecture](https://docs.espressif.com/projects/esp-idf/en/v4.4.2/esp32/_images/mesh-traditional-network-architecture.png)
 
@@ -48,7 +48,7 @@ A traditional Wi-Fi network is a "point-to-multipoint" network. The central node
 The difference between ESP-MESH-LITE and traditional Wi-Fi networks is that the nodes in ESP-MESH-LITE do not need to be connected to a central node, but can be connected to neighboring nodes. Each node is responsible for data forwarding of adjacent nodes through Wi-Fi connection. Without being limited by the distance to the central node, the ESP-MESH-LITE network is able to cover a wider area. Similarly, without being limited by the capacity of the central node, ESP-MESH-LITE allows more connections and is less prone to overload. At the same time, each node gets an IP address assigned by the parent node, hence accessing the network in the same way a single device accesses a router. During the process, the parent node only forwards this data on the network layer and ignores the application layer.
 
 
-## <span id = "2">Concept of ESP-MESH-LITE</span>
+## Concept of ESP-MESH-LITE
 
 ### Term
 
@@ -67,7 +67,7 @@ The difference between ESP-MESH-LITE and traditional Wi-Fi networks is that the 
 
 ### Tree Topology
 
-ESP-MESH-LITE is based on the traditional Wi-Fi protocol and can be regarded as a provisioning protocol that combines multiple independent Wi-Fi networks into a single WLAN network. In a Wi-Fi network, a station is limited to a single connection to an AP at any given time (upstream connection), while an AP can connect to multiple stations at the same time (downstream connection). However, the ESP-MESH-LITE network allows a node to act as both station and AP, so a node in ESP-MESH-LITE can establish **multiple downstream connections using its SoftAP interface** and **one upstream connection using its station interface**. This will naturally result in a tree network topology consisting of multiple layers of parent-child structures.
+ESP-MESH-LITE is based on the traditional Wi-Fi protocol and can be regarded as a provisioning protocol that combines multiple independent Wi-Fi networks into a single WLAN network. In a Wi-Fi network, a station is limited to a single connection to an AP at any given time (upstream connection), while an AP can be simultaneously connected to multiple stations (downstream connection). However, the ESP-MESH-LITE network allows a node to act as both station and AP, so a node in ESP-MESH-LITE can establish **multiple downstream connections using its SoftAP interface** and **one upstream connection using its station interface**. This will naturally result in a tree network topology consisting of multiple layers of parent-child structures.
 
 ![ESP-MESH-LITE Tree Topology](https://docs.espressif.com/projects/esp-idf/en/v4.4.2/esp32/_images/mesh-tree-topology.png)
 
@@ -95,9 +95,9 @@ The total number of nodes in ESP-MESH-LITE depends on the maximum number of laye
 
 **Intermediate Parent Node**: A node that is neither a root nor a leaf node is an intermediate parent node. An intermediate parent node must have one and only one upstream connection (i.e., one parent node), yet can have zero or more downstream connections (i.e., zero or more child nodes). Therefore, an intermediate parent node can send and receive its own packets, as well as forward packets from its upstream and downstream connections. As shown in the figure above, nodes B to J are intermediate parent nodes. **Note that intermediate parent nodes such as E/F/G/I/J without downstream connections are not equivalent to leaf nodes**, as these nodes are still allowed to establish downstream connections.
 
-**Idle Node**: A node that has not yet joined the network is considered an idle node. An idle node will attempt to establish an upstream connection with an intermediate parent node, or become a root node if available (see [Automatic Root Node Selection](#Automatically_select_the_root_node)). As shown in the figure above, K and O are idle nodes.
+**Idle Node**: A node that has not yet joined the network is considered an idle node. An idle node will attempt to establish an upstream connection with an intermediate parent node, or become a root node if available (see [Automatic Root Node Selection](#automatic-root-node-selection)). As shown in the figure above, K and O are idle nodes.
 
-### <span id = "Beacon">Beacon Frame</span>
+### Beacon Frame
 
 Each node in ESP-MESH-LITE that can establish a downstream connection (i.e., a node that has a SoftAP interface) transmits Wi-Fi beacon frames periodically. Through the beacon frames, the node allows other nodes to detect its presence and status. The idle node will listen for beacon frames to generate a list of potential parent nodes and form an uplink connection with one of the potential parent nodes. ESP-MESH-LITE uses "Vendor Information Elements" to store metadata, such as:
 
@@ -106,7 +106,7 @@ Each node in ESP-MESH-LITE that can establish a downstream connection (i.e., a n
 - Current number of child nodes
 - The maximum number of downstream connections allowed
 
-### <span id = "Preferred_parent_node">Preferred Parent Node</span>
+### Preferred Parent Node
 
 When an idle node has multiple candidate parent nodes (potential parent nodes), the idle node will establish an upstream connection with one of the **preferred parent nodes**. The preferred parent node is determined based on the following conditions:
 
@@ -127,10 +127,10 @@ If more than one candidate parent node exists on the same layer, the one with th
 
 **Notes**
 
-Users can also define which layers are fixed or disabled for the selected nodes through `esp_mesh_lite_set_allowed_level` and `esp_mesh_lite_set_disallowed_level` (see [Mesh-Lite API Reference](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/include/esp_mesh_lite_core.h)).
+> Users can also define which layers are fixed or disabled for the selected nodes through `esp_mesh_lite_set_allowed_level` and `esp_mesh_lite_set_disallowed_level` (see [Mesh-Lite API Reference](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/include/esp_mesh_lite_core.h)).
 
 
-## <span id = "3">Establish Network</span>
+## Establish Network
 
 ### General Process
 
@@ -146,7 +146,7 @@ The ESP-MESH-LITE network will first select the root node and then establish dow
 
 #### 1. Root Node Selection
 
-The root node is specified directly (see [User Specifies the Root Node](#Specify_the_root_node)) or is determined by fusion (see [Automatic Root Node Selection](#Automatically_select_the_root_node)). Once selected, the remaining nodes start connecting to the root node and establishing the upstream connection.
+The root node is specified directly (see [User Specifies the Root Node](#user-specifies-the-root-node)) or is determined by fusion (see [Automatic Root Node Selection](#automatic-root-node-selection)). Once selected, the remaining nodes start connecting to the root node and establishing the upstream connection.
 
 #### 2. Forming the Second Layer
 
@@ -160,7 +160,7 @@ The remaining idle nodes will be connected to the intermediate parent nodes with
 
 To prevent the network from exceeding the maximum number of layers allowed, the nodes on the maximum layer will become leaf nodes after connected. In this way, other idle nodes will not be able to establish connections with the leaf nodes on this maximum layer and therefore will not exceed the maximum number of layers allowed. However, if the idle node is unable to find other potential parent nodes, it will remain idle indefinitely. As shown in the figure above, the maximum number of layers allowed in the network is four. Therefore, node H will become a leaf node after connected to prevent any further downstream connection.
 
-### <span id = "Automatically_select_the_root_node">Automatic Root Node Selection</span>
+### Automatic Root Node Selection
 
 In automatic mode, the selection of the root node depends on the signal strength relative to the router.
 
@@ -188,7 +188,7 @@ The following figure illustrates the automatic root node selection process in an
 
 **4.** Node F and node G connect node D and node E, respectively, and complete the network building process.
 
-### <span id = "Specify_the_root_node">User Specifies the Root Node</span>
+### User Specifies the Root Node
 
 The root node can also be specified by the user, which means that the specified root node can be directly connected to the router. When the root node is specified, if there are nodes that are also connected to the router, they will actively disconnect and go to a new parent node to prevent root node conflicts. The following figure shows the manual selection process of the root node in an ESP-MESH-LITE network.
 
@@ -207,7 +207,7 @@ The root node can also be specified by the user, which means that the specified 
 
 ### Select Parent Node
 
-By default, ESP-MESH-LITE is self-provisioning, i.e., each node can autonomously select a potential parent node with which to establish an upstream connection. The self-selected parent node is called the preferred parent node. The criteria used to select the preferred parent node are intended to reduce the layers of the ESP-MESH-LITE network for better connectivity stability (see [Preferred Parent Node](#Preferred_parent_node)).
+By default, ESP-MESH-LITE is self-provisioning, i.e., each node can autonomously select a potential parent node with which to establish an upstream connection. The self-selected parent node is called the preferred parent node. The criteria used to select the preferred parent node are intended to reduce the layers of the ESP-MESH-LITE network for better connectivity stability (see [Preferred Parent Node](#preferred-parent-node)).
 
 ### Asynchronous Power-Up Reset
 
@@ -238,7 +238,7 @@ A loop is a situation where a particular node establishes an upstream connection
 
 
 
-## <span id = "4">Manage Network</span>
+## Manage Network
 
 **As a self-healing network, ESP-MESH-LITE detects and fixes failures in the Mesh network**. A failure occurs when a parent node with one or more child nodes is disconnected or the connection between a parent node and its child nodes is unstable. A child node in ESP-MESH-LITE will re-scan for a more suitable parent node and establish an upstream connection with it to maintain network interconnection. ESP-MESH-LITE can handle root node failures and intermediate parent node failures.
 
@@ -261,13 +261,13 @@ If the root node and the nodes on the lower layers (e.g., root, the second layer
 
 Notes
 
-If all nodes except the disconnected root node are not allowed to be Level 1, self-healing cannot be performed.
+> If all nodes except the disconnected root node are not allowed to be Level 1, self-healing cannot be performed.
 
 ### Intermediate Parent Node Failure
 
-If an intermediate parent node is disconnected, the child node that is therefore disconnected from it will actively try to reconnect with that parent node. After several failed reconnection attempts, each child node starts scanning for potential parent nodes (see [Beacon Frame](#Beacon)).
+If an intermediate parent node is disconnected, the child node that is therefore disconnected from it will actively try to reconnect with that parent node. After several failed reconnection attempts, each child node starts scanning for potential parent nodes (see [Beacon Frame](#beacon-frame)).
 
-If there are other available potential parent nodes, each child node will choose a new preferred parent node respectively (see [Preferred Parent Node](#Preferred_parent_node)) and establish upstream connections.
+If there are other available potential parent nodes, each child node will choose a new preferred parent node respectively (see [Preferred Parent Node](#preferred-parent-node)) and establish upstream connections.
 
 The following example shows the network self-healing from an intermediate parent node disconnection failure.
 
@@ -284,17 +284,17 @@ The following example shows the network self-healing from an intermediate parent
 
 Notes
 
-If the layer of a child node has been specified, the child node will not select a node on a higher layer as a potential parent. For example, if node G is specified to be Level 3 only, then it will not attempt to connect to node F. In this case, node G will remain idle indefinitely until a suitable secondary node is scanned.
+> If the layer of a child node has been specified, the child node will not select a node on a higher layer as a potential parent. For example, if node G is specified to be Level 3 only, then it will not attempt to connect to node F. In this case, node G will remain idle indefinitely until a suitable secondary node is scanned.
 
 ### Root Node Switching (Self-Reference)
 
-There are two major ways for automatic root node switching, one is a **Fusion** scenario triggered by multiple devices connected to the router at the same time (see [Automatic Root Node Selection](#Automatically_select_the_root_node)).
+There are two major ways for automatic root node switching, one is a **Fusion** scenario triggered by multiple devices connected to the router at the same time (see [Automatic Root Node Selection](#automatic-root-node-selection)).
 
 In another case, for Mesh routers with the same SSID Password, if the root node is connected to Router A, the whole Mesh network is then hosted under Router A. If Router A is accidentally disconnected, the entire network loses Internet access. At this time, all nodes enter **Self-Reference** mode, once finding the Mesh router B with the same SSID password, the node will refer itself to the root node with its MAC address and router RSSI. The root node selects and notifies the best self-referred node, which then disconnects from the parent node to connect to router B. At the same time, the root node notifies its child nodes to re-scan for new potential parents, and start scanning as well.
 
 
 
-## <span id = "5">Data Transmission</span>
+## Data Transmission
 
 Each node in ESP-Mesh-Lite enables the LWIP stack and can be treated as a device directly connected to the router, which can independently invoke network interfaces such as Socket, MQTT, HTTP, etc., on the application layer.
 
@@ -308,7 +308,7 @@ The following figure shows the various network layers involved in bidirectional 
 
 
 
-## <span id = "6">Performance</span>
+## Performance
 
 The performance of an ESP-MESH-LITE network can be evaluated based on multiple metrics, such as:
 
@@ -348,7 +348,7 @@ Below are some common performance metrics for the ESP-MESH-LITE network:
 
 
 
-## <span id = "7">Difference Between ESP-MESH-LITE and [ESP-MESH](https://docs.espressif.com/projects/esp-idf/en/v4.4.2/esp32/api-guides/esp-wifi-mesh.html)</span>
+## Difference Between ESP-MESH-LITE and [ESP-MESH](https://docs.espressif.com/projects/esp-idf/en/v4.4.2/esp32/api-guides/esp-wifi-mesh.html)
 
 - ESP-MESH-LITE saves more memory space compared to ESP-MESH, but ESP-MESH's self-provisioning and self-healing features are relatively better.
 
@@ -360,7 +360,7 @@ Below are some common performance metrics for the ESP-MESH-LITE network:
 
 
 
-## <span id = "8">Migration Guides</span>
+## Migration Guides
 
 If you want to integrate the original project code with ESP-MESH-LITE, you only need to focus on the router connection operation during provisioning. Instead of calling esp_wifi_connect() directly to connect, you need to call esp_mesh_lite_connect().
 
@@ -402,13 +402,13 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 
 **Notes**
 
-For specific provisioning code modification, please refer to [Wi-Fi Provisioning](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker_led_light/components/app_wifi/app_wifi.c).
+> For specific provisioning code modification, please refer to [Wi-Fi Provisioning](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker_led_light/components/app_wifi/app_wifi.c).
+>
+> Except for the provisioning connection part, the rest of the network applications (Socket, MQTT, HTTP, etc.) do not need to be modified.
 
-Except for the provisioning connection part, the rest of the network applications (Socket, MQTT, HTTP, etc.) do not need to be modified.
 
 
-
-## <span id = "9">Further Notes</span>
+## Further Notes
 
 - Data transmission is encrypted using Wi-Fi WPA2-PSK (password required for SoftAP)
 - Communication between nodes within a Mesh network can be encrypted with AES128 using `esp_mesh_lite_aes_set_key` (see [Mesh-Lite API Reference](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/include/esp_mesh_lite_core.h))

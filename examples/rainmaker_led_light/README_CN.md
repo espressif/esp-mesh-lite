@@ -1,8 +1,8 @@
 - [English Version](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker_led_light/README.md)
 
-# LED Light 示例(Nove Home)
+# LED Light 示例(Nova Home)
 
-本示例通过使用 Rainmaker 云平台来展示 ESP-IoT-Bridge **Wi-Fi 路由器**功能，用户可通过 `Nove Home` APP 来为设备配网并使设备成功连接至 Rainmaker 云端，设备本身基于 Rainmaker 实现自身连接云端的同时，还可以为其他无线设备提供无线上网的能力，搭配 Mesh-Lite 功能形成组网，极大程度上减轻路由器承载压力，同时扩大了无线通信范围。
+本示例通过使用 Rainmaker 云平台来展示 ESP-IoT-Bridge **Wi-Fi 路由器**功能，用户可通过 `Nova Home` APP 来为设备配网并使设备成功连接至 Rainmaker 云端，设备本身基于 Rainmaker 实现自身连接云端的同时，还可以为其他无线设备提供无线上网的能力，搭配 Mesh-Lite 功能形成组网，极大程度上减轻路由器承载压力，同时扩大了无线通信范围。
 
 ## Get Start
 
@@ -44,9 +44,9 @@ $ idf.py build
 $ idf.py flash
 ```
 
-### 6. 在 Nove Home 中加入设备
+### 6. 在 Nova Home 中加入设备
 
-- 打开 Nove Home，APP 自动搜索到待配网设备
+- 打开 Nova Home，APP 自动搜索到待配网设备
 
 <img src="./_static/find_devices.jpg" alt="find_devices" width="25%" div align=center />
 
@@ -72,4 +72,4 @@ $ idf.py flash
 
 ### 7. 注意事项
 
-- 目前 Nove Home 仅支持 Wi-Fi Provisioning 配网（BLE），故该方案目前不支持 ESP32-S2 芯片
+- 目前 Nova Home 仅支持 Wi-Fi Provisioning 配网（BLE），故该方案目前不支持 ESP32-S2 芯片

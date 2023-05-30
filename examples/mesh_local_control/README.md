@@ -34,6 +34,7 @@ Enter `idf.py menuconfig`, and configure the followings under the submenu "Examp
 <img src="device_config.png"  width="800">
 <p> Configure the devices </p>
 </div>
+
 ### Build and Flash
 
 CMake:

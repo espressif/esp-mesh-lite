@@ -34,6 +34,7 @@
 <img src="device_config.png"  width="800">
 <p> 配置设备 </p>
 </div>
+
 ### 编译和烧录
 
 CMake:
