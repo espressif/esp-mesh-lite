@@ -2,6 +2,24 @@
 
 # ChangeLog
 
+## v0.2.0 - 2023-6-5
+
+### Enhancements:
+
+#### Mesh
+
+- Check if the level exceeds the maximum level when level changes
+
+#### Supported Socs
+
+- ESP32-C2
+
+#### Bugfix
+
+- API compatible with idf5.x and idf4.x versions
+- Update documentation to fix links not jumping correctly
+- Compile error when MESH_LITE_ENABLE is n
+
 ## v0.1.2 - 2023-3-26
 
 #### Supported ESP-IDF Version
