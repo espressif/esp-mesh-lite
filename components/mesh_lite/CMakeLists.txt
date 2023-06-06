@@ -10,9 +10,9 @@ if (CONFIG_MESH_LITE_ENABLE)
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${NEW_PROV_MGR} ${OLD_PROV_MGR})
 endif()
 
-idf_component_register (SRCS "${srcs}"
-                        INCLUDE_DIRS include
-                        REQUIRES ${require_components})
+idf_component_register(SRCS "${srcs}"
+                       INCLUDE_DIRS include
+                       REQUIRES ${require_components})
 
 string(CONCAT LIBS "esp_mesh_lite_" "${IDF_TARGET}")
 
@@ -22,4 +22,6 @@ target_link_libraries(${COMPONENT_LIB} INTERFACE ${LIBS})
 set_property(TARGET ${LIBS} APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${COMPONENT_LIB})
 
 include(package_manager)
-cu_pkg_define_version(${CMAKE_CURRENT_LIST_DIR})
+if (CONFIG_MESH_LITE_ENABLE)
+    cu_pkg_define_version(${CMAKE_CURRENT_LIST_DIR})
+endif()
