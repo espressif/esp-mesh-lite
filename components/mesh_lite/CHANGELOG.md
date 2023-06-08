@@ -2,6 +2,20 @@
 
 # ChangeLog
 
+# v0.4.0 - 2023-7-12
+
+### Enhancements:
+
+#### Mesh
+
+- feat: Added event posting for OTA failure and success.
+
+#### Bugfix
+
+- fix: When multiple root nodes are far apart and unable to discover each other, they will continuously disconnect and reconnect to the router.
+- fix: During the LAN OTA upgrade process, it suddenly paused.
+- fix: LAN OTA upgrade failed.
+
 ## v0.3.0 - 2023-6-30
 
 ### Enhancements:
