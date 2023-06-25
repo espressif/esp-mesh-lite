@@ -1,5 +1,21 @@
 # ChangeLog
 
+## v0.3.0 - 2023-6-30
+
+### 功能:
+
+#### Mesh
+
+- 为 esp_mesh_lite_wifi_scan_start 添加 wifi_scan_config 参数
+- 开放 API 以允许应用层获取路由器信息和根节点 SoftAP IP 地址
+- 支持手动指定设备为叶子节点
+
+#### 修复
+
+- 删除 `CONFIG_LWIP_IPV6=n`，解决 rainmaker_led_light 编译不过的问题
+- Demo 示例禁用 PMF
+- 优化 mesh_local_control 示例，解决 socket connect 阻塞 event task 的问题
+
 ## v0.2.0 - 2023-6-5
 
 ### 功能:

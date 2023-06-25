@@ -2,6 +2,22 @@
 
 # ChangeLog
 
+## v0.3.0 - 2023-6-30
+
+### Enhancements:
+
+#### Mesh
+
+- refactor: add wifi_scan_config param for esp_mesh_lite_wifi_scan_start
+- chore: Open APIs to allow external access to router information and root SoftAP IP addr
+- feat: Support manually specifying a device as a leaf node.
+
+#### Bugfix
+
+- Disable PMF in the Demo example.
+- Remove `CONFIG_LWIP_IPV6=n` to resolve the compilation issue of rainmaker_led_light.
+- Optimize the mesh_local_control example to resolve the problem of socket connect blocking the event task.
+
 ## v0.2.0 - 2023-6-5
 
 ### Enhancements:

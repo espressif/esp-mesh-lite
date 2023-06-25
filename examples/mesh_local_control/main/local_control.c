@@ -31,7 +31,7 @@ static const char *TAG = "local_control";
  */
 static int socket_tcp_client_create(const char *ip, uint16_t port)
 {
-    ESP_LOGI(TAG, "Create a tcp client, ip: %s, port: %d", ip, port);
+    ESP_LOGD(TAG, "Create a tcp client, ip: %s, port: %d", ip, port);
 
     esp_err_t ret = ESP_OK;
     int sockfd    = -1;
@@ -47,16 +47,16 @@ static int socket_tcp_client_create(const char *ip, uint16_t port)
     if (sockfd < 0) {
         ESP_LOGE(TAG, "socket create, sockfd: %d", sockfd);
         goto ERR_EXIT;
-    } 
+    }
 
     esp_netif_get_netif_impl_name(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), iface.ifr_name);
     if (setsockopt(sockfd, SOL_SOCKET, SO_BINDTODEVICE,  &iface, sizeof(struct ifreq)) != 0) {
-        ESP_LOGI(TAG, "Bind [sock=%d] to interface %s fail", sockfd, iface.ifr_name);
+        ESP_LOGE(TAG, "Bind [sock=%d] to interface %s fail", sockfd, iface.ifr_name);
     }
 
     ret = connect(sockfd, (struct sockaddr *)&server_addr, sizeof(struct sockaddr_in));
     if (ret < 0) {
-        ESP_LOGE(TAG, "socket connect, ret: %d, ip: %s, port: %d",
+        ESP_LOGD(TAG, "socket connect, ret: %d, ip: %s, port: %d",
                    ret, ip, port);
         goto ERR_EXIT;
     }
@@ -86,13 +86,14 @@ void tcp_client_write_task(void *arg)
     while (1) {
         if (g_sockfd == -1) {
             vTaskDelay(500 / portTICK_PERIOD_MS);
+            g_sockfd = socket_tcp_client_create(CONFIG_SERVER_IP, CONFIG_SERVER_PORT);
             continue;
         }
 
         vTaskDelay(3000 / portTICK_PERIOD_MS);
 
-        size = asprintf(&data, "{\"src_addr\": \"" MACSTR "\",\"data\": \"Hello TCP Server!\",\"count\": %d}",
-                        MAC2STR(sta_mac), count++);
+        size = asprintf(&data, "{\"src_addr\": \"" MACSTR "\",\"data\": \"Hello TCP Server!\",\"level\": %d,\"count\": %d}\r\n",
+                        MAC2STR(sta_mac), esp_mesh_lite_get_level(), count++);
 
         ESP_LOGD(TAG, "TCP write, size: %d, data: %s", size, data);
         ret = write(g_sockfd, data, size);
@@ -100,6 +101,8 @@ void tcp_client_write_task(void *arg)
 
         if (ret <= 0) {
             ESP_LOGE(TAG, "<%s> TCP write", strerror(errno));
+            close(g_sockfd);
+            g_sockfd = -1;
             continue;
         }
     }
@@ -108,7 +111,9 @@ void tcp_client_write_task(void *arg)
 
     close(g_sockfd);
     g_sockfd = -1;
-    free(data);
+    if (data) {
+        free(data);
+    }
     vTaskDelete(NULL);
 }
 
@@ -141,18 +146,10 @@ static void print_system_info_timercb(TimerHandle_t timer)
 static void ip_event_sta_got_ip_handler(void *arg, esp_event_base_t event_base,
                                         int32_t event_id, void *event_data)
 {
-    if (g_sockfd != -1) {
-        close(g_sockfd);
-        g_sockfd = -1;
-    }
-
-    g_sockfd = socket_tcp_client_create(CONFIG_SERVER_IP, CONFIG_SERVER_PORT);
-
     static bool tcp_task = false;
 
     if (!tcp_task) {
-        xTaskCreate(tcp_client_write_task, "tcp_client_write_task", 4 * 1024,
-                    NULL, 5, NULL);
+        xTaskCreate(tcp_client_write_task, "tcp_client_write_task", 4 * 1024, NULL, 5, NULL);
         tcp_task = true;
     }
 }

@@ -13,6 +13,7 @@ extern "C"
 
 #include "cJSON.h"
 #include "esp_wifi_types.h"
+#include "esp_netif_ip_addr.h"
 
 extern const char* ESP_MESH_LITE_EVENT;
 
@@ -39,6 +40,12 @@ extern const char* ESP_MESH_LITE_EVENT;
 #define JOIN_MESH_WITHOUT_CONFIGURED_WIFI_INFO CONFIG_JOIN_MESH_WITHOUT_CONFIGURED_WIFI_INFO
 #else
 #define JOIN_MESH_WITHOUT_CONFIGURED_WIFI_INFO 0
+#endif
+
+#ifdef CONFIG_LEAF_NODE
+#define LEAF_NODE CONFIG_LEAF_NODE
+#else
+#define LEAF_NODE 0
 #endif
 
 #ifdef CONFIG_OTA_DATA_LEN
@@ -72,6 +79,7 @@ STATIC_ASSERT(sizeof(CONFIG_BRIDGE_SOFTAP_PASSWORD) < (63 + 2))
     .end_with_mac = ESP_MESH_LITE_SOFTAP_SSID_END_WITH_THE_MAC, \
     .join_mesh_ignore_router_status = JOIN_MESH_IGNORE_ROUTER_STATUS, \
     .join_mesh_without_configured_wifi = JOIN_MESH_WITHOUT_CONFIGURED_WIFI_INFO, \
+    .leaf_node = LEAF_NODE, \
     .ota_data_len = OTA_DATA_LEN, \
     .ota_wnd = OTA_WND_DEFAULT, \
     .softap_ssid = CONFIG_BRIDGE_SOFTAP_SSID, \
@@ -102,6 +110,7 @@ typedef struct {
     bool end_with_mac;                      /**< Whether to add Mac information to the suffix of softap ssid */
     bool join_mesh_ignore_router_status;    /**< Join Mesh no matter whether the node is connected to router */
     bool join_mesh_without_configured_wifi; /**< Join Mesh without configured with information */
+    bool leaf_node;                         /**< Whether it is a leaf node */
     uint32_t ota_data_len;                  /**< The maximum length of an OTA data transmission */
     uint16_t ota_wnd;                       /**< OTA data transfer window size */
     const char* softap_ssid;                /**< SoftAP SSID */
@@ -249,6 +258,14 @@ esp_err_t esp_mesh_lite_set_argot(uint32_t argot);
 esp_err_t esp_mesh_lite_set_softap_info(const char* softap_ssid, const char* softap_password, bool end_with_mac);
 
 /**
+ * @brief  Set Node as leaf node.
+ *
+ * @param[in]  enable: true -> Leaf Node; false -> Regular Node
+ *
+ */
+esp_err_t esp_mesh_lite_set_leaf_node(bool enable);
+
+/**
  * @brief  Get the mesh_lite_id
  * 
  * @return
@@ -297,12 +314,42 @@ uint8_t esp_mesh_lite_get_allowed_level(void);
 uint8_t esp_mesh_lite_get_disallowed_level(void);
 
 /**
+ * @brief  Check if Node is a Leaf Node
+ *
+ */
+bool esp_mesh_lite_is_leaf_node(void);
+
+/**
  * @brief  Get the device category
  *
  * @return
  *      - device category
  */
 char *esp_mesh_lite_get_device_category(void);
+
+/**
+ * @brief  Get the Root SoftAP GW ip
+ *
+ * @param[in]  type
+ *             IPADDR_TYPE_V4
+ *             IPADDR_TYPE_V6
+ * @param[in]  ip_addr
+ *
+ * @return
+ *      - Root SoftAP GW ip
+ */
+esp_err_t esp_mesh_lite_get_root_ip(uint8_t type, esp_ip_addr_t *ip_addr);
+
+/**
+ * @brief  Get router config information
+ *
+ * @param[out] router_config output router config
+ *
+ * @return
+ *    - ESP_OK
+ *    - ESP_ERR_INVALID_ARG
+ */
+esp_err_t esp_mesh_lite_get_router_config(wifi_sta_config_t *router_config);
 
 /**
  * @brief  Scan all available APs.
@@ -312,7 +359,7 @@ char *esp_mesh_lite_get_device_category(void);
  * @return
  *    - 0: scan start successful
  */
-esp_err_t esp_mesh_lite_wifi_scan_start(uint32_t timeout);
+esp_err_t esp_mesh_lite_wifi_scan_start(const wifi_scan_config_t *config, uint32_t timeout);
 
 
 /*****************************************************/

@@ -68,7 +68,7 @@ Q2. When Mesh-Lite is working, I call the `esp_wifi_scan_start` interface but it
 A2. Because Mesh-Lite also has scan operations inside, it is recommended to use the `esp_mesh_lite_wifi_scan_start()` interface to scan. To call the scan interface externally, there needs to be a flag in the scan_done cb to control whether it is an externally called scan. If it is not an externally called scan, do not enter the external scan_done cb for processing.
 
 ```
-if (esp_mesh_lite_wifi_scan_start(3000 / TICK_MS) == ESP_OK) {
+if (esp_mesh_lite_wifi_scan_start(NULL, 3000 / TICK_MS) == ESP_OK) {
    scan_flag = true;
 }
 ```

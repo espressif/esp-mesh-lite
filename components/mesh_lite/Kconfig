@@ -56,6 +56,10 @@ menu "ESP Wi-Fi Mesh Lite"
             help
                 If enabled, it will join Mesh no matter whether the node is connected to router
 
+        config LEAF_NODE
+            bool "Configure the node as a leaf node"
+            default n
+
         config DEVICE_CATEGORY
                 string "Device Category"
                 default "ESP32"
