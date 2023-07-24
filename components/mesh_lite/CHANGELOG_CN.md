@@ -1,5 +1,17 @@
 # ChangeLog
 
+# v0.6.0 - 2023-8-29
+
+### Enhancements:
+
+#### Mesh
+
+- 删除 end_with_mac 字段以适应各种类型的后缀
+
+#### Bugfix
+
+- 修复根节点在连接路由器异常时子节点不能正常加入 Mesh 网络
+
 # v0.5.0 - 2023-8-3
 
 ### Enhancements:

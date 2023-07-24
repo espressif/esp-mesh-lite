@@ -340,7 +340,7 @@ static esp_err_t rainmaker_mesh_lite_handler(uint32_t session_id, const uint8_t 
     item = cJSON_GetObjectItem(root, "ssid");
     if (item) {
         esp_mesh_lite_set_softap_ssid_to_nvs(item->valuestring);
-        esp_mesh_lite_set_softap_info(item->valuestring, (char*)config.password, true);
+        esp_mesh_lite_set_softap_info(item->valuestring, (char*)config.password);
 
         snprintf(softap_ssid, sizeof(softap_ssid), "%.25s_%02x%02x%02x", item->valuestring, softap_mac[3], softap_mac[4], softap_mac[5]);
         memcpy((char *)config.ssid, softap_ssid, sizeof(config.ssid));
@@ -348,7 +348,7 @@ static esp_err_t rainmaker_mesh_lite_handler(uint32_t session_id, const uint8_t 
         out_ssid = (char *) calloc(1, MAX_SSID_LEN);
         snprintf(out_ssid, MAX_SSID_LEN, DEFAULT_SSID_PREFIX "%02x%02x%02x", softap_mac[3], softap_mac[4], softap_mac[5]);
         esp_mesh_lite_set_softap_ssid_to_nvs(out_ssid);
-        esp_mesh_lite_set_softap_info(out_ssid, (char*)config.password, true);
+        esp_mesh_lite_set_softap_info(out_ssid, (char*)config.password);
 
         snprintf(softap_ssid, sizeof(softap_ssid), "%.25s_%02x%02x%02x", out_ssid, softap_mac[3], softap_mac[4], softap_mac[5]);
         memcpy((char *)config.ssid, softap_ssid, sizeof(config.ssid));

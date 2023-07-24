@@ -24,12 +24,6 @@ extern const char* ESP_MESH_LITE_EVENT;
 /* Definitions for error constants. */
 #define ESP_ERR_DUPLICATE_ADDITION    0x110   /*!< Duplicate addition */
 
-#ifdef CONFIG_BRIDGE_SOFTAP_SSID_END_WITH_THE_MAC
-#define ESP_MESH_LITE_SOFTAP_SSID_END_WITH_THE_MAC CONFIG_BRIDGE_SOFTAP_SSID_END_WITH_THE_MAC
-#else
-#define ESP_MESH_LITE_SOFTAP_SSID_END_WITH_THE_MAC 0
-#endif
-
 #ifdef CONFIG_JOIN_MESH_IGNORE_ROUTER_STATUS
 #define JOIN_MESH_IGNORE_ROUTER_STATUS CONFIG_JOIN_MESH_IGNORE_ROUTER_STATUS
 #else
@@ -60,23 +54,12 @@ extern const char* ESP_MESH_LITE_EVENT;
 #define OTA_WND_DEFAULT 0
 #endif
 
-#if ESP_MESH_LITE_SOFTAP_SSID_END_WITH_THE_MAC
-#define SSID_MAC_LEN    7  // _XXYYZZ
-#else
-#define SSID_MAC_LEN    0
-#endif
-
-#define STATIC_ASSERT(condition) typedef char p__LINE__[ (condition) ? 1 : -1];
-STATIC_ASSERT((sizeof(CONFIG_BRIDGE_SOFTAP_SSID) + SSID_MAC_LEN) < (32 + 2))
-STATIC_ASSERT(sizeof(CONFIG_BRIDGE_SOFTAP_PASSWORD) < (63 + 2))
-
 #define ESP_MESH_LITE_DEFAULT_INIT() { \
     .vendor_id = {CONFIG_MESH_LITE_VENDOR_ID_0, CONFIG_MESH_LITE_VENDOR_ID_1}, \
     .mesh_id = CONFIG_MESH_LITE_ID, \
     .max_connect_number = CONFIG_BRIDGE_SOFTAP_MAX_CONNECT_NUMBER, \
     .max_router_number = CONFIG_MESH_LITE_MAX_ROUTER_NUMBER, \
     .max_level = CONFIG_MESH_LITE_MAXIMUM_LEVEL_ALLOWED, \
-    .end_with_mac = ESP_MESH_LITE_SOFTAP_SSID_END_WITH_THE_MAC, \
     .join_mesh_ignore_router_status = JOIN_MESH_IGNORE_ROUTER_STATUS, \
     .join_mesh_without_configured_wifi = JOIN_MESH_WITHOUT_CONFIGURED_WIFI_INFO, \
     .leaf_node = LEAF_NODE, \
@@ -107,7 +90,6 @@ typedef struct {
     uint8_t max_connect_number;             /**< Max number of stations allowed to connect in */
     uint8_t max_router_number;              /**< Maximum number of trace router number */
     uint8_t max_level;                      /**< The maximum level allowed of Mesh-Lite */
-    bool end_with_mac;                      /**< Whether to add Mac information to the suffix of softap ssid */
     bool join_mesh_ignore_router_status;    /**< Join Mesh no matter whether the node is connected to router */
     bool join_mesh_without_configured_wifi; /**< Join Mesh without configured with information */
     bool leaf_node;                         /**< Whether it is a leaf node */
@@ -252,10 +234,9 @@ esp_err_t esp_mesh_lite_set_argot(uint32_t argot);
  *
  * @param[in]  softap_ssid
  * @param[in]  softap_password
- * @param[in]  end_with_mac: Whether to add mac information at the end of ssid. eg:SSID_XXYYZZ
  *
  */
-esp_err_t esp_mesh_lite_set_softap_info(const char* softap_ssid, const char* softap_password, bool end_with_mac);
+esp_err_t esp_mesh_lite_set_softap_info(const char* softap_ssid, const char* softap_password);
 
 /**
  * @brief  Set Node as leaf node.
