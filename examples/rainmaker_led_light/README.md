@@ -1,8 +1,11 @@
 - [中文版本](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker_led_light/README_CN.md)
 
+| Supported Targets | ESP32 | ESP32-C3 | ESP32-S3 |
+| ----------------- | ----- | -------- | -------- |
+
 # LED Light Example(Nova Home)
 
-This example uses the Rainmaker cloud platform to demonstrate the ESP-IoT-Bridge **Wi-Fi router** function. User can configure the device through the `Nova Home` APP and successfully connect to the Rainmaker cloud. The device is connected to the cloud based on Rainmaker, It can also provide other devices with the ability to surf the Internet wirelessly, and form a network with the Mesh-Lite function, which greatly reduces the load on the router and expands the wireless communication range.
+This example uses the Rainmaker cloud platform to demonstrate the ESP-Mesh-Lite function. User can configure the device through the `Nova Home` APP and successfully connect to the Rainmaker cloud. The device is connected to the cloud based on Rainmaker, It can also provide other devices with the ability to surf the Internet wirelessly, and form a network with the Mesh-Lite function, which greatly reduces the load on the router and expands the wireless communication range.
 
 ## Get Start
 
@@ -28,7 +31,7 @@ Refer to [README](https://github.com/espressif/esp-iot-bridge/blob/master/compon
 
 ### 4. Mesh-Lite function
 
-- You can choose whether to enable the Mesh-Lite function in the menuconfig `Bridge Configuration -> The Interface used to provide network data forwarding for other devices -> Enable Mesh-Lite`. This example enables this function by default.
+- You can choose whether to enable the Mesh-Lite function in the menuconfig `Component config → ESP Wi-Fi Mesh Lite`. This example enables this function by default.
 - If the Mesh-Lite function is enabled, the first networked device will connect to the target router and serve as the root node, and subsequent devices will be connected to the root node device and act as child nodes to form a Mesh-Lite network. For details, please refer to [Mesh-Lite](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/User_Guide.md).
 
 ### 5. Build & Flash
@@ -42,31 +45,69 @@ $ idf.py build
 $ idf.py flash
 ```
 
-### 6. Add devices to Nova Home
+### 6. Operation Steps
 
-- Open `Nova Home`, the APP will automatically search for the device to be configured
+#### 6.1 Add Root Node
+
+- Open the Nova Home app，The app will automatically discover the devices ready for network configuration.
 
 <img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/find_devices.jpg" alt="find_devices" width="25%" div align=center />
 
-- Add devices
+- Select one of the devices from the list.
 
-<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/select_devices.jpg" alt="select_devices" width="25%" div align=center />
+<img src="./_static/select_root_node.png" alt="select_root_node" width="25%" div align=center />
 
-- Enter distribution network information
+- Enter the network configuration details to proceed with the setup.
 
 <img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/select_network.jpg" alt="select_network" width="25%" div align=center />
 
-- Pair and connect to configure the network
+- After successful network configuration, the device will be added to the app.
 
-<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/connect_ble.jpg" alt="connect_ble" width="25%" div align=center />
+<img src="./_static/root_done.png" alt="img" width="25%" div align=center />
 
-- Distribution network is successful
+<img src="./_static/root_device_of_common.png" alt="root_device_of_common" width="25%" div align=center />
 
-<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/done.jpg" alt="done" width="25%" div align=center />
+- Page of the Device in the Mesh (Mesh ID is 117)
 
-- LED control
+<img src="./_static/root_device_of_mesh.png" alt="root_device_of_mesh" width="25%" div align=center />
 
-<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/control.jpg" alt="control" width="25%" div align=center />
+#### 6.2 Add child node
+
+- On the Mesh page of the root node, click the plus icon in the upper-right corner.
+
+<img src="./_static/mesh_page.png" alt="mesh_page" width="25%" div align=center />
+
+- Choose the child node device you want to add to the network.
+
+<img src="./_static/select_child_devices.jpg" alt="select_child_devices" width="25%" div align=center />
+
+- Enter the network configuration details (same as the router's), and proceed with the setup.
+
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/select_network.jpg" alt="select_network" width="25%" div align=center />
+
+- Network configuration successful.
+
+<img src="./_static/child_done.png" alt="child_done" width="25%" div align=center />
+
+#### 6.3 Control all devices in the Mesh network.
+
+- Access the Mesh page, tap on the corresponding root node to enter the control page. On the control page, you can control the lighting effects of all devices within the Mesh 
+
+<img src="./_static/root_control.png" alt="root_control" width="25%" div align=center />
+
+#### 6.4 Group control
+
+- Access the Mesh page, tap on the "Group" option in the lower-left corner.
+
+<img src="./_static/click_group.png" alt="click_group" width="25%" div align=center />
+
+- Create a new Mesh Group.
+
+<img src="./_static/select_device_for_group.png" alt="select_device_for_group" width="25%" div align=center />
+
+- Use the created Group page to control the devices associated with that group.
+
+<img src="./_static/group_control.png" alt="group_control" width="25%" div align=center />
 
 ### 7. Precautions
 

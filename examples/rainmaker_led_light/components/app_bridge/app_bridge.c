@@ -171,6 +171,8 @@ void esp_rmaker_mesh_lite_child_info_update_and_report(void)
     xSemaphoreTake(child_info_mutex, portMAX_DELAY);
     uint8_t loop = 0;
     esp_mesh_lite_child_info_t* p = child_info;
+    char *child_ip_string = NULL;
+    char *child_mac_string = NULL;
 
     while (p) {
         if (loop < MAX_STATION) {
@@ -184,14 +186,28 @@ void esp_rmaker_mesh_lite_child_info_update_and_report(void)
     }
 
     cJSON *child_ip_item = cJSON_CreateStringArray((const char* const*)ip_strings, loop);
+    if (child_ip_item) {
+        child_ip_string = cJSON_PrintUnformatted(child_ip_item);
+        cJSON_Delete(child_ip_item);
+    }
+
     cJSON *child_mac_item = cJSON_CreateStringArray((const char* const*)mac_strings, loop);
-    char* child_ip_string = cJSON_PrintUnformatted(child_ip_item);
-    char* child_mac_string = cJSON_PrintUnformatted(child_mac_item);
-    cJSON_Delete(child_ip_item);
-    cJSON_Delete(child_mac_item);
+    if (child_mac_item) {
+        child_mac_string = cJSON_PrintUnformatted(child_mac_item);
+        cJSON_Delete(child_mac_item);
+    }
 
     esp_rmaker_param_update_and_report(child_ip_param, esp_rmaker_array(child_ip_string));
     esp_rmaker_param_update_and_report(child_mac_param, esp_rmaker_array(child_mac_string));
+
+    if (child_ip_string) {
+        free(child_ip_string);
+        child_ip_string = NULL;
+    }
+    if (child_mac_string) {
+        free(child_mac_string);
+        child_mac_string = NULL;
+    }
 
     xSemaphoreGive(child_info_mutex);
 }
@@ -271,6 +287,10 @@ static void esp_mesh_lite_convert_str_to_group_id(char *mesh_group_str)
     const char delimiter[] = ",";
     uint8_t group_id = 0;
     str = (char *)malloc(mesh_group_strlen - 1);
+
+    if (!str) {
+        return;
+    }
 
     memmove(str, mesh_group_str + 1, mesh_group_strlen - 2);
     str[mesh_group_strlen - 2] = '\0';
@@ -359,9 +379,14 @@ static void esp_mesh_lite_handler(void *arg, esp_event_base_t event_base,
 
 static char* esp_rmaker_mesh_lite_self_ip_format(esp_netif_ip_info_t* ap_ip_info, esp_netif_ip_info_t* sta_ip_info)
 {
-    char* self_ip_obj[2];
+    char *self_ip_obj[2];
+    char *self_ip_string = NULL;
     self_ip_obj[0] = (char*)calloc(IP_MAX_LEN, 1);
     self_ip_obj[1] = (char*)calloc(IP_MAX_LEN, 1);
+
+    if (!self_ip_obj[0] || !self_ip_obj[1]) {
+        return NULL;
+    }
 
     if (!ap_ip_info) {
         esp_netif_ip_info_t ap_ip_info_old;
@@ -382,8 +407,11 @@ static char* esp_rmaker_mesh_lite_self_ip_format(esp_netif_ip_info_t* ap_ip_info
     }
 
     cJSON *slef_ip_item = cJSON_CreateStringArray((const char* const*)self_ip_obj, 2);
-    char* self_ip_string = cJSON_PrintUnformatted(slef_ip_item);
-    cJSON_Delete(slef_ip_item);
+    if (slef_ip_item) {
+        self_ip_string = cJSON_PrintUnformatted(slef_ip_item);
+        cJSON_Delete(slef_ip_item);
+    }
+
     free(self_ip_obj[0]);
     free(self_ip_obj[1]);
 
@@ -392,9 +420,15 @@ static char* esp_rmaker_mesh_lite_self_ip_format(esp_netif_ip_info_t* ap_ip_info
 
 static char* esp_rmaker_mesh_lite_self_mac_format(void)
 {
-    char* self_mac_obj[2];
+    char *self_mac_obj[2];
+    char *self_mac_string = NULL;
     self_mac_obj[0] = (char*)calloc(MAC_MAX_LEN, 1);
     self_mac_obj[1] = (char*)calloc(MAC_MAX_LEN, 1);
+
+    if (!self_mac_obj[0] || !self_mac_obj[1]) {
+        return NULL;
+    }
+
     uint8_t mac_temp[6];
     esp_wifi_get_mac(WIFI_IF_AP, mac_temp);
     snprintf(self_mac_obj[0], MAC_MAX_LEN, MACSTR, MAC2STR(mac_temp));
@@ -402,8 +436,10 @@ static char* esp_rmaker_mesh_lite_self_mac_format(void)
     snprintf(self_mac_obj[1], MAC_MAX_LEN, MACSTR, MAC2STR(mac_temp));
 
     cJSON *self_mac_item = cJSON_CreateStringArray((const char* const*)self_mac_obj, 2);
-    char* self_mac_string = cJSON_PrintUnformatted(self_mac_item);
-    cJSON_Delete(self_mac_item);
+    if (self_mac_item) {
+        self_mac_string = cJSON_PrintUnformatted(self_mac_item);
+        cJSON_Delete(self_mac_item);
+    }
     free(self_mac_obj[0]);
     free(self_mac_obj[1]);
 
@@ -418,7 +454,11 @@ void app_rmaker_mesh_lite_level_update_and_report(uint8_t level)
 void app_rmaker_mesh_lite_self_ip_update_and_report(esp_netif_ip_info_t* ap_ip_info, esp_netif_ip_info_t* sta_ip_info)
 {
     char* self_ip_string = esp_rmaker_mesh_lite_self_ip_format(ap_ip_info, sta_ip_info);
-    esp_rmaker_param_update_and_report(self_ip_param, esp_rmaker_array(self_ip_string));
+    if (self_ip_string) {
+        esp_rmaker_param_update_and_report(self_ip_param, esp_rmaker_array(self_ip_string));
+        free(self_ip_string);
+        self_ip_string = NULL;
+    }
 }
 
 esp_err_t app_rmaker_mesh_lite_service_create(void)
@@ -451,12 +491,20 @@ esp_err_t app_rmaker_mesh_lite_service_create(void)
         esp_rmaker_device_add_param(service, password_param);
 
         char* self_ip_string = esp_rmaker_mesh_lite_self_ip_format(NULL, NULL);
-        self_ip_param = esp_rmaker_param_create(ESP_RMAKER_MESH_LITE_SERVICE_SELF_IP, "esp.param.self_ip", esp_rmaker_array(self_ip_string), PROP_FLAG_READ);
-        esp_rmaker_device_add_param(service, self_ip_param);
+        if (self_ip_string) {
+            self_ip_param = esp_rmaker_param_create(ESP_RMAKER_MESH_LITE_SERVICE_SELF_IP, "esp.param.self_ip", esp_rmaker_array(self_ip_string), PROP_FLAG_READ);
+            esp_rmaker_device_add_param(service, self_ip_param);
+            free(self_ip_string);
+            self_ip_string = NULL;
+        }
 
         char* self_mac_string = esp_rmaker_mesh_lite_self_mac_format();
-        self_mac_param = esp_rmaker_param_create(ESP_RMAKER_MESH_LITE_SERVICE_SELF_MAC, "esp.param.self_mac", esp_rmaker_array(self_mac_string), PROP_FLAG_READ);
-        esp_rmaker_device_add_param(service, self_mac_param);
+        if (self_mac_string) {
+            self_mac_param = esp_rmaker_param_create(ESP_RMAKER_MESH_LITE_SERVICE_SELF_MAC, "esp.param.self_mac", esp_rmaker_array(self_mac_string), PROP_FLAG_READ);
+            esp_rmaker_device_add_param(service, self_mac_param);
+            free(self_mac_string);
+            self_mac_string = NULL;
+        }
 
         child_ip_param = esp_rmaker_param_create(ESP_RMAKER_MESH_LITE_SERVICE_CHILD_IP, "esp.param.child_ip", esp_rmaker_array("[]"), PROP_FLAG_READ);
         esp_rmaker_device_add_param(service, child_ip_param);

@@ -127,7 +127,7 @@ static const esp_mesh_lite_msg_action_t node_report_action[] = {
     {NULL, NULL, NULL} /* Must be NULL terminated */
 };
 
-static void root_timer_cb(void* param)
+static void root_timer_cb(TimerHandle_t timer)
 {
     if (esp_mesh_lite_get_level() > ROOT) {
         return;
@@ -164,7 +164,7 @@ static void root_timer_cb(void* param)
     xSemaphoreGive(node_info_mutex);
 }
 
-static void report_timer_cb(void* param)
+static void report_timer_cb(TimerHandle_t timer)
 {
     if (esp_mesh_lite_get_level() > ROOT) {
         esp_mesh_lite_report_info();

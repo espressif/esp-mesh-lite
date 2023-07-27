@@ -1,8 +1,11 @@
 - [English Version](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker_led_light/README.md)
 
+| Supported Targets | ESP32 | ESP32-C3 | ESP32-S3 |
+| ----------------- | ----- | -------- | -------- |
+
 # LED Light 示例(Nova Home)
 
-本示例通过使用 Rainmaker 云平台来展示 ESP-IoT-Bridge **Wi-Fi 路由器**功能，用户可通过 `Nova Home` APP 来为设备配网并使设备成功连接至 Rainmaker 云端，设备本身基于 Rainmaker 实现自身连接云端的同时，还可以为其他无线设备提供无线上网的能力，搭配 Mesh-Lite 功能形成组网，极大程度上减轻路由器承载压力，同时扩大了无线通信范围。
+本示例通过使用 Rainmaker 云平台来展示 ESP-Mesh-Lite 功能，用户可通过 `Nova Home` APP 来为设备配网并使设备成功连接至 Rainmaker 云端，设备本身基于 Rainmaker 实现自身连接云端的同时，还可以为其他无线设备提供无线上网的能力，多个设备形成 Mesh 组网，极大程度上减轻路由器承载压力，同时扩大了无线通信范围。
 
 ## Get Start
 
@@ -29,7 +32,7 @@
 
 ### 4. Mesh-Lite 功能
 
-- 可以在 menuconfig 配置 `Bridge Configuration -> The Interface used to provide network data forwarding for other devices -> Enable Mesh-Lite` 中选择是否使能 Mesh-Lite 功能，本示例默认使能该功能。
+- 可以在 menuconfig 配置 `Component config → ESP Wi-Fi Mesh Lite` 中选择是否使能 Mesh-Lite 功能，本示例默认使能该功能。
 
 - 若开启 Mesh-Lite 功能，第一个配网的设备会连接至目标路由器并作为 Root 根结点，之后的设备均会连接至根结点设备并作为子节点组成一个 Mesh-Lite 网络，详情请参考 [Mesh-Lite](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/User_Guide_CN.md)。
 
@@ -44,31 +47,71 @@ $ idf.py build
 $ idf.py flash
 ```
 
-### 6. 在 Nova Home 中加入设备
+### 6. 操作步骤
+
+#### 6.1 添加根节点
 
 - 打开 Nova Home，APP 自动搜索到待配网设备
 
 <img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/find_devices.jpg" alt="find_devices" width="25%" div align=center />
 
-- 添加对应的设备
+- 选择其中某个设备
 
-<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/select_devices.jpg" alt="select_devices" width="25%" div align=center />
+<img src="./_static/select_root_node.png" alt="select_root_node" width="25%" div align=center />
 
-- 输入配网信息
+- 输入配网信息进入配网
 
 <img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/select_network.jpg" alt="select_network" width="25%" div align=center />
 
-- 点击配对和连接进行配网
+- 配网成功
 
-<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/connect_ble.jpg" alt="connect_ble" width="25%" div align=center />
+<img src="./_static/root_done.png" alt="root_done" width="25%" div align=center />
+
+- 配网成功后的设备
+
+<img src="./_static/root_device_of_common.png" alt="root_device_of_common" width="25%" div align=center />
+
+- 配网成功后的设备所属 Mesh 页面（Mesh ID 为 117）
+
+<img src="./_static/root_device_of_mesh.png" alt="root_device_of_mesh" width="25%" div align=center />
+
+#### 6.2 添加子节点
+
+- 进入对应 Mesh 页面，点击右上角加号
+
+<img src="./_static/mesh_page.png" alt="mesh_page" width="25%" div align=center />
+
+- 选择要配网的子节电设备
+
+<img src="./_static/select_child_devices.jpg" alt="select_child_devices" width="25%" div align=center />
+
+- 输入配网信息（同为路由器信息）进入配网
+
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/select_network.jpg" alt="select_network" width="25%" div align=center />
 
 - 配网成功
 
-<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/done.jpg" alt="done" width="25%" div align=center />
+<img src="./_static/child_done.png" alt="child_done" width="25%" div align=center />
 
-- LED 控制
+#### 6.3 群控
 
-<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/control.jpg" alt="control" width="25%" div align=center />
+- 进入 Mesh 页面，点击对应根节点，进入控制页面进行控制 Mesh 组网内部所有设备的灯效
+
+<img src="./_static/root_control.png" alt="root_control" width="25%" div align=center />
+
+#### 6.4 组控
+
+- 进入 Mesh 页面，点击左下角 Group
+
+<img src="./_static/click_group.png" alt="click_group" width="25%" div align=center />
+
+- 创建 Mesh Group
+
+<img src="./_static/select_device_for_group.png" alt="select_device_for_group" width="25%" div align=center />
+
+- 通过创建的 Group 页面进行控制
+
+<img src="./_static/group_control.png" alt="group_control" width="25%" div align=center />
 
 ### 7. 注意事项
 

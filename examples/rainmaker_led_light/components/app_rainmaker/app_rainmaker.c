@@ -161,7 +161,7 @@ void esp_rmaker_control_light_by_user(char* data)
 
 char group_control_payload[GROUP_CONTROL_PAYLOAD_LEN];
 
-extern void esp_now_send_group_control(uint8_t* payload);
+extern void esp_now_send_group_control(uint8_t* payload, bool seq_init);
 extern bool esp_rmaker_is_my_group_id(uint8_t group_id);
 
 static esp_err_t esp_rmaker_app_handle_set_params(char *data, size_t data_len, esp_rmaker_req_src_t src)
@@ -180,8 +180,9 @@ static esp_err_t esp_rmaker_app_handle_set_params(char *data, size_t data_len, e
                 memset(group_control_payload, 0x0, GROUP_CONTROL_PAYLOAD_LEN);
                 memcpy(group_control_payload, payload_string, GROUP_CONTROL_PAYLOAD_LEN);
                 free(payload_string);
+                payload_string = NULL;
 
-                esp_now_send_group_control((uint8_t*)group_control_payload);
+                esp_now_send_group_control((uint8_t*)group_control_payload, false);
 
                 if (group_id_js->valueint && (esp_rmaker_is_my_group_id(group_id_js->valueint) == false)) {
                     control = false;
