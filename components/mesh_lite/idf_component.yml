@@ -10,4 +10,5 @@ dependencies:
   espressif/cmake_utilities: 0.*
 examples:
   - path: ../../examples/mesh_local_control
+  - path: ../../examples/no_router
   - path: ../../examples/rainmaker/led_light

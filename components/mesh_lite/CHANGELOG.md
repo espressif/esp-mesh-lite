@@ -2,6 +2,18 @@
 
 # ChangeLog
 
+## v0.8.0 - 2023-9-19
+
+### Enhancements:
+
+#### Supported ESP-IDF Version
+
+- Add v5.1
+
+#### Supported Socs
+
+- ESP32-C6
+
 ## v0.7.0 - 2023-9-4
 
 ### Enhancements:
@@ -94,6 +106,8 @@
 - Compile error when MESH_LITE_ENABLE is n
 
 ## v0.1.2 - 2023-3-26
+
+### Enhancements:
 
 #### Supported ESP-IDF Version
 

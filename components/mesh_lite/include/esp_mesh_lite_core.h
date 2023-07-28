@@ -14,6 +14,7 @@ extern "C"
 #include "cJSON.h"
 #include "esp_wifi_types.h"
 #include "esp_netif_ip_addr.h"
+#include "esp_mesh_lite_port.h"
 
 extern const char* ESP_MESH_LITE_EVENT;
 
@@ -184,7 +185,7 @@ esp_err_t esp_mesh_lite_set_disallowed_level(uint8_t level);
  * @param[in]  conf
  *
  */
-esp_err_t esp_mesh_lite_set_router_config(wifi_sta_config_t *conf);
+esp_err_t esp_mesh_lite_set_router_config(mesh_lite_sta_config_t *conf);
 
 /**
  * @brief  Whether to allow other nodes to join the mesh network.
@@ -309,7 +310,7 @@ esp_err_t esp_mesh_lite_get_root_ip(uint8_t type, esp_ip_addr_t *ip_addr);
  *    - ESP_OK
  *    - ESP_ERR_INVALID_ARG
  */
-esp_err_t esp_mesh_lite_get_router_config(wifi_sta_config_t *router_config);
+esp_err_t esp_mesh_lite_get_router_config(mesh_lite_sta_config_t *router_config);
 
 /**
  * @brief  Scan all available APs.

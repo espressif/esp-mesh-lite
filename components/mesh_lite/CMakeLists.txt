@@ -1,8 +1,8 @@
 set(srcs)
-set(require_components "json" "esp_wifi")
+set(require_components "json" "esp_wifi" "app_update")
 
 if (CONFIG_MESH_LITE_ENABLE)
-    list(APPEND srcs "src/esp_mesh_lite.c")
+    list(APPEND srcs "src/esp_mesh_lite.c" "src/esp_mesh_lite_port.c")
 
     set(OLD_PROV_MGR "${IDF_PATH}/components/wifi_provisioning/src/")
     set(NEW_PROV_MGR "${CMAKE_CURRENT_LIST_DIR}/src/wifi_prov/manager.c")

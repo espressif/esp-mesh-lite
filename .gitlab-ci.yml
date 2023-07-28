@@ -109,6 +109,24 @@ esp32_v5.0_build:
     - *build_default_example
     - *build_rainmaker_example
 
+esp32_v5.1_build:
+  stage: build
+  image: espressif/idf:release-v5.1
+  tags:
+    - build
+
+  variables:
+    <<: *global-variables
+    idf_target: esp32
+    idf_branch: release/v5.1
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_default_example
+    - *build_rainmaker_example
+
 esp32c3_v4.3_build:
   stage: build
   image: espressif/idf:release-v4.3
@@ -154,6 +172,24 @@ esp32c3_v5.0_build:
     <<: *global-variables
     idf_target: esp32c3
     idf_branch: release/v5.0
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_default_example
+    - *build_rainmaker_example
+
+esp32c3_v5.1_build:
+  stage: build
+  image: espressif/idf:release-v5.1
+  tags:
+    - build
+
+  variables:
+    <<: *global-variables
+    idf_target: esp32c3
+    idf_branch: release/v5.1
 
   before_script:
     - *before_script_preparation
@@ -213,6 +249,23 @@ esp32s2_v5.0_build:
   script:
     - *build_default_example
 
+esp32s2_v5.1_build:
+  stage: build
+  image: espressif/idf:release-v5.1
+  tags:
+    - build
+
+  variables:
+    <<: *global-variables
+    idf_target: esp32s2
+    idf_branch: release/v5.1
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_default_example
+
 esp32s3_v4.4_build:
   stage: build
   image: espressif/idf:release-v4.4
@@ -241,6 +294,78 @@ esp32s3_v5.0_build:
     <<: *global-variables
     idf_target: esp32s3
     idf_branch: release/v5.0
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_default_example
+    - *build_rainmaker_example
+
+esp32s3_v5.1_build:
+  stage: build
+  image: espressif/idf:release-v5.1
+  tags:
+    - build
+
+  variables:
+    <<: *global-variables
+    idf_target: esp32s3
+    idf_branch: release/v5.1
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_default_example
+    - *build_rainmaker_example
+
+esp32c2_v5.0_build:
+  stage: build
+  image: espressif/idf:release-v5.0
+  tags:
+    - build
+
+  variables:
+    <<: *global-variables
+    idf_target: esp32c2
+    idf_branch: release/v5.0
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_default_example
+    - *build_rainmaker_example
+
+esp32c2_v5.1_build:
+  stage: build
+  image: espressif/idf:release-v5.1
+  tags:
+    - build
+
+  variables:
+    <<: *global-variables
+    idf_target: esp32c2
+    idf_branch: release/v5.1
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *build_default_example
+    - *build_rainmaker_example
+
+esp32c6_v5.1_build:
+  stage: build
+  image: espressif/idf:release-v5.1
+  tags:
+    - build
+
+  variables:
+    <<: *global-variables
+    idf_target: esp32c6
+    idf_branch: release/v5.1
 
   before_script:
     - *before_script_preparation
