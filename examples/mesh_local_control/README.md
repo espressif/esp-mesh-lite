@@ -30,10 +30,7 @@ Enter `idf.py menuconfig`, and configure the followings under the submenu "Examp
  * ESP-WIFI-MESH network: The network password length should be between 8 and 64 bits (both exclusive), and the network will not be encrypted if you leave the password blank.
  * TCP server: the information of the TCP server run on the PC.
 
-<div align=center>
-<img src="device_config.png"  width="800">
-<p> Configure the devices </p>
-</div>
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/mesh_local_control/device_config.png" alt="device_config" width="80%" div align=center />
 
 ### Build and Flash
 

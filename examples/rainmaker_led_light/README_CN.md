@@ -48,27 +48,27 @@ $ idf.py flash
 
 - 打开 Nova Home，APP 自动搜索到待配网设备
 
-<img src="./_static/find_devices.jpg" alt="find_devices" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/find_devices.jpg" alt="find_devices" width="25%" div align=center />
 
 - 添加对应的设备
 
-<img src="./_static/select_devices.jpg" alt="select_devices" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/select_devices.jpg" alt="select_devices" width="25%" div align=center />
 
 - 输入配网信息
 
-<img src="./_static/select_network.jpg" alt="select_network" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/select_network.jpg" alt="select_network" width="25%" div align=center />
 
 - 点击配对和连接进行配网
 
-<img src="./_static/connect_ble.jpg" alt="connect_ble" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/connect_ble.jpg" alt="connect_ble" width="25%" div align=center />
 
 - 配网成功
 
-<img src="./_static/done.jpg" alt="done" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/done.jpg" alt="done" width="25%" div align=center />
 
 - LED 控制
 
-<img src="./_static/control.jpg" alt="control" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/control.jpg" alt="control" width="25%" div align=center />
 
 ### 7. 注意事项
 
