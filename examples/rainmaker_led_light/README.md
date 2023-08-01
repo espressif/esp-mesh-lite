@@ -46,27 +46,27 @@ $ idf.py flash
 
 - Open `Nova Home`, the APP will automatically search for the device to be configured
 
-<img src="./_static/find_devices.jpg" alt="find_devices" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/find_devices.jpg" alt="find_devices" width="25%" div align=center />
 
 - Add devices
 
-<img src="./_static/select_devices.jpg" alt="select_devices" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/select_devices.jpg" alt="select_devices" width="25%" div align=center />
 
 - Enter distribution network information
 
-<img src="./_static/select_network.jpg" alt="select_network" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/select_network.jpg" alt="select_network" width="25%" div align=center />
 
 - Pair and connect to configure the network
 
-<img src="./_static/connect_ble.jpg" alt="connect_ble" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/connect_ble.jpg" alt="connect_ble" width="25%" div align=center />
 
 - Distribution network is successful
 
-<img src="./_static/done.jpg" alt="done" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/done.jpg" alt="done" width="25%" div align=center />
 
 - LED control
 
-<img src="./_static/control.jpg" alt="control" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/control.jpg" alt="control" width="25%" div align=center />
 
 ### 7. Precautions
 

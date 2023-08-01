@@ -176,7 +176,7 @@ ESP-MESH-LITE 默认首先上电的设备作为根节点，若存在多个设备
 
 下图展示了在 ESP-MESH-LITE 网络中，根节点的自动选择过程。
 
-<img src="./docs/_static/root_node_election.png" style="zoom: 50%;" />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/components/mesh_lite/docs/_static/root_node_election.png" style="zoom: 50%;" />
 
 <center>根节点选举示例
 
@@ -220,7 +220,7 @@ ESP-MESH-LITE 网络构建可能会受到节点上电顺序的影响。如果网
 
 下方示例展示了异步上电对网络构建的影响。
 
-<img src="./docs/_static/Network_Construction_Example.png" style="zoom:60%;" />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/components/mesh_lite/docs/_static/Network_Construction_Example.png" style="zoom:60%;" />
 
 <center>网络构建（异步电源）示例
 
@@ -249,7 +249,7 @@ ESP-MESH-LITE 网络构建可能会受到节点上电顺序的影响。如果网
 
 如果根节点和下面多层的节点（例如根节点、第二层节点和第三层节点）同时断开，则位于最浅层的仍在正常工作的节点多次尝试重连失败后，将会重新扫描潜在父节点，若扫描到将选择新的首选父节点形成上行连接，若扫描不到则连接至路由器。
 
-<img src="./docs/_static/mesh-root-node-failure.png" style="zoom:60%;" />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/components/mesh_lite/docs/_static/mesh-root-node-failure.png" style="zoom:60%;" />
 
 <center>根节点故障的自修复示意
 
@@ -303,7 +303,7 @@ ESP-Mesh-Lite 对于每个节点来说，都会使能 LWIP 协议栈，都可以
 
 下图展示了 ESP-MESH-LITE 叶子节点网络通信时双向数据流涉及的各种网络层。
 
-![](./docs/_static/Schematic_diagram_of_bidirectional_data_flow.png)
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/components/mesh_lite/docs/_static/Schematic_diagram_of_bidirectional_data_flow.png" style="zoom:80%;" />
 
 <center>ESP-MESH-LITE 双向数据流
 

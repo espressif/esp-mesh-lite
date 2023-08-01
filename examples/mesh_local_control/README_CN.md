@@ -30,10 +30,7 @@
  * ESP-WIFI-MESH 网络：密码长度要大于 8 位并小于 64 位，设置为空则不加密
  * TCP 服务器：主机上运行的 TCP 服务器信息, 包含：IP 地址、端口
 
-<div align=center>
-<img src="device_config.png"  width="800">
-<p> 配置设备 </p>
-</div>
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/mesh_local_control/device_config.png" alt="device_config" width="80%" div align=center />
 
 ### 编译和烧录
 

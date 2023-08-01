@@ -175,7 +175,7 @@ After all Mesh-Lite devices (with the same Mesh-Lite ID) connected to the same r
 
 The following figure illustrates the automatic root node selection process in an ESP-MESH-LITE network.
 
-<img src="./docs/_static/root_node_election.png" style="zoom: 50%;" />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/components/mesh_lite/docs/_static/root_node_election.png" style="zoom: 50%;" />
 
 <center>Examples of Root Node Selection
 
@@ -219,7 +219,7 @@ ESP-MESH-LITE network building may be affected by the order in which nodes are p
 
 The following example demonstrates the impact of asynchronous power-up on network building.
 
-<img src="./docs/_static/Network_Construction_Example.png" style="zoom:60%;" />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/components/mesh_lite/docs/_static/Network_Construction_Example.png" style="zoom:60%;" />
 
 <center>Example of Network Building (Asynchronous Power)
 
@@ -248,7 +248,7 @@ For the root node, any change (connection or disconnection) in its child nodes w
 
 If the root node and the nodes on the lower layers (e.g., root, the second layer, and the third layer) are disconnected at the same time, the node on the highest layer that is still working will re-scan for potential parent nodes after several failed reconnection attempts. If scanned, a new preferred parent node will be selected to establish an upstream connection. If not, it will connect to the router.
 
-<img src="./docs/_static/mesh-root-node-failure.png" style="zoom:60%;" />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/components/mesh_lite/docs/_static/mesh-root-node-failure.png" style="zoom:60%;" />
 
 <center>Self-healing for Root Node Failure
 
@@ -302,7 +302,7 @@ Each node in ESP-Mesh-Lite enables the LWIP stack and can be treated as a device
 
 The following figure shows the various network layers involved in bidirectional data flow during ESP-MESH-LITE leaf node network communication.
 
-![](./docs/_static/Schematic_diagram_of_bidirectional_data_flow.png)
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/components/mesh_lite/docs/_static/Schematic_diagram_of_bidirectional_data_flow.png" style="zoom:80%;" />
 
 <center>ESP-MESH-LITE Bidirectional Data Flow
 
