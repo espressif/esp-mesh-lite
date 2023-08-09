@@ -29,60 +29,60 @@ dependencies:
   esp_insights:
     path: components/esp_insights
     git: https://github.com/espressif/esp-insights.git
-    version: d21bfb3
+    version: 203a87f
 
   esp_diagnostics:
     path: components/esp_diagnostics
     git: https://github.com/espressif/esp-insights.git
-    version: d21bfb3
+    version: 203a87f
 
   rtc_store:
     path: components/rtc_store
     git: https://github.com/espressif/esp-insights.git
-    version: d21bfb3
+    version: 203a87f
 
   esp_schedule:
     path: components/esp_schedule
     git: https://github.com/espressif/esp-rainmaker.git
-    version: 4f5a886
+    version: 3d5adc5
 
   esp_rainmaker:
     path: components/esp_rainmaker
     git: https://github.com/espressif/esp-rainmaker.git
-    version: 4f5a886
+    version: 3d5adc5
 
   gpio_button:
     path: components/gpio_button
     git: https://github.com/espressif/esp-rainmaker.git
-    version: 4f5a886
+    version: 3d5adc5
 
   json_generator:
     path: components/json_generator
     git: https://github.com/espressif/esp-rainmaker.git
-    version: 4f5a886
+    version: 3d5adc5
 
   json_parser:
     path: components/json_parser
     public: true
     git: https://github.com/espressif/esp-rainmaker.git
-    version: 4f5a886
+    version: 3d5adc5
 
   qrcode:
     path: components/qrcode
     git: https://github.com/espressif/esp-rainmaker.git
-    version: 4f5a886
+    version: 3d5adc5
 
   rmaker_common:
     path: components/rmaker_common
     git: https://github.com/espressif/esp-rainmaker.git
-    version: 4f5a886
+    version: 3d5adc5
 
   app_insights:
     path: examples/common/app_insights
     git: https://github.com/espressif/esp-rainmaker.git
-    version: 4f5a886
+    version: 3d5adc5
 
   app_reset:
     path: examples/common/app_reset
     git: https://github.com/espressif/esp-rainmaker.git
-    version: 4f5a886
+    version: 3d5adc5
