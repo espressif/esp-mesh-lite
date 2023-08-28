@@ -17,7 +17,7 @@
 #define ESPNOW_WIFI_IF   ESP_IF_WIFI_AP
 #endif
 
-#define ESPNOW_QUEUE_SIZE           6
+#define ESPNOW_QUEUE_SIZE           50
 
 #define IS_BROADCAST_ADDR(addr) (memcmp(addr, s_broadcast_mac, ESP_NOW_ETH_ALEN) == 0)
 
@@ -73,4 +73,5 @@ typedef struct {
     uint8_t dest_mac[ESP_NOW_ETH_ALEN];   //MAC address of destination device.
 } app_espnow_send_param_t;
 
+esp_err_t app_espnow_reset_group_control(void);
 esp_err_t app_espnow_init(void);

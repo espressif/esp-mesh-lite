@@ -1,5 +1,8 @@
 - [中文版本](https://github.com/espressif/esp-mesh-lite/blob/master/examples/mesh_local_control/README_CN.md)
 
+| Supported Targets | ESP32 | ESP32-C2 | ESP32-C3 | ESP32-S2 | ESP32-S3 |
+| ----------------- | ----- | -------- | -------- | -------- | -------- |
+
 # Mesh Local Control Example
 
 ## Introduction

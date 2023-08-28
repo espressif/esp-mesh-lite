@@ -151,10 +151,7 @@ esp_err_t app_light_init(void)
 
 static void push_btn_cb(void *arg)
 {
-    app_light_set_power(!g_power);
-    esp_rmaker_param_update_and_report(
-            esp_rmaker_device_get_param_by_type(light_device, ESP_RMAKER_PARAM_POWER),
-            esp_rmaker_bool(g_power));
+    app_espnow_reset_group_control();
 }
 
 void app_driver_init()

@@ -2,6 +2,24 @@
 
 # ChangeLog
 
+# v0.5.0 - 2023-8-3
+
+### Enhancements:
+
+#### Mesh
+
+- feat: Add join mesh without configured wifi.
+- feat: Optimization for the "no_router" scenario.
+- feat: Adapted to the new Nova Home APP and improved group control functionality.
+
+#### Bugfix
+
+- fix: circular recovery issue caused by hard reboot
+
+#### Docs
+
+- feat: update image url
+
 # v0.4.0 - 2023-7-12
 
 ### Enhancements:
