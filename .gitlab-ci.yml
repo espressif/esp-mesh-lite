@@ -30,6 +30,7 @@ default:
   - chmod 600 ~/.ssh/id_rsa
   - echo -e "Host gitlab.espressif.cn\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - export IDF_PATH=/opt/esp/idf
+  - python -m pip install --upgrade idf-component-manager
 
 .build_mesh_local_control_example: &build_mesh_local_control_example
   - cd examples/mesh_local_control
