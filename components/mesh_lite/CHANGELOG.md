@@ -2,6 +2,18 @@
 
 # ChangeLog
 
+# v0.6.0 - 2023-8-29
+
+### Enhancements:
+
+#### Mesh
+
+- feat: Remove end_with_mac field to accommodate various types of suffixes.
+
+#### Bugfix
+
+- fix: child node cannot join mesh when root disconnect the router
+
 # v0.5.0 - 2023-8-3
 
 ### Enhancements:
