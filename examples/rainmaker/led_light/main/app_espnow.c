@@ -11,7 +11,10 @@
 #include "freertos/semphr.h"
 #include "cJSON.h"
 #include "esp_log.h"
+#include "esp_timer.h"
 #include "esp_netif_types.h"
+
+#include "app_wifi.h"
 #include "app_espnow.h"
 #include "esp_mesh_lite.h"
 
@@ -21,7 +24,12 @@
 
 #define ESPNOW_DEBUG                     0
 #define ESPNOW_MAXDELAY                  512
-#define GROUP_CONTROL_PAYLOAD_LEN        250
+#define GROUP_CONTROL_PAYLOAD_MAX_LEN    250
+#define ESPNOW_PAYLOAD_HEAD_LEN          5
+
+#define ESPNOW_DEVICE_NAME               "Light"
+#define ESPNOW_GROUP_ID                  "group_id"
+#define ESPNOW_DISTRIBUTION_NETWORK      "distribution_network"
 
 typedef enum espnow_msg_mode {
     ESPNOW_MSG_MODE_INVALID = 0,
@@ -31,7 +39,7 @@ typedef enum espnow_msg_mode {
 
 extern bool esp_rmaker_is_my_group_id(uint8_t group_id);
 extern void esp_rmaker_control_light_by_user(char* data);
-extern char group_control_payload[GROUP_CONTROL_PAYLOAD_LEN];
+extern char group_control_payload[GROUP_CONTROL_PAYLOAD_MAX_LEN];
 
 static const char *TAG = "app_espnow";
 static uint32_t current_seq = 0;
@@ -49,19 +57,22 @@ typedef struct esp_now_msg_send {
 static esp_now_msg_send_t* sent_msgs;
 
 /* Parse received ESPNOW data. */
-int espnow_data_parse(uint8_t *data, uint16_t data_len, uint32_t *seq, uint8_t *payload)
+esp_err_t espnow_data_parse(uint8_t *data, uint16_t data_len, uint32_t *seq, uint8_t *payload)
 {
     app_espnow_data_t *buf = (app_espnow_data_t *)data;
 
     if (data_len < sizeof(app_espnow_data_t)) {
         ESP_LOGE(TAG, "Receive ESPNOW data too short, len:%d", data_len);
-        return -1;
+        return ESP_FAIL;
     }
 
     *seq = buf->seq;
-    memcpy(payload, buf->payload, data_len - 4);
+    if (buf->mesh_id == esp_mesh_lite_get_mesh_id()) {
+        memcpy(payload, buf->payload, data_len - ESPNOW_PAYLOAD_HEAD_LEN);
+        return ESP_OK;
+    }
 
-    return -1;
+    return ESP_FAIL;
 }
 
 /* Prepare ESPNOW data to be sent. */
@@ -74,6 +85,7 @@ void espnow_data_prepare(uint8_t *buf, uint8_t* payload, size_t payload_len, boo
     } else {
         temp->seq = ++current_seq;
     }
+    temp->mesh_id = esp_mesh_lite_get_mesh_id();
 #if ESPNOW_DEBUG
     printf("send seq: %"PRIu32", current_seq: %"PRIu32"\r\n", temp->seq, current_seq);
     ESP_LOGW(TAG, "free heap %d, minimum %d", esp_get_free_heap_size(), esp_get_minimum_free_heap_size());
@@ -110,16 +122,16 @@ static void esp_now_send_timer_cb(TimerHandle_t timer)
 void esp_now_send_group_control(uint8_t* payload, bool seq_init)
 {
     size_t payload_len = strlen((char*)payload);
-    uint8_t *buf = calloc(1, payload_len + 4);
+    uint8_t *buf = calloc(1, payload_len + ESPNOW_PAYLOAD_HEAD_LEN);
     espnow_data_prepare(buf, payload, payload_len, seq_init);
-    if (esp_now_send(s_broadcast_mac, buf, payload_len + 4) != ESP_OK) {
+    if (esp_now_send(s_broadcast_mac, buf, payload_len + ESPNOW_PAYLOAD_HEAD_LEN) != ESP_OK) {
         ESP_LOGE(TAG, "Send error");
     }
 
     xSemaphoreTake(sent_msgs_mutex, portMAX_DELAY);
     sent_msgs->retry_times = 0;
     sent_msgs->max_retry = 2;
-    sent_msgs->msg_len = payload_len + 4;
+    sent_msgs->msg_len = payload_len + ESPNOW_PAYLOAD_HEAD_LEN;
     sent_msgs->sent_msg = buf;
     xSemaphoreGive(sent_msgs_mutex);
 }
@@ -196,19 +208,21 @@ static void espnow_task(void *pvParameter)
             {
                 app_espnow_event_recv_cb_t *recv_cb = &evt.info.recv_cb;
                 uint32_t recv_seq;
-                memset(group_control_payload, 0x0, GROUP_CONTROL_PAYLOAD_LEN);
-                espnow_data_parse(recv_cb->data, recv_cb->data_len, &recv_seq, (uint8_t*)group_control_payload);
+                memset(group_control_payload, 0x0, GROUP_CONTROL_PAYLOAD_MAX_LEN);
+                if (espnow_data_parse(recv_cb->data, recv_cb->data_len, &recv_seq, (uint8_t*)group_control_payload) != ESP_OK) {
+                    goto cleanup;
+                }
 
                 cJSON *light_js = NULL;
                 cJSON *rmaker_data_js = cJSON_Parse((const char*)group_control_payload);
                 if (rmaker_data_js) {
-                    light_js = cJSON_GetObjectItem(rmaker_data_js, "Light");
+                    light_js = cJSON_GetObjectItem(rmaker_data_js, ESPNOW_DEVICE_NAME);
                     if (!light_js) {
                         cJSON_Delete(rmaker_data_js);
-                        break;
+                        goto cleanup;
                     }
                 } else {
-                    break;
+                    goto cleanup;
                 }
 
 #if ESPNOW_DEBUG
@@ -249,7 +263,7 @@ static void espnow_task(void *pvParameter)
                         ESP_LOGE(TAG, "Send error");
                     }
 
-                    cJSON *group_id_js = cJSON_GetObjectItem(light_js, "group_id");
+                    cJSON *group_id_js = cJSON_GetObjectItem(light_js, ESPNOW_GROUP_ID);
                     if (group_id_js) {
                         if (group_id_js->valueint && (esp_rmaker_is_my_group_id(group_id_js->valueint) == false)) {
                             ESP_LOGW(TAG, "The Group_id[%d] does not belong to the device, and control information is ignored", group_id_js->valueint);
@@ -257,12 +271,32 @@ static void espnow_task(void *pvParameter)
                             esp_rmaker_control_light_by_user(group_control_payload);
                         }
                     }
+
+                    cJSON *control_js = cJSON_GetObjectItem(light_js, ESPNOW_DISTRIBUTION_NETWORK);
+                    if (control_js) {
+                        bool provisioned = false;
+                        /* Let's find out if the device is provisioned */
+                        ESP_ERROR_CHECK(wifi_prov_mgr_is_provisioned(&provisioned));
+                        /* If device is not yet provisioned start provisioning service */
+                        if (!provisioned) {
+                            if (app_wifi_prov_is_timeout()) {
+                                ESP_LOGI(TAG, "Starting provisioning");
+                                esp_restart();
+                            } else {
+                                ESP_LOGW(TAG, "In provisioning");
+                            }
+                        } else {
+                            ESP_LOGW(TAG, "Already provisioned");
+                        }
+                    }
+
                     last_espnow_msg_mode = espnow_msg_mode;
                     time_stamp = esp_timer_get_time();
                 } else {
                     /* repeat */
                 }
                 cJSON_Delete(rmaker_data_js);
+cleanup:
                 free(recv_cb->data);
                 recv_cb->data = NULL;
                 break;
@@ -281,8 +315,8 @@ esp_err_t app_espnow_reset_group_control(void)
     cJSON *payload = cJSON_CreateObject();
     if (object) {
         if (payload) {
-            cJSON_AddNumberToObject(payload, "group_id", 0);
-            cJSON_AddItemToObject(object, "Light", payload);
+            cJSON_AddNumberToObject(payload, ESPNOW_GROUP_ID, 0);
+            cJSON_AddItemToObject(object, ESPNOW_DEVICE_NAME, payload);
             char *rsp_string = cJSON_PrintUnformatted(object);
             if (rsp_string) {
                 current_seq = 0;

@@ -1,0 +1,30 @@
+menu "Distribution Network Controller Example"
+
+    menu "Button Configuration"
+        config APP_GPIO_BUTTON_SW1
+            default 16 if IDF_TARGET_ESP32   || IDF_TARGET_ESP32H2
+            default 38 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+            default 9
+            int "GPIO button of switch"
+            help
+                Set the GPIO button of switch.
+    endmenu
+
+    menu "ESPNOW Configuration"
+
+        config ESPNOW_PMK
+            string "ESPNOW primary master key"
+            default "pmk1234567890123"
+            help
+                ESPNOW primary master for the example to use. The length of ESPNOW primary master must be 16 bytes.
+
+        config ESPNOW_CHANNEL
+            int "Channel"
+            default 1
+            range 0 14
+            help
+                The channel on which sending and receiving ESPNOW data.
+
+    endmenu
+
+endmenu

@@ -57,6 +57,7 @@ enum {
 /* User defined field of ESPNOW data in this example. */
 typedef struct {
     uint32_t seq;                         //Magic number which is used to determine which device to send unicast ESPNOW data.
+    uint8_t mesh_id;                      //Mesh ID of ESPNOW data
     uint8_t payload[0];                   //Real payload of ESPNOW data.
 } __attribute__((packed)) app_espnow_data_t;
 
@@ -73,5 +74,5 @@ typedef struct {
     uint8_t dest_mac[ESP_NOW_ETH_ALEN];   //MAC address of destination device.
 } app_espnow_send_param_t;
 
-esp_err_t app_espnow_reset_group_control(void);
 esp_err_t app_espnow_init(void);
+esp_err_t app_espnow_reset_group_control(void);

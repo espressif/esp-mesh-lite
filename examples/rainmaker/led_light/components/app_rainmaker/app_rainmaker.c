@@ -7,12 +7,17 @@
 #include <string.h>
 #include <esp_log.h>
 #include <esp_rmaker_standard_params.h>
+#include <app_insights.h>
 #include <esp_rmaker_ota.h>
+#include <esp_rmaker_mqtt.h>
+#include <esp_rmaker_schedule.h>
 #include <esp_rmaker_common_events.h>
-
+#include <esp_rmaker_standard_devices.h>
 #include <cJSON.h>
-#include <app_light.h>
-#include <app_rainmaker_ota.h>
+
+#include "app_light.h"
+#include "app_rainmaker_ota.h"
+#include "esp_mesh_lite.h"
 
 static const char *TAG = "app_rainmaker";
 
@@ -75,7 +80,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
                 ESP_LOGI(TAG, "RainMaker Claim Failed.");
                 break;
             default:
-                ESP_LOGW(TAG, "Unhandled RainMaker Event: %d", event_id);
+                ESP_LOGW(TAG, "Unhandled RainMaker Event: %"PRId32"", event_id);
         }
     } else if (event_base == RMAKER_COMMON_EVENT) {
         switch (event_id) {
@@ -114,7 +119,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
                 esp_mesh_lite_erase_rtc_store();
                 break;
             default:
-                ESP_LOGW(TAG, "Unhandled RainMaker Common Event: %d", event_id);
+                ESP_LOGW(TAG, "Unhandled RainMaker Common Event: %"PRId32"", event_id);
         }
     } else {
         ESP_LOGW(TAG, "Invalid event received!");

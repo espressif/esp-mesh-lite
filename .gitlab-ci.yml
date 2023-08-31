@@ -39,8 +39,13 @@ default:
   - idf.py build
   - cd -
 
-.build_rainmaker_led_light_example: &build_rainmaker_led_light_example
-  - cd examples/rainmaker_led_light
+.build_rainmaker_example: &build_rainmaker_example
+  - cd examples/rainmaker/led_light
+  - rm -rf build sdkconfig
+  - idf.py set-target ${idf_target}
+  - idf.py build
+  - cd -
+  - cd examples/rainmaker/provisioning_controller
   - rm -rf build sdkconfig
   - idf.py set-target ${idf_target}
   - idf.py build
@@ -79,7 +84,7 @@ esp32_v4.4_build:
 
   script:
     - *build_mesh_local_control_example
-    - *build_rainmaker_led_light_example
+    - *build_rainmaker_example
 
 esp32_v5.0_build:
   stage: build
@@ -97,7 +102,7 @@ esp32_v5.0_build:
 
   script:
     - *build_mesh_local_control_example
-    - *build_rainmaker_led_light_example
+    - *build_rainmaker_example
 
 esp32c3_v4.3_build:
   stage: build
@@ -132,7 +137,7 @@ esp32c3_v4.4_build:
 
   script:
     - *build_mesh_local_control_example
-    - *build_rainmaker_led_light_example
+    - *build_rainmaker_example
 
 esp32c3_v5.0_build:
   stage: build
@@ -150,7 +155,7 @@ esp32c3_v5.0_build:
 
   script:
     - *build_mesh_local_control_example
-    - *build_rainmaker_led_light_example
+    - *build_rainmaker_example
 
 esp32s2_v4.3_build:
   stage: build
@@ -219,7 +224,7 @@ esp32s3_v4.4_build:
 
   script:
     - *build_mesh_local_control_example
-    - *build_rainmaker_led_light_example
+    - *build_rainmaker_example
 
 esp32s3_v5.0_build:
   stage: build
@@ -237,7 +242,7 @@ esp32s3_v5.0_build:
 
   script:
     - *build_mesh_local_control_example
-    - *build_rainmaker_led_light_example
+    - *build_rainmaker_example
 
 push_master_to_github:
   stage: deploy

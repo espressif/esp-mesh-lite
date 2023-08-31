@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "inttypes.h"
 #include "nvs.h"
 #include "nvs_flash.h"
 #include "esp_log.h"
@@ -32,9 +33,9 @@ void session_cost_information(const char *tag, const char *func, int line, const
 {
     static uint32_t free_heap = 0;
 
-    ESP_LOGW(tag, "%s %d %s const heap %d", func, line, desc ? desc : "NULL", esp_get_free_heap_size() - free_heap);
+    ESP_LOGW(tag, "%s %d %s const heap %"PRIu32"", func, line, desc ? desc : "NULL", esp_get_free_heap_size() - free_heap);
     free_heap = esp_get_free_heap_size();
-    ESP_LOGW(tag, "free heap %d, minimum %d", free_heap, esp_get_minimum_free_heap_size());
+    ESP_LOGW(tag, "free heap %"PRIu32", minimum %"PRIu32"", free_heap, esp_get_minimum_free_heap_size());
 }
 
 void app_main(void)
@@ -47,10 +48,10 @@ void app_main(void)
 
     app_rainmaker_start();
 
-    /* Start wifi provisioning */
-    app_wifi_start(POP_TYPE_MAC);
-
     app_rmaker_mesh_lite_service_create();
 
     app_espnow_init();
+
+    /* Start wifi provisioning */
+    app_wifi_start(POP_TYPE_MAC);
 }

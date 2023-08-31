@@ -72,7 +72,7 @@
 #### Bugfix
 
 - Disable PMF in the Demo example.
-- Remove `CONFIG_LWIP_IPV6=n` to resolve the compilation issue of rainmaker_led_light.
+- Remove `CONFIG_LWIP_IPV6=n` to resolve the compilation issue of rainmaker/led_light.
 - Optimize the mesh_local_control example to resolve the problem of socket connect blocking the event task.
 
 ## v0.2.0 - 2023-6-5

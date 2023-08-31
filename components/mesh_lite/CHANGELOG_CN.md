@@ -69,7 +69,7 @@
 
 #### 修复
 
-- 删除 `CONFIG_LWIP_IPV6=n`，解决 rainmaker_led_light 编译不过的问题
+- 删除 `CONFIG_LWIP_IPV6=n`，解决 rainmaker/led_light 编译不过的问题
 - Demo 示例禁用 PMF
 - 优化 mesh_local_control 示例，解决 socket connect 阻塞 event task 的问题
 
