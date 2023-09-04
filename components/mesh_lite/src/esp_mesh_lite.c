@@ -199,6 +199,7 @@ static void esp_mesh_lite_event_ip_changed_handler(void *arg, esp_event_base_t e
             break;
         case ESP_MESH_LITE_EVENT_OTA_SUCCESS:
             ESP_LOGI(TAG, "LAN OTA Success");
+            esp_restart();
             break;
     }
 }
