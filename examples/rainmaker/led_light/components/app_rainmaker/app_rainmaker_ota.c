@@ -8,7 +8,7 @@
 #include <esp_wifi.h>
 #include <esp_rmaker_standard_params.h>
 #include <esp_rmaker_ota.h>
-
+#include <esp_rmaker_utils.h>
 #include <app_rainmaker_ota.h>
 
 static const char *TAG = "app_rainmaker_ota";

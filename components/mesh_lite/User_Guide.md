@@ -402,7 +402,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 
 **Notes**
 
-> For specific provisioning code modification, please refer to [Wi-Fi Provisioning](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker_led_light/components/app_wifi/app_wifi.c).
+> For specific provisioning code modification, please refer to [Wi-Fi Provisioning](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker/led_light/components/app_wifi/app_wifi.c).
 >
 > Except for the provisioning connection part, the rest of the network applications (Socket, MQTT, HTTP, etc.) do not need to be modified.
 

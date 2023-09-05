@@ -63,6 +63,7 @@ static EventGroupHandle_t wifi_event_group;
 
 #define POP_STR_SIZE            (9)
 static esp_timer_handle_t prov_stop_timer;
+static bool prov_timeout = false;
 /* Timeout period in minutes */
 #define APP_WIFI_PROV_TIMEOUT_PERIOD   CONFIG_APP_WIFI_PROV_TIMEOUT_PERIOD
 /* Autofetch period in micro-seconds */
@@ -388,7 +389,7 @@ static esp_err_t rainmaker_mesh_lite_handler(uint32_t session_id, const uint8_t 
     config.authmode = strlen((char*)config.password) < 8 ? WIFI_AUTH_OPEN : WIFI_AUTH_WPA2_PSK;
     ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, (wifi_config_t*)&config));
 
-    ESP_LOGW("heap", "free heap %d, minimum %d", esp_get_free_heap_size(), esp_get_minimum_free_heap_size());
+    ESP_LOGW("heap", "free heap %"PRIu32", minimum  %"PRIu32"", esp_get_free_heap_size(), esp_get_minimum_free_heap_size());
 
     return ESP_OK;
 }
@@ -516,8 +517,14 @@ pop_err:
 static void app_wifi_prov_stop(void *priv)
 {
     ESP_LOGW(TAG, "Provisioning timed out. Please reboot device to restart provisioning.");
+    prov_timeout = true;
     wifi_prov_mgr_stop_provisioning();
     esp_event_post(APP_WIFI_EVENT, APP_WIFI_EVENT_PROV_TIMEOUT, NULL, 0, portMAX_DELAY);
+}
+
+bool app_wifi_prov_is_timeout(void)
+{
+    return prov_timeout;
 }
 
 esp_err_t app_wifi_start_timer(void)
@@ -535,6 +542,7 @@ esp_err_t app_wifi_start_timer(void)
         esp_timer_start_once(prov_stop_timer, prov_timeout_period);
         ESP_LOGI(TAG, "Provisioning will auto stop after %d minute(s).",
                 APP_WIFI_PROV_TIMEOUT_PERIOD);
+        prov_timeout = false;
         return ESP_OK;
     } else {
         ESP_LOGE(TAG, "Failed to create Provisioning auto stop timer.");
@@ -548,8 +556,6 @@ esp_err_t app_wifi_start(app_wifi_pop_type_t pop_type)
 
     /* Register our event handler for Wi-Fi, IP and Provisioning related events */
     ESP_ERROR_CHECK(esp_event_handler_register(WIFI_PROV_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL));
-    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL));
-    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler, NULL));
 
     /* Configuration for the provisioning manager */
     wifi_prov_mgr_config_t config = {
@@ -676,9 +682,6 @@ esp_err_t app_wifi_start(app_wifi_pop_type_t pop_type)
     }
     /* Wait for Wi-Fi connection */
     xEventGroupWaitBits(wifi_event_group, WIFI_CONNECTED_EVENT, false, true, portMAX_DELAY);
-
-    ESP_ERROR_CHECK(esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler));
-    ESP_ERROR_CHECK(esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler));
 
     return ESP_OK;
 }

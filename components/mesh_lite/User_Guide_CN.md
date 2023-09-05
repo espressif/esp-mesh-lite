@@ -403,7 +403,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 
 **备注**
 
-> 具体配网代码修改请参考 [Wi-Fi Provisioning](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker_led_light/components/app_wifi/app_wifi.c)
+> 具体配网代码修改请参考 [Wi-Fi Provisioning](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker/led_light/components/app_wifi/app_wifi.c)
 >
 > 除了配网连接部分的修改，其余的网络应用（Socket、MQTT、HTTP 等）均不需要修改
 

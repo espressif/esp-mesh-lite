@@ -1,4 +1,4 @@
-- [English Version](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker_led_light/README.md)
+- [English Version](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker/led_light/README.md)
 
 | Supported Targets | ESP32 | ESP32-C3 | ESP32-S3 |
 | ----------------- | ----- | -------- | -------- |
@@ -53,65 +53,65 @@ $ idf.py flash
 
 - 打开 Nova Home，APP 自动搜索到待配网设备
 
-<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/find_devices.jpg" alt="find_devices" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker/led_light/_static/find_devices.jpg" alt="find_devices" width="25%" div align=center />
 
 - 选择其中某个设备
 
-<img src="./_static/select_root_node.png" alt="select_root_node" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker/led_light/_static/select_root_node.png" alt="select_root_node" width="25%" div align=center />
 
 - 输入配网信息进入配网
 
-<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/select_network.jpg" alt="select_network" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker/led_light/_static/select_network.jpg" alt="select_network" width="25%" div align=center />
 
 - 配网成功
 
-<img src="./_static/root_done.png" alt="root_done" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker/led_light/_static/root_done.png" alt="root_done" width="25%" div align=center />
 
 - 配网成功后的设备
 
-<img src="./_static/root_device_of_common.png" alt="root_device_of_common" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker/led_light/_static/root_device_of_common.png" alt="root_device_of_common" width="25%" div align=center />
 
 - 配网成功后的设备所属 Mesh 页面（Mesh ID 为 117）
 
-<img src="./_static/root_device_of_mesh.png" alt="root_device_of_mesh" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker/led_light/_static/root_device_of_mesh.png" alt="root_device_of_mesh" width="25%" div align=center />
 
 #### 6.2 添加子节点
 
 - 进入对应 Mesh 页面，点击右上角加号
 
-<img src="./_static/mesh_page.png" alt="mesh_page" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker/led_light/_static/mesh_page.png" alt="mesh_page" width="25%" div align=center />
 
 - 选择要配网的子节电设备
 
-<img src="./_static/select_child_devices.jpg" alt="select_child_devices" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker/led_light/_static/select_child_devices.jpg" alt="select_child_devices" width="25%" div align=center />
 
 - 输入配网信息（同为路由器信息）进入配网
 
-<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker_led_light/_static/select_network.jpg" alt="select_network" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker/led_light/_static/select_network.jpg" alt="select_network" width="25%" div align=center />
 
 - 配网成功
 
-<img src="./_static/child_done.png" alt="child_done" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker/led_light/_static/child_done.png" alt="child_done" width="25%" div align=center />
 
 #### 6.3 群控
 
 - 进入 Mesh 页面，点击对应根节点，进入控制页面进行控制 Mesh 组网内部所有设备的灯效
 
-<img src="./_static/root_control.png" alt="root_control" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker/led_light/_static/root_control.png" alt="root_control" width="25%" div align=center />
 
 #### 6.4 组控
 
 - 进入 Mesh 页面，点击左下角 Group
 
-<img src="./_static/click_group.png" alt="click_group" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker/led_light/_static/click_group.png" alt="click_group" width="25%" div align=center />
 
 - 创建 Mesh Group
 
-<img src="./_static/select_device_for_group.png" alt="select_device_for_group" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker/led_light/_static/select_device_for_group.png" alt="select_device_for_group" width="25%" div align=center />
 
 - 通过创建的 Group 页面进行控制
 
-<img src="./_static/group_control.png" alt="group_control" width="25%" div align=center />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/rainmaker/led_light/_static/group_control.png" alt="group_control" width="25%" div align=center />
 
 ### 7. 注意事项
 
