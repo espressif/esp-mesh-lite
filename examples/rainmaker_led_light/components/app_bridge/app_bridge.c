@@ -553,6 +553,8 @@ esp_err_t app_rmaker_enable_bridge(void)
     esp_mesh_lite_config_t mesh_lite_config = ESP_MESH_LITE_DEFAULT_INIT();
     esp_mesh_lite_init(&mesh_lite_config);
 
+    esp_mesh_lite_start();
+
     child_info_mutex = xSemaphoreCreateMutex();
 
     for (uint8_t i = 0; i < MAX_STATION; i++) {

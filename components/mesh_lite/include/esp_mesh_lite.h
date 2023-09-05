@@ -37,6 +37,12 @@ typedef enum {
  */
 void esp_mesh_lite_init(esp_mesh_lite_config_t* config);
 
+/**
+ * @brief Start Mesh-Lite.
+ * 
+ */
+void esp_mesh_lite_start(void);
+
 typedef struct  esp_mesh_lite_node_info {
     uint8_t level;
     char mac[MAC_MAX_LEN];

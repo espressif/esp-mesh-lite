@@ -31,6 +31,8 @@ ESP-MESH-LITE is a Wi-Fi networking application of [IoT-Bridge](https://github.c
 
     esp_mesh_lite_config_t mesh_lite_config = ESP_MESH_LITE_DEFAULT_INIT();
     esp_mesh_lite_init(&mesh_lite_config);
+
+    esp_mesh_lite_start();
 	```
 
 ## Add component to your project

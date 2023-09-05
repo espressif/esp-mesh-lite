@@ -1,5 +1,18 @@
 # ChangeLog
 
+# v0.7.0 - 2023-9-4
+
+### Enhancements:
+
+#### Mesh
+
+- 增加 esp_mesh_lite_start API
+- LAN OTA: LAN OTA 成功后 esp_restart 的调用放到 lib 外部
+
+#### Bugfix
+
+- 修复网络异常时的内存泄露
+
 # v0.6.0 - 2023-8-29
 
 ### Enhancements:

@@ -2,6 +2,19 @@
 
 # ChangeLog
 
+# v0.7.0 - 2023-9-4
+
+### Enhancements:
+
+#### Mesh
+
+- feat: Add esp_mesh_lite_start API
+- chore(LAN OTA): After LAN OTA is successful, the call of esp_restart is placed outside lib
+
+#### Bugfix
+
+- fix: Fix the memory leak when the network is abnormal
+
 # v0.6.0 - 2023-8-29
 
 ### Enhancements:
