@@ -5,7 +5,7 @@
 
 # LED Light Example(Nova Home)
 
-This example uses the Rainmaker cloud platform to demonstrate the ESP-Mesh-Lite function. User can configure the device through the `Nova Home` APP and successfully connect to the Rainmaker cloud. The device is connected to the cloud based on Rainmaker, It can also provide other devices with the ability to surf the Internet wirelessly, and form a network with the Mesh-Lite function, which greatly reduces the load on the router and expands the wireless communication range.
+This example uses the [Rainmaker cloud platform](https://rainmaker.espressif.com) to demonstrate the ESP-Mesh-Lite function. User can configure the device through the `Nova Home` APP and successfully connect to the Rainmaker cloud. The device is connected to the cloud based on Rainmaker, It can also provide other devices with the ability to surf the Internet wirelessly, and form a network with the Mesh-Lite function, which greatly reduces the load on the router and expands the wireless communication range.
 
 ## Get Start
 

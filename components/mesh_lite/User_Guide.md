@@ -302,7 +302,7 @@ Each node in ESP-Mesh-Lite enables the LWIP stack and can be treated as a device
 
 The following figure shows the various network layers involved in bidirectional data flow during ESP-MESH-LITE leaf node network communication.
 
-<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/components/mesh_lite/docs/_static/Schematic_diagram_of_bidirectional_data_flow.png" style="zoom:80%;" />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/components/mesh_lite/docs/_static/Schematic_diagram_of_bidirectional_data_flow.jpg" style="zoom:80%;" />
 
 <center>ESP-MESH-LITE Bidirectional Data Flow
 

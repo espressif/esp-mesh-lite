@@ -2,7 +2,7 @@
 
 # ChangeLog
 
-# v0.7.0 - 2023-9-4
+## v0.7.0 - 2023-9-4
 
 ### Enhancements:
 
@@ -15,7 +15,7 @@
 
 - fix: Fix the memory leak when the network is abnormal
 
-# v0.6.0 - 2023-8-29
+## v0.6.0 - 2023-8-29
 
 ### Enhancements:
 
@@ -27,7 +27,7 @@
 
 - fix: child node cannot join mesh when root disconnect the router
 
-# v0.5.0 - 2023-8-3
+## v0.5.0 - 2023-8-3
 
 ### Enhancements:
 
@@ -45,7 +45,7 @@
 
 - feat: update image url
 
-# v0.4.0 - 2023-7-12
+## v0.4.0 - 2023-7-12
 
 ### Enhancements:
 

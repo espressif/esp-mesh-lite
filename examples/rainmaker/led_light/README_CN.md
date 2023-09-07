@@ -5,7 +5,7 @@
 
 # LED Light 示例(Nova Home)
 
-本示例通过使用 Rainmaker 云平台来展示 ESP-Mesh-Lite 功能，用户可通过 `Nova Home` APP 来为设备配网并使设备成功连接至 Rainmaker 云端，设备本身基于 Rainmaker 实现自身连接云端的同时，还可以为其他无线设备提供无线上网的能力，多个设备形成 Mesh 组网，极大程度上减轻路由器承载压力，同时扩大了无线通信范围。
+本示例通过使用 [Rainmaker 云平台](https://rainmaker.espressif.com) 来展示 ESP-Mesh-Lite 功能，用户可通过 `Nova Home` APP 来为设备配网并使设备成功连接至 Rainmaker 云端，设备本身基于 Rainmaker 实现自身连接云端的同时，还可以为其他无线设备提供无线上网的能力，多个设备形成 Mesh 组网，极大程度上减轻路由器承载压力，同时扩大了无线通信范围。
 
 ## Get Start
 
