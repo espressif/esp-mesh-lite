@@ -1,0 +1,17 @@
+menu "Example Configuration"
+
+    config MESH_ROOT
+        select JOIN_MESH_IGNORE_ROUTER_STATUS
+        bool "Root device"
+        default n
+        help
+            Configure the root device type.
+
+    config MESH_CHANNEL
+        int "Mesh network channel"
+        range 1 14
+        default 11
+        help
+            Mesh network channel.
+
+endmenu
