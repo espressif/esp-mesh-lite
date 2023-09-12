@@ -303,7 +303,7 @@ ESP-Mesh-Lite 对于每个节点来说，都会使能 LWIP 协议栈，都可以
 
 下图展示了 ESP-MESH-LITE 叶子节点网络通信时双向数据流涉及的各种网络层。
 
-<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/components/mesh_lite/docs/_static/Schematic_diagram_of_bidirectional_data_flow.png" style="zoom:80%;" />
+<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/components/mesh_lite/docs/_static/Schematic_diagram_of_bidirectional_data_flow.jpg" style="zoom:80%;" />
 
 <center>ESP-MESH-LITE 双向数据流
 
