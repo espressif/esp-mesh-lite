@@ -32,8 +32,13 @@ default:
   - export IDF_PATH=/opt/esp/idf
   - python -m pip install --upgrade idf-component-manager
 
-.build_mesh_local_control_example: &build_mesh_local_control_example
+.build_default_example: &build_default_example
   - cd examples/mesh_local_control
+  - rm -rf build sdkconfig
+  - idf.py set-target ${idf_target}
+  - idf.py build
+  - cd -
+  - cd examples/no_router
   - rm -rf build sdkconfig
   - idf.py set-target ${idf_target}
   - idf.py build
@@ -66,7 +71,7 @@ esp32_v4.3_build:
     - *before_script_preparation
 
   script:
-    - *build_mesh_local_control_example
+    - *build_default_example
 
 esp32_v4.4_build:
   stage: build
@@ -83,7 +88,7 @@ esp32_v4.4_build:
     - *before_script_preparation
 
   script:
-    - *build_mesh_local_control_example
+    - *build_default_example
     - *build_rainmaker_example
 
 esp32_v5.0_build:
@@ -101,7 +106,7 @@ esp32_v5.0_build:
     - *before_script_preparation
 
   script:
-    - *build_mesh_local_control_example
+    - *build_default_example
     - *build_rainmaker_example
 
 esp32c3_v4.3_build:
@@ -119,7 +124,7 @@ esp32c3_v4.3_build:
     - *before_script_preparation
 
   script:
-    - *build_mesh_local_control_example
+    - *build_default_example
 
 esp32c3_v4.4_build:
   stage: build
@@ -136,7 +141,7 @@ esp32c3_v4.4_build:
     - *before_script_preparation
 
   script:
-    - *build_mesh_local_control_example
+    - *build_default_example
     - *build_rainmaker_example
 
 esp32c3_v5.0_build:
@@ -154,7 +159,7 @@ esp32c3_v5.0_build:
     - *before_script_preparation
 
   script:
-    - *build_mesh_local_control_example
+    - *build_default_example
     - *build_rainmaker_example
 
 esp32s2_v4.3_build:
@@ -172,7 +177,7 @@ esp32s2_v4.3_build:
     - *before_script_preparation
 
   script:
-    - *build_mesh_local_control_example
+    - *build_default_example
 
 esp32s2_v4.4_build:
   stage: build
@@ -189,7 +194,7 @@ esp32s2_v4.4_build:
     - *before_script_preparation
 
   script:
-    - *build_mesh_local_control_example
+    - *build_default_example
 
 esp32s2_v5.0_build:
   stage: build
@@ -206,7 +211,7 @@ esp32s2_v5.0_build:
     - *before_script_preparation
 
   script:
-    - *build_mesh_local_control_example
+    - *build_default_example
 
 esp32s3_v4.4_build:
   stage: build
@@ -223,7 +228,7 @@ esp32s3_v4.4_build:
     - *before_script_preparation
 
   script:
-    - *build_mesh_local_control_example
+    - *build_default_example
     - *build_rainmaker_example
 
 esp32s3_v5.0_build:
@@ -241,7 +246,7 @@ esp32s3_v5.0_build:
     - *before_script_preparation
 
   script:
-    - *build_mesh_local_control_example
+    - *build_default_example
     - *build_rainmaker_example
 
 push_master_to_github:
