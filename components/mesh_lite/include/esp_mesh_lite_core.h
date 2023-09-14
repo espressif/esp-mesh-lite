@@ -144,32 +144,6 @@ esp_err_t esp_mesh_lite_core_init(esp_mesh_lite_config_t* config);
 void esp_mesh_lite_connect(void);
 
 /**
- * @brief Start Mesh-Lite OTA
- *
- * @param[in] filesize: The size of the firmware file to be updated.
- * 
- * @param[in] fw_version: The version of the firmware file to be updated.
- * 
- * @param[in] extern_url_ota_cb: The callback function of ota from the external url, 
- *                               when the local area network ota cannot be performed,
- *                               the callback function will be called to perform ota.
- * 
- */
-esp_err_t esp_mesh_lite_ota_start(int filesize, char *fw_version, extern_url_ota_cb_t extern_url_ota_cb);
-
-/**
- * @brief Notify the child node to suspend the OTA process
- *
- */
-esp_err_t esp_mesh_lite_ota_notify_child_node_pause(void);
-
-/**
- * @brief Notify the child node to restart the OTA process
- *
- */
-esp_err_t esp_mesh_lite_ota_notify_child_node_restart(void);
-
-/**
  * @brief Set the mesh_lite_id
  *
  * @param[in] mesh_id: Each mesh network should have a different and unique ID.
@@ -346,6 +320,49 @@ esp_err_t esp_mesh_lite_get_router_config(wifi_sta_config_t *router_config);
  *    - 0: scan start successful
  */
 esp_err_t esp_mesh_lite_wifi_scan_start(const wifi_scan_config_t *config, uint32_t timeout);
+
+
+/*****************************************************/
+/************ ESP Wi-Fi Mesh Lite LAN OTA ************/
+/*****************************************************/
+
+/**
+ * @brief Start Mesh-Lite OTA
+ * 
+ * @param[in] filesize: The size of the firmware file to be updated.
+ * 
+ * @param[in] fw_version: The version of the firmware file to be updated.
+ * 
+ * @param[in] extern_url_ota_cb: The callback function of ota from the external url,
+ *                               when the local area network ota cannot be performed,
+ *                               the callback function will be called to perform ota.
+ * 
+ */
+esp_err_t esp_mesh_lite_ota_start(int filesize, char *fw_version, extern_url_ota_cb_t extern_url_ota_cb);
+
+/**
+ * @brief 
+ * 
+ * @attention  Called when executing the external OTA process.
+ *             When the higher-level node also starts the OTA process,
+ *             the current external OTA process will be stopped.
+ * 
+ * @attention  Please refer to examples/rainmaker/led_light/components/app_rainmaker/app_rainmaker_ota.c
+ *
+ */
+esp_err_t esp_mesh_lite_wait_ota_allow(void);
+
+/**
+ * @brief Notify the child node to suspend the OTA process
+ *
+ */
+esp_err_t esp_mesh_lite_ota_notify_child_node_pause(void);
+
+/**
+ * @brief Notify the child node to restart the OTA process
+ *
+ */
+esp_err_t esp_mesh_lite_ota_notify_child_node_restart(void);
 
 
 /*****************************************************/
