@@ -48,10 +48,10 @@ void app_main(void)
 
     app_rainmaker_start();
 
-    app_rmaker_mesh_lite_service_create();
-
     app_espnow_init();
 
     /* Start wifi provisioning */
     app_wifi_start(POP_TYPE_MAC);
+
+    app_rmaker_mesh_lite_service_create();
 }
