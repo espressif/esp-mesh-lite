@@ -1,7 +1,7 @@
 - [English Version](https://github.com/espressif/esp-mesh-lite/blob/master/examples/mesh_local_control/README.md)
 
-| Supported Targets | ESP32 | ESP32-C2 | ESP32-C3 | ESP32-S2 | ESP32-S3 |
-| ----------------- | ----- | -------- | -------- | -------- | -------- |
+| Supported Targets | ESP32 | ESP32-C3 | ESP32-S2 | ESP32-S3 | ESP32-C2 | ESP32-C6 |
+| ----------------- | ----- | -------- | -------- | -------- | -------- | -------- |
 
 # Mesh-Lite 局域网控制示例
 
@@ -39,7 +39,7 @@
 
 CMake:
 ```shell
-idf.py erase_flash flash monitor -b 921600 -p /dev/ttyUSBx
+idf.py erase_flash flash monitor -p /dev/ttyUSBx
 ```
 
 ### 运行
