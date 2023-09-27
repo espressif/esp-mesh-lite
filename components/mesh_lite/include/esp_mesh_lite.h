@@ -58,6 +58,15 @@ esp_err_t esp_mesh_lite_report_info(void);
 #endif /* CONFIG_MESH_LITE_NODE_INFO_REPORT */
 
 /**
+ * @brief Get the child node number of Mesh-Lite
+ *
+ * @attention The valid number of child nodes can only be obtained when CONFIG_MESH_LITE_NODE_INFO_REPORT is configured, otherwise 0 is returned.
+ *
+ * @return the child node number of Mesh-Lite
+ */
+uint8_t esp_mesh_lite_get_child_node_number(void);
+
+/**
  * @brief Get the softap ssid from NVS
  *
  * @param[out]    softap_ssid: Pointer to the softap ssid.

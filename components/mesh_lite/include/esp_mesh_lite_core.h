@@ -25,6 +25,12 @@ extern const char* ESP_MESH_LITE_EVENT;
 /* Definitions for error constants. */
 #define ESP_ERR_DUPLICATE_ADDITION    0x110   /*!< Duplicate addition */
 
+#ifdef CONFIG_MESH_LITE_MAXIMUM_NODE_NUMBER
+#define MESH_LITE_MAXIMUM_NODE_NUMBER CONFIG_MESH_LITE_MAXIMUM_NODE_NUMBER
+#else
+#define MESH_LITE_MAXIMUM_NODE_NUMBER 0
+#endif
+
 #ifdef CONFIG_JOIN_MESH_IGNORE_ROUTER_STATUS
 #define JOIN_MESH_IGNORE_ROUTER_STATUS CONFIG_JOIN_MESH_IGNORE_ROUTER_STATUS
 #else
@@ -61,6 +67,7 @@ extern const char* ESP_MESH_LITE_EVENT;
     .max_connect_number = CONFIG_BRIDGE_SOFTAP_MAX_CONNECT_NUMBER, \
     .max_router_number = CONFIG_MESH_LITE_MAX_ROUTER_NUMBER, \
     .max_level = CONFIG_MESH_LITE_MAXIMUM_LEVEL_ALLOWED, \
+    .max_node_number = MESH_LITE_MAXIMUM_NODE_NUMBER, \
     .join_mesh_ignore_router_status = JOIN_MESH_IGNORE_ROUTER_STATUS, \
     .join_mesh_without_configured_wifi = JOIN_MESH_WITHOUT_CONFIGURED_WIFI_INFO, \
     .leaf_node = LEAF_NODE, \
@@ -91,6 +98,7 @@ typedef struct {
     uint8_t max_connect_number;             /**< Max number of stations allowed to connect in */
     uint8_t max_router_number;              /**< Maximum number of trace router number */
     uint8_t max_level;                      /**< The maximum level allowed of Mesh-Lite */
+    uint8_t max_node_number;                /**< The maximum node number of Mesh-Lite */
     bool join_mesh_ignore_router_status;    /**< Join Mesh no matter whether the node is connected to router */
     bool join_mesh_without_configured_wifi; /**< Join Mesh without configured with information */
     bool leaf_node;                         /**< Whether it is a leaf node */

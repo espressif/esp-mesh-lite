@@ -43,6 +43,12 @@ menu "ESP Wi-Fi Mesh Lite"
             int "Report time interval(s)"
             default 300
 
+        config MESH_LITE_MAXIMUM_NODE_NUMBER
+            depends on MESH_LITE_NODE_INFO_REPORT
+            int "The maximum node number"
+            default 50
+            range 1 200
+
         config JOIN_MESH_WITHOUT_CONFIGURED_WIFI_INFO
             bool "Join Mesh without configured with information"
             default y
