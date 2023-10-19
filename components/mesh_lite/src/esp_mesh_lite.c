@@ -170,7 +170,34 @@ static void report_timer_cb(TimerHandle_t timer)
         esp_mesh_lite_report_info();
     }
 }
+
+static void esp_mesh_lite_event_ip_event_handler(void *arg, esp_event_base_t event_base,
+                                                 int32_t event_id, void *event_data)
+{
+    if (esp_mesh_lite_get_level() > 1) {
+        esp_mesh_lite_report_info();
+    }
+}
 #endif /* MESH_LITE_NODE_INFO_REPORT */
+
+uint8_t esp_mesh_lite_get_child_node_number(void)
+{
+    uint8_t node_number = 0;
+#ifdef CONFIG_MESH_LITE_NODE_INFO_REPORT
+    node_info_list_t* current = node_info_list;
+
+    if (xSemaphoreTake(node_info_mutex, portMAX_DELAY) != pdTRUE) {
+        return node_number;
+    }
+
+    while (current) {
+        node_number++;
+        current = current->next;
+    }
+    xSemaphoreGive(node_info_mutex);
+#endif /* MESH_LITE_NODE_INFO_REPORT */
+    return node_number;
+}
 
 static void esp_mesh_lite_event_ip_changed_handler(void *arg, esp_event_base_t event_base,
                                                   int32_t event_id, void *event_data)
@@ -213,6 +240,8 @@ void esp_mesh_lite_init(esp_mesh_lite_config_t* config)
 
     esp_mesh_lite_core_init(config);
 #if CONFIG_MESH_LITE_NODE_INFO_REPORT
+    esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &esp_mesh_lite_event_ip_event_handler, NULL, NULL);
+
     node_info_mutex = xSemaphoreCreateMutex();
     esp_mesh_lite_msg_action_list_register(node_report_action);
 
