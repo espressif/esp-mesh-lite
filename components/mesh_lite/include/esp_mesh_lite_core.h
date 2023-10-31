@@ -89,6 +89,13 @@ typedef enum {
     ESP_MESH_LITE_EVENT_CORE_MAX,
 } esp_mesh_lite_event_core_t;
 
+typedef enum {
+    ESP_MESH_LITE_EVENT_OTA_START = ESP_MESH_LITE_EVENT_CORE_MAX,
+    ESP_MESH_LITE_EVENT_OTA_FINISH,
+    ESP_MESH_LITE_EVENT_OTA_PROGRESS,
+    ESP_MESH_LITE_EVENT_OTA_MAX,
+} esp_mesh_lite_event_ota_t;
+
 /**
  * @brief Mesh-Lite configuration parameters passed to esp_mesh_lite_core_init call.
  */
@@ -111,6 +118,22 @@ typedef struct {
 
 typedef esp_err_t (*extern_url_ota_cb_t)(void);
 typedef cJSON* (*msg_process_cb_t)(cJSON *payload, uint32_t seq);
+
+typedef enum {
+    ESP_MESH_LITE_EVENT_OTA_SUCCESS = 0,
+    ESP_MESH_LITE_EVENT_OTA_FAIL,
+    ESP_MESH_LITE_EVENT_OTA_WRITE_ERR,
+    ESP_MESH_LITE_EVENT_OTA_GET_PARTITION_ERR,
+    ESP_MESH_LITE_EVENT_OTA_SET_BOOT_PARTITION_ERR,
+} ota_finish_reason_t;
+
+typedef struct {
+    ota_finish_reason_t reason;
+} mesh_lite_event_ota_finish_t;
+
+typedef struct {
+    uint8_t percentage;
+} mesh_lite_event_ota_progress_t;
 
 /**
  * @brief Mesh-Lite message action parameters passed to esp_mesh_lite_msg_action_list_register call.

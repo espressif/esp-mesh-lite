@@ -218,16 +218,24 @@ static void esp_mesh_lite_event_ip_changed_handler(void *arg, esp_event_base_t e
             break;
         case ESP_MESH_LITE_EVENT_CORE_ROUTER_INFO_CHANGED:
             break;
-        case ESP_MESH_LITE_EVENT_OTA_FAIL:
-        case ESP_MESH_LITE_EVENT_OTA_WRITE_ERR:
-        case ESP_MESH_LITE_EVENT_OTA_GET_PARTITION_ERR:
-        case ESP_MESH_LITE_EVENT_OTA_SET_BOOT_PARTITION_ERR:
-            ESP_LOGE(TAG, "LAN OTA Fail");
+        case ESP_MESH_LITE_EVENT_OTA_START:
+            ESP_LOGI(TAG, "OTA Start\r\n");
             break;
-        case ESP_MESH_LITE_EVENT_OTA_SUCCESS:
-            ESP_LOGI(TAG, "LAN OTA Success");
-            esp_restart();
+        case ESP_MESH_LITE_EVENT_OTA_FINISH: {
+            mesh_lite_event_ota_finish_t *event = (mesh_lite_event_ota_finish_t*)event_data;
+            if (event->reason == ESP_MESH_LITE_EVENT_OTA_SUCCESS) {
+                ESP_LOGI(TAG, "LAN OTA Success!");
+                esp_restart();
+            } else {
+                ESP_LOGE(TAG, "LAN OTA Fail! Reason: %d\r\n", event->reason);
+            }
             break;
+        }
+        case ESP_MESH_LITE_EVENT_OTA_PROGRESS: {
+            mesh_lite_event_ota_progress_t *event = (mesh_lite_event_ota_progress_t*)event_data;
+            ESP_LOGI(TAG, "LAN OTA Percentage: %d%%", event->percentage);
+            break;
+        }
     }
 }
 
