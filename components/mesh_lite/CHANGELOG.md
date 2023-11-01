@@ -2,6 +2,23 @@
 
 # ChangeLog
 
+## v0.9.0 - 2023-10-31
+
+### Enhancements:
+
+#### Mesh
+
+- Added a "max node number" configuration option.
+- Add LAN OTA progress reporting
+- When setting the allowed level and disallowed level, it will automatically check whether it conflicts with the current level. If it conflicts, the station will be disconnected and the new parent node will be searched again.
+- Fixed leaf nodes being connected by other child nodes.
+- Add processing of root nodes with the same signal strength during fusion
+
+#### Bugfix
+
+- Fixed the issue where nodes failed to reconnect to their original parent node after a soft restart
+- Resolved the communication error prompt problem in the "no_router" example
+
 ## v0.8.0 - 2023-9-19
 
 ### Enhancements:
