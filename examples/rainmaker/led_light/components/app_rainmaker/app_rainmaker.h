@@ -7,3 +7,5 @@
 #pragma once
 
 void app_rainmaker_start(void);
+
+void esp_rmaker_control_light_by_user(char* data);

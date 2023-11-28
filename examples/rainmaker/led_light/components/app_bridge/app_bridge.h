@@ -32,3 +32,5 @@ void app_rmaker_mesh_lite_report_info_to_parent(void);
 void app_rmaker_mesh_lite_level_update_and_report(uint8_t level);
 
 void app_rmaker_mesh_lite_self_ip_update_and_report(esp_netif_ip_info_t* ap_ip_info, esp_netif_ip_info_t* sta_ip_info);
+
+bool esp_rmaker_is_my_group_id(uint8_t group_id);

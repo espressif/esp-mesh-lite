@@ -17,6 +17,8 @@
 #include <cJSON.h>
 
 #include "app_light.h"
+#include "app_espnow.h"
+#include "app_bridge.h"
 #include "app_rainmaker_ota.h"
 #include "esp_mesh_lite.h"
 
@@ -163,13 +165,7 @@ void esp_rmaker_control_light_by_user(char* data)
     __real_esp_rmaker_handle_set_params((char *)data, strlen(data), ESP_RMAKER_REQ_SRC_CLOUD);
 }
 
-#define GROUP_CONTROL_PAYLOAD_LEN  250
-
-char group_control_payload[GROUP_CONTROL_PAYLOAD_LEN];
-
-extern void esp_now_send_group_control(uint8_t* payload, bool seq_init);
-extern bool esp_rmaker_is_my_group_id(uint8_t group_id);
-
+char group_control_payload[GROUP_CONTROL_PAYLOAD_MAX_LEN];
 esp_err_t __wrap_esp_rmaker_handle_set_params(char *data, size_t data_len, esp_rmaker_req_src_t src)
 {
     ESP_LOGI(TAG, "Received params: %.*s", data_len, data);
@@ -183,8 +179,8 @@ esp_err_t __wrap_esp_rmaker_handle_set_params(char *data, size_t data_len, esp_r
             cJSON *group_id_js = cJSON_GetObjectItem(light_js, "group_id");
             if (group_id_js) {
                 char* payload_string = cJSON_PrintUnformatted(rmaker_data_js);
-                memset(group_control_payload, 0x0, GROUP_CONTROL_PAYLOAD_LEN);
-                memcpy(group_control_payload, payload_string, GROUP_CONTROL_PAYLOAD_LEN);
+                memset(group_control_payload, 0x0, GROUP_CONTROL_PAYLOAD_MAX_LEN);
+                memcpy(group_control_payload, payload_string, GROUP_CONTROL_PAYLOAD_MAX_LEN);
                 free(payload_string);
                 payload_string = NULL;
 
