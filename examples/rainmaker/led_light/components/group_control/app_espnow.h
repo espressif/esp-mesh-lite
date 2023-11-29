@@ -17,6 +17,21 @@
 #define ESPNOW_WIFI_IF   ESP_IF_WIFI_AP
 #endif
 
+#define ESPNOW_DEBUG                     0
+#define ESPNOW_MAXDELAY                  512
+#define GROUP_CONTROL_PAYLOAD_MAX_LEN    250
+#define ESPNOW_PAYLOAD_HEAD_LEN          5
+
+#define ESPNOW_DEVICE_NAME               "Light"
+#define ESPNOW_GROUP_ID                  "group_id"
+#define ESPNOW_DISTRIBUTION_NETWORK      "distribution_network"
+
+typedef enum espnow_msg_mode {
+    ESPNOW_MSG_MODE_INVALID = 0,
+    ESPNOW_MSG_MODE_CONTROL = 1,
+    ESPNOW_MSG_MODE_RESET   = 2
+} ESPNOW_MSG_MODE;
+
 #define ESPNOW_QUEUE_SIZE           50
 
 #define IS_BROADCAST_ADDR(addr) (memcmp(addr, s_broadcast_mac, ESP_NOW_ETH_ALEN) == 0)
@@ -76,3 +91,4 @@ typedef struct {
 
 esp_err_t app_espnow_init(void);
 esp_err_t app_espnow_reset_group_control(void);
+void esp_now_send_group_control(uint8_t* payload, bool seq_init);

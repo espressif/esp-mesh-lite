@@ -16,29 +16,13 @@
 
 #include "app_wifi.h"
 #include "app_espnow.h"
+#include "app_bridge.h"
 #include "esp_mesh_lite.h"
 
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
 #include "esp_mac.h"
 #endif
 
-#define ESPNOW_DEBUG                     0
-#define ESPNOW_MAXDELAY                  512
-#define GROUP_CONTROL_PAYLOAD_MAX_LEN    250
-#define ESPNOW_PAYLOAD_HEAD_LEN          5
-
-#define ESPNOW_DEVICE_NAME               "Light"
-#define ESPNOW_GROUP_ID                  "group_id"
-#define ESPNOW_DISTRIBUTION_NETWORK      "distribution_network"
-
-typedef enum espnow_msg_mode {
-    ESPNOW_MSG_MODE_INVALID = 0,
-    ESPNOW_MSG_MODE_CONTROL = 1,
-    ESPNOW_MSG_MODE_RESET   = 2
-} ESPNOW_MSG_MODE;
-
-extern bool esp_rmaker_is_my_group_id(uint8_t group_id);
-extern void esp_rmaker_control_light_by_user(char* data);
 extern char group_control_payload[GROUP_CONTROL_PAYLOAD_MAX_LEN];
 
 static const char *TAG = "app_espnow";

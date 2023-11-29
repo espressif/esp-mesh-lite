@@ -9,6 +9,7 @@
 #include <esp_rmaker_standard_params.h>
 #include <app_insights.h>
 #include <esp_rmaker_ota.h>
+#include <esp_rmaker_core.h>
 #include <esp_rmaker_mqtt.h>
 #include <esp_rmaker_schedule.h>
 #include <esp_rmaker_common_events.h>
@@ -16,6 +17,8 @@
 #include <cJSON.h>
 
 #include "app_light.h"
+#include "app_espnow.h"
+#include "app_bridge.h"
 #include "app_rainmaker_ota.h"
 #include "esp_mesh_lite.h"
 
@@ -24,7 +27,7 @@ static const char *TAG = "app_rainmaker";
 esp_rmaker_device_t *light_device;
 
 extern const char ota_server_cert[] asm("_binary_server_crt_start");
-extern esp_err_t esp_rmaker_handle_set_params(char *data, size_t data_len, esp_rmaker_req_src_t src);
+extern esp_err_t __real_esp_rmaker_handle_set_params(char *data, size_t data_len, esp_rmaker_req_src_t src);
 
 static void esp_rmaker_app_set_params_callback(const char *topic, void *payload, size_t payload_len, void *priv_data);
 
@@ -85,7 +88,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
     } else if (event_base == RMAKER_COMMON_EVENT) {
         switch (event_id) {
             case RMAKER_MQTT_EVENT_PUBLISHED: {
-                static uint8_t resubscribe = 3;
+                static uint8_t resubscribe = 4;
                 if (resubscribe) {
                     // "params/remote" topic resubscribe
                     char subscribe_topic[MQTT_TOPIC_BUFFER_SIZE];
@@ -159,17 +162,11 @@ esp_err_t app_utils_rmaker_ui_identify_service_enable(void)
 
 void esp_rmaker_control_light_by_user(char* data)
 {
-    esp_rmaker_handle_set_params((char *)data, strlen(data), ESP_RMAKER_REQ_SRC_CLOUD);
+    __real_esp_rmaker_handle_set_params((char *)data, strlen(data), ESP_RMAKER_REQ_SRC_CLOUD);
 }
 
-#define GROUP_CONTROL_PAYLOAD_LEN  250
-
-char group_control_payload[GROUP_CONTROL_PAYLOAD_LEN];
-
-extern void esp_now_send_group_control(uint8_t* payload, bool seq_init);
-extern bool esp_rmaker_is_my_group_id(uint8_t group_id);
-
-static esp_err_t esp_rmaker_app_handle_set_params(char *data, size_t data_len, esp_rmaker_req_src_t src)
+char group_control_payload[GROUP_CONTROL_PAYLOAD_MAX_LEN];
+esp_err_t __wrap_esp_rmaker_handle_set_params(char *data, size_t data_len, esp_rmaker_req_src_t src)
 {
     ESP_LOGI(TAG, "Received params: %.*s", data_len, data);
 
@@ -182,8 +179,8 @@ static esp_err_t esp_rmaker_app_handle_set_params(char *data, size_t data_len, e
             cJSON *group_id_js = cJSON_GetObjectItem(light_js, "group_id");
             if (group_id_js) {
                 char* payload_string = cJSON_PrintUnformatted(rmaker_data_js);
-                memset(group_control_payload, 0x0, GROUP_CONTROL_PAYLOAD_LEN);
-                memcpy(group_control_payload, payload_string, GROUP_CONTROL_PAYLOAD_LEN);
+                memset(group_control_payload, 0x0, GROUP_CONTROL_PAYLOAD_MAX_LEN);
+                memcpy(group_control_payload, payload_string, GROUP_CONTROL_PAYLOAD_MAX_LEN);
                 free(payload_string);
                 payload_string = NULL;
 
@@ -199,7 +196,7 @@ static esp_err_t esp_rmaker_app_handle_set_params(char *data, size_t data_len, e
     }
 
     if (control) {
-        esp_rmaker_handle_set_params((char *)data, data_len, src);
+        __real_esp_rmaker_handle_set_params((char *)data, data_len, src);
     }
 
     return ESP_OK;
@@ -207,7 +204,7 @@ static esp_err_t esp_rmaker_app_handle_set_params(char *data, size_t data_len, e
 
 static void esp_rmaker_app_set_params_callback(const char *topic, void *payload, size_t payload_len, void *priv_data)
 {
-    esp_rmaker_app_handle_set_params((char *)payload, payload_len, ESP_RMAKER_REQ_SRC_CLOUD);
+    esp_rmaker_handle_set_params((char *)payload, payload_len, ESP_RMAKER_REQ_SRC_CLOUD);
 }
 
 void app_rainmaker_start(void)
