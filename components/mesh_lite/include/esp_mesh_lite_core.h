@@ -146,6 +146,10 @@ typedef struct esp_mesh_lite_msg_action {
     msg_process_cb_t process; /**< The callback function when receiving the 'type' message, The cjson information in the type message can be processed in this cb*/
 } esp_mesh_lite_msg_action_t;
 
+/**
+ * @brief Define the type for the callback function.
+ */
+typedef const uint8_t*(*esp_mesh_lite_get_ssid_by_mac_cb_t)(const uint8_t *bssid);
 
 /*****************************************************/
 /**************** ESP Wi-Fi Mesh Lite ****************/
@@ -353,6 +357,15 @@ esp_err_t esp_mesh_lite_get_router_config(mesh_lite_sta_config_t *router_config)
  */
 esp_err_t esp_mesh_lite_wifi_scan_start(const wifi_scan_config_t *config, uint32_t timeout);
 
+/**
+ * @brief Register a callback function to check if BSSID is contained.
+ *
+ * @param[in] callback Pointer to the callback function.
+ *
+ * @return
+ *     - ESP_OK: Registration successful.
+ */
+esp_err_t esp_mesh_lite_bssid_check_cb_register(esp_mesh_lite_get_ssid_by_mac_cb_t cb);
 
 /*****************************************************/
 /************ ESP Wi-Fi Mesh Lite LAN OTA ************/
