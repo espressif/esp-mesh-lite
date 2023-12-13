@@ -15,7 +15,6 @@ default:
 
 .setup_esp_idf: &setup_esp_idf
   - cd $IDF_PATH
-  - git fetch origin ${idf_branch}
   - git checkout ${idf_branch}
   - git submodule update --init --recursive
   - ./install.sh
