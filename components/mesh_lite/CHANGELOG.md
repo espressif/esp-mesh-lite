@@ -2,6 +2,19 @@
 
 # ChangeLog
 
+## v0.10.0 - 2023-12-13
+
+### Enhancements:
+
+#### Mesh
+
+- Support controlling mesh_lite internal log output color
+- Support whitelist verification during networking
+
+#### Bugfix
+
+- Fixed the problem of slow network recovery after the root node goes offline
+
 ## v0.9.0 - 2023-10-31
 
 ### Enhancements:
