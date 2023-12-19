@@ -146,6 +146,15 @@ typedef struct {
 } mesh_lite_event_ota_progress_t;
 
 /**
+ * @brief Structure representing an RSSI threshold list for ESP-Mesh-Lite.
+ */
+typedef struct {
+    int8_t rssi_min;         /**< The lower level of the RSSI threshold range. */
+    int8_t rssi_max;         /**< The upper level of the RSSI threshold range. */
+    uint8_t rssi_threshold;  /**< RSSI threshold level. */
+} esp_mesh_lite_rssi_threshold_list_t;
+
+/**
  * @brief Mesh-Lite message action parameters passed to esp_mesh_lite_msg_action_list_register call.
  */
 typedef struct esp_mesh_lite_msg_action {
@@ -253,6 +262,39 @@ esp_err_t esp_mesh_lite_allow_others_to_join(bool enable);
  *
  */
 esp_err_t esp_mesh_lite_set_argot(uint32_t argot);
+
+/**
+ * @brief Set the RSSI threshold for ESP-Mesh-Lite.
+ *
+ * This function sets the RSSI threshold list for ESP-Mesh-Lite. The list is an array of
+ * esp_mesh_lite_rssi_threshold_list_t structures, where each structure defines an RSSI range
+ * and the corresponding threshold value. The size parameter indicates the number of elements
+ * in the array.
+ *
+ * Usage Example:
+ * @code{.c}
+ * static const esp_mesh_lite_rssi_threshold_list_t rssi_level[] = {
+ *     {0,  -35, 20},
+ *     {-35,  -55, 15},
+ *     {-55,  -75, 10},
+ *     {-75,  -125, 5},
+ * };
+ *
+ * esp_err_t result = esp_mesh_lite_set_rssi_threshold(rssi_level, sizeof(rssi_level) / sizeof(esp_mesh_lite_rssi_threshold_list_t));
+ * if (result == ESP_OK) {
+ *     // RSSI threshold list set successfully
+ * } else {
+ *     // Failed to set the RSSI threshold list
+ * }
+ * @endcode
+ *
+ * @param[in] rssi_threshold_list An array of RSSI thresholds to be applied.
+ * @param[in] size Number of elements in the rssi_threshold_list array.
+ * @return
+ *      - ESP_OK: Success
+ *      - ESP_FAIL: Failed to set the RSSI threshold list
+ */
+esp_err_t esp_mesh_lite_set_rssi_threshold(esp_mesh_lite_rssi_threshold_list_t rssi_threshold_list[], size_t size);
 
 /**
  * @brief  Set SoftAP information.
