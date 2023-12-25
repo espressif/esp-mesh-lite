@@ -48,7 +48,7 @@ void app_main(void)
 
     app_rainmaker_start();
 
-    app_espnow_init();
+    group_control_init();
 
     /* Start wifi provisioning */
     app_wifi_start(POP_TYPE_MAC);
