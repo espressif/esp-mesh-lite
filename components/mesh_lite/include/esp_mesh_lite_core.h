@@ -182,6 +182,19 @@ typedef struct esp_mesh_lite_msg_action {
 } esp_mesh_lite_msg_action_t;
 
 /**
+ * @brief Callback structure for ESP-Mesh-Lite scanning events.
+ *
+ * This structure defines the callback functions for handling scanning events in ESP-Mesh-Lite.
+ * It consists of two function pointers:
+ *   - scan_start_cb: Callback function invoked when a scanning operation starts.
+ *   - scan_end_cb: Callback function invoked when a scanning operation ends.
+ */
+typedef struct esp_mesh_lite_scan_cb {
+    void (*scan_start_cb)(void); /**< Callback function for scan start event. */
+    void (*scan_end_cb)(void);   /**< Callback function for scan end event. */
+} esp_mesh_lite_scan_cb_t;
+
+/**
  * @brief Define the type for the callback function.
  */
 typedef const uint8_t*(*esp_mesh_lite_get_ssid_by_mac_cb_t)(const uint8_t *bssid);
@@ -510,6 +523,43 @@ esp_err_t esp_mesh_lite_wifi_scan_start(const wifi_scan_config_t *config, uint32
  *     - ESP_OK: Registration successful.
  */
 esp_err_t esp_mesh_lite_bssid_check_cb_register(esp_mesh_lite_get_ssid_by_mac_cb_t cb);
+
+/**
+ * @brief Register callback functions for ESP-Mesh-Lite scanning events.
+ *
+ * This function registers the callback functions defined in the esp_mesh_lite_scan_cb_t structure
+ * to handle scanning events in ESP-Mesh-Lite. The provided callbacks will be invoked when scanning
+ * operations start and end respectively.
+ *
+ * Usage Example:
+ * @code{.c}
+ * static void app_scan_start(void)
+ * {
+ *     // Implementation of scan start callback
+ *     return;
+ * }
+ *
+ * static void app_scan_end(void)
+ * {
+ *     // Implementation of scan end callback
+ *     return;
+ * }
+ *
+ * static esp_mesh_lite_scan_cb_t scan_cb = {
+ *     .scan_start_cb = app_scan_start,
+ *     .scan_end_cb = app_scan_end,
+ * };
+ *
+ * esp_mesh_lite_scan_cb_register(&scan_cb);
+ * @endcode
+ *
+ * @param cb Pointer to the esp_mesh_lite_scan_cb_t structure containing the callback functions
+ *           for handling scanning events.
+ * @return
+ *     - ESP_OK: Callback registration successful.
+ *     - ESP_ERR_INVALID_ARG: Invalid argument provided.
+ */
+esp_err_t esp_mesh_lite_scan_cb_register(esp_mesh_lite_scan_cb_t *cb);
 
 /*****************************************************/
 /************ ESP Wi-Fi Mesh Lite LAN OTA ************/
