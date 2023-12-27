@@ -170,7 +170,7 @@ static esp_err_t esp_storage_init(void)
     return ret;
 }
 
-static esp_err_t wifi_init(void)
+static void wifi_init(void)
 {
     // Station
     wifi_config_t wifi_config = {
@@ -179,21 +179,29 @@ static esp_err_t wifi_init(void)
             .password = CONFIG_ROUTER_PASSWORD,
         },
     };
-    esp_bridge_wifi_set(WIFI_MODE_STA, (char *)wifi_config.sta.ssid, (char *)wifi_config.sta.password, NULL);
+    esp_bridge_wifi_set_config(WIFI_IF_STA, &wifi_config);
 
     // Softap
-    memset(&wifi_config, 0x0, sizeof(wifi_config_t));
-    size_t softap_ssid_len = sizeof(wifi_config.ap.ssid);
-    if (esp_mesh_lite_get_softap_ssid_from_nvs((char *)wifi_config.ap.ssid, &softap_ssid_len) != ESP_OK) {
-        snprintf((char *)wifi_config.ap.ssid, sizeof(wifi_config.ap.ssid), "%s", CONFIG_BRIDGE_SOFTAP_SSID);
-    }
-    size_t softap_psw_len = sizeof(wifi_config.ap.password);
-    if (esp_mesh_lite_get_softap_psw_from_nvs((char *)wifi_config.ap.password, &softap_psw_len) != ESP_OK) {
-        strlcpy((char *)wifi_config.ap.password, CONFIG_BRIDGE_SOFTAP_PASSWORD, sizeof(wifi_config.ap.password));
-    }
-    esp_bridge_wifi_set(WIFI_MODE_AP, (char *)wifi_config.ap.ssid, (char *)wifi_config.ap.password, NULL);
+    snprintf((char *)wifi_config.ap.ssid, sizeof(wifi_config.ap.ssid), "%s", CONFIG_BRIDGE_SOFTAP_SSID);
+    strlcpy((char *)wifi_config.ap.password, CONFIG_BRIDGE_SOFTAP_PASSWORD, sizeof(wifi_config.ap.password));
+    esp_bridge_wifi_set_config(WIFI_IF_AP, &wifi_config);
+}
 
-    return ESP_OK;
+void app_wifi_set_softap_info(void)
+{
+    char softap_ssid[32];
+    uint8_t softap_mac[6];
+    esp_wifi_get_mac(WIFI_IF_AP, softap_mac);
+    memset(softap_ssid, 0x0, sizeof(softap_ssid));
+
+#ifdef CONFIG_BRIDGE_SOFTAP_SSID_END_WITH_THE_MAC
+    snprintf(softap_ssid, sizeof(softap_ssid), "%.25s_%02x%02x%02x", CONFIG_BRIDGE_SOFTAP_SSID, softap_mac[3], softap_mac[4], softap_mac[5]);
+#else
+    snprintf(softap_ssid, sizeof(softap_ssid), "%.32s", CONFIG_BRIDGE_SOFTAP_SSID);
+#endif
+    esp_mesh_lite_set_softap_ssid_to_nvs(softap_ssid);
+    esp_mesh_lite_set_softap_psw_to_nvs(CONFIG_BRIDGE_SOFTAP_PASSWORD);
+    esp_mesh_lite_set_softap_info(softap_ssid, CONFIG_BRIDGE_SOFTAP_PASSWORD);
 }
 
 void app_main()
@@ -214,6 +222,8 @@ void app_main()
 
     esp_mesh_lite_config_t mesh_lite_config = ESP_MESH_LITE_DEFAULT_INIT();
     esp_mesh_lite_init(&mesh_lite_config);
+
+    app_wifi_set_softap_info();
 
     esp_mesh_lite_start();
 
