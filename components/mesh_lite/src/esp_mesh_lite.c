@@ -21,7 +21,7 @@
 
 #include "esp_mesh_lite.h"
 
-static const char* TAG = "Mesh-Lite";
+static const char *TAG = "Mesh-Lite";
 
 #if CONFIG_MESH_LITE_NODE_INFO_REPORT
 
@@ -245,6 +245,8 @@ void esp_mesh_lite_init(esp_mesh_lite_config_t* config)
 
     esp_bridge_network_segment_check_register(esp_mesh_lite_network_segment_is_used);
     esp_event_handler_instance_register(ESP_MESH_LITE_EVENT, ESP_EVENT_ANY_ID, &esp_mesh_lite_event_ip_changed_handler, NULL, NULL);
+
+    esp_mesh_lite_espnow_init();
 
     esp_mesh_lite_core_init(config);
 #if CONFIG_MESH_LITE_NODE_INFO_REPORT

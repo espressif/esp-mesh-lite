@@ -12,6 +12,7 @@ extern "C"
 #endif
 
 #include "esp_mesh_lite_core.h"
+#include "esp_mesh_lite_espnow.h"
 
 #define ROOT    (1)
 

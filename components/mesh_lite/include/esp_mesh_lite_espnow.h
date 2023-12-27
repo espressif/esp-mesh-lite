@@ -1,0 +1,103 @@
+/*
+ * SPDX-FileCopyrightText: 2023 Espressif Systems (Shanghai) CO LTD
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#pragma once
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "esp_now.h"
+
+#define ESPNOW_MAXDELAY                  (512)
+#define ESPNOW_PAYLOAD_MAX_LEN           (250)
+
+static uint8_t s_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+#define IS_BROADCAST_ADDR(addr) (memcmp(addr, s_broadcast_mac, ESP_NOW_ETH_ALEN) == 0)
+
+typedef enum {
+    ESPNOW_DATA_TYPE_MESH_LITE_CORE,
+    ESPNOW_DATA_TYPE_RM_GROUP_CONTROL,
+    ESPNOW_DATA_TYPE_RM_ZERO_PROV,
+    ESPNOW_DATA_TYPE_RESERVE,
+} esp_mesh_lite_espnow_data_type_t;
+
+typedef struct espnow_cb_register {
+    esp_mesh_lite_espnow_data_type_t type;
+    void (*esp_mesh_lite_espnow_recv_cb)(const uint8_t *mac_addr, const uint8_t *data, int len);
+    struct espnow_cb_register *next;
+} espnow_cb_register_t;
+
+typedef struct {
+    uint8_t mac_addr[ESP_NOW_ETH_ALEN];
+    esp_now_send_status_t status;
+} espnow_send_cb_t;
+
+typedef struct {
+    uint8_t mac_addr[ESP_NOW_ETH_ALEN];
+    uint8_t *data;
+    int data_len;
+} espnow_recv_cb_t;
+
+typedef enum {
+    ESPNOW_SEND_CB,
+    ESPNOW_RECV_CB,
+} esp_mesh_lite_espnow_event_id_t;
+
+typedef union {
+    espnow_send_cb_t send_cb;
+    espnow_recv_cb_t recv_cb;
+} esp_mesh_lite_espnow_event_info_t;
+
+/* When ESPNOW sending or receiving callback function is called, post event to ESPNOW task. */
+typedef struct {
+    esp_mesh_lite_espnow_event_id_t id;
+    esp_mesh_lite_espnow_event_info_t info;
+} esp_mesh_lite_espnow_event_t;
+
+/**
+ * @brief Initialize ESP-Mesh-Lite ESP-NOW module.
+ *
+ * This function initializes the ESP-Mesh-Lite ESP-NOW module, enabling communication
+ * between Mesh Lite nodes using ESP-NOW protocol.
+ *
+ * @return
+ *      - ESP_OK: Initialization successful
+ *      - ESP_FAIL: Failed to initialize ESP-NOW module
+ */
+esp_err_t esp_mesh_lite_espnow_init(void);
+
+/**
+ * @brief Send data using ESP-Mesh-Lite ESP-NOW.
+ *
+ * This function sends data of the specified type to a peer node with the given MAC address
+ * using ESP-Mesh-Lite ESP-NOW protocol.
+ *
+ * @param[in] type Type of data being sent.
+ * @param[in] peer_addr MAC address of the peer node.
+ * @param[in] data Pointer to the data to be sent.
+ * @param[in] len Length of the data.
+ * @return
+ *      - ESP_OK: Data sent successfully
+ *      - ESP_FAIL: Failed to send data
+ */
+esp_err_t esp_mesh_lite_espnow_send(uint8_t type, uint8_t *peer_addr, const uint8_t *data, size_t len);
+
+/**
+ * @brief Register a callback function for handling ESP-Mesh-Lite ESP-NOW data reception.
+ *
+ * This function registers a callback function to handle the reception of ESP-NOW data
+ * with the specified data type. When data of the specified type is received, the
+ * registered callback function will be invoked.
+ *
+ * @param[in] type Type of data for which the callback is registered.
+ * @param[in] recv_cb Pointer to the callback function for data reception.
+ *                    The callback function must have the signature:
+ *                    `void recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len)`.
+ * @return
+ *      - ESP_OK: Callback registration successful
+ *      - ESP_FAIL: Failed to register the callback
+ */
+esp_err_t esp_mesh_lite_espnow_recv_cb_register(esp_mesh_lite_espnow_data_type_t type,
+                                                void (*recv_cb)(const uint8_t *mac_addr, const uint8_t *data, int len));
