@@ -61,6 +61,14 @@ extern const char* ESP_MESH_LITE_EVENT;
 #define OTA_WND_DEFAULT 0
 #endif
 
+/**
+ * @brief Enumeration representing different networking modes for ESP-Mesh-Lite.
+ */
+typedef enum {
+    ESP_MESH_LITE_ROUTER,
+    ESP_MESH_LITE_MESH,
+} esp_mesh_lite_networking_mode_t;
+
 #define ESP_MESH_LITE_DEFAULT_INIT() { \
     .vendor_id = {CONFIG_MESH_LITE_VENDOR_ID_0, CONFIG_MESH_LITE_VENDOR_ID_1}, \
     .mesh_id = CONFIG_MESH_LITE_ID, \
@@ -306,6 +314,19 @@ esp_err_t esp_mesh_lite_set_rssi_threshold(esp_mesh_lite_rssi_threshold_list_t r
 esp_err_t esp_mesh_lite_set_softap_info(const char* softap_ssid, const char* softap_password);
 
 /**
+ * @brief Set the networking mode for ESP-Mesh-Lite.
+ *
+ * This function sets the networking mode for ESP-Mesh-Lite. The networking mode can be either
+ * Router mode or Mesh mode.
+ *
+ * @param mode           Networking mode to set (either ESP_MESH_LITE_ROUTER or ESP_MESH_LITE_MESH).
+ * @param rssi_threshold RSSI threshold for router mode. Only effective when mode is ESP_MESH_LITE_ROUTER.
+ *                       If the router's signal strength is below this threshold, the device will connect to a mesh node.
+ * @return esp_err_t ESP_OK on success, or an error code indicating the reason for failure.
+ */
+esp_err_t esp_mesh_lite_set_networking_mode(esp_mesh_lite_networking_mode_t mode, int8_t rssi_threshold);
+
+/**
  * @brief  Set Node as leaf node.
  *
  * @param[in]  enable: true -> Leaf Node; false -> Regular Node
@@ -369,6 +390,16 @@ uint8_t esp_mesh_lite_get_allowed_level(void);
  *      - disallowed_level
  */
 uint8_t esp_mesh_lite_get_disallowed_level(void);
+
+/**
+ * @brief Get the current networking mode of ESP-Mesh-Lite.
+ *
+ * This function retrieves the current networking mode of ESP-Mesh-Lite.
+ *
+ * @param[out] mode Pointer to a variable where the current networking mode will be stored.
+ * @return esp_err_t ESP_OK on success, or an error code indicating the reason for failure.
+ */
+esp_err_t esp_mesh_lite_get_networking_mode(esp_mesh_lite_networking_mode_t *mode);
 
 /**
  * @brief  Check if Node is a Leaf Node

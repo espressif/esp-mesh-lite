@@ -9,7 +9,8 @@
 #### Mesh
 
 - Support set leaf node softap status
-- Supports customizing the signal strength threshold during scanning for parent nodes
+- Support customizing the signal strength threshold during scanning for parent nodes
+- Support set networking mode(Mesh mode or Router mode, default Mesh mode)
 
 #### Bugfix
 
