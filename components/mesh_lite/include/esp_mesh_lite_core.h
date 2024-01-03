@@ -97,6 +97,16 @@ typedef enum {
 } esp_mesh_lite_event_ota_t;
 
 /**
+ * @brief Enumeration for the soft AP status of ESP-Mesh-Lite leaf nodes.
+ *
+ * Defines two possible states: DISABLE_SOFTAP and ENABLE_SOFTAP.
+ */
+typedef enum {
+    DISABLE_SOFTAP,
+    ENABLE_SOFTAP,
+} esp_mesh_lite_leaf_node_softap_status_t;
+
+/**
  * @brief Mesh-Lite configuration parameters passed to esp_mesh_lite_core_init call.
  */
 typedef struct {
@@ -260,6 +270,15 @@ esp_err_t esp_mesh_lite_set_softap_info(const char* softap_ssid, const char* sof
  *
  */
 esp_err_t esp_mesh_lite_set_leaf_node(bool enable);
+
+/**
+ * @brief Set the soft AP status for ESP-Mesh-Lite leaf nodes.
+ *
+ * This function allows the configuration of the soft AP status for ESP-Mesh-Lite leaf nodes.
+ *
+ * @param status Soft AP status to set (either DISABLE_SOFTAP or ENABLE_SOFTAP).
+ */
+void esp_mesh_lite_set_leaf_node_softap_status(esp_mesh_lite_leaf_node_softap_status_t status);
 
 /**
  * @brief  Get the mesh_lite_id

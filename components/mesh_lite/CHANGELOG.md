@@ -2,6 +2,18 @@
 
 # ChangeLog
 
+## v0.11.0 - 2024-1-3
+
+### Enhancements:
+
+#### Mesh
+
+- Support set leaf node softap status
+
+#### Bugfix
+
+- Fixed send msg to root fail when softap ssid is different
+
 ## v0.10.0 - 2023-12-13
 
 ### Enhancements:
