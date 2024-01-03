@@ -9,6 +9,7 @@
 #### Mesh
 
 - Support set leaf node softap status
+- Supports customizing the signal strength threshold during scanning for parent nodes
 
 #### Bugfix
 
