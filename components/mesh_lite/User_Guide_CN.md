@@ -17,22 +17,24 @@ ESP-MESH-LITE 是一套建立在 Wi-Fi 协议之上的网络协议。ESP-MESH-LI
 5. [数据传输](#数据传输)
 6. [性能](#性能)
 7. [ESP-MESH-LITE 与 ESP-MESH 差异](#esp-mesh-lite-与-esp-mesh-差异)
-7. [移植指南](#移植指南)
-8. [更多注意事项](#更多注意事项)
+8. [ESPNOW 使用指南](#espnow-使用指南)
+9. [移植指南](#移植指南)
+10. [更多注意事项](#更多注意事项)
 
 ## 简介
 
 乐鑫 ESP-Mesh-Lite 方案已经适配乐鑫多种芯片：
 
-| 芯片     | ESP-IDF Release/v4.3                                         | ESP-IDF Release/v4.4                                         | ESP-IDF Release/v5.0                                         | ESP-IDF Release/v5.1                                         |
-| -------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| ESP32    | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) |
-| ESP32-C3 | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) |
-| ESP32-S2 | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) |
-| ESP32-S3 | *N/A*                                                        | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) |
-| ESP32-C2 | *N/A*                                                        | *N/A*                                                        | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) |
-| ESP32-C6 | *N/A*                                                        | *N/A*                                                        | *N/A*                                                        | [![alt text](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e)](https://camo.githubusercontent.com/bd5f5f82b920744ff961517942e99a46699fee58737cd9b31bf56e5ca41b781b/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f2d737570706f727465642d677265656e) |
+| 芯片     |  ESP-IDF Release/v4.3  |  ESP-IDF Release/v4.4  |  ESP-IDF Release/v5.0  |  ESP-IDF Release/v5.1  |
+| :------- | :--------------------: | :--------------------: | :--------------------: | :--------------------: |
+| ESP32    | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
+| ESP32-C3 | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
+| ESP32-S2 | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
+| ESP32-S3 |                        | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
+| ESP32-C2 |                        |                        | ![alt text][supported] | ![alt text][supported] |
+| ESP32-C6 |                        |                        |                        | ![alt text][supported] |
 
+[supported]: https://img.shields.io/badge/-%E6%94%AF%E6%8C%81-green "supported"
 
 ![传统网络架构示意图](https://docs.espressif.com/projects/esp-idf/zh_CN/v4.4.2/esp32/_images/mesh-traditional-network-architecture.png)
 
@@ -359,6 +361,68 @@ ESP-MESH-LITE 网络的常见性能指标如下表所示：
     - ESP-MESH-LITE：默认首先配网完上电的设备作为根节点，若同时有多个设备上电，设备都连到路由器上面后，所有设备开始广播路由器 RSSI，RSSI 最好的作为根节点，其余节点断开与路由器的连接，开始重新扫描发现新的父节点。
 
 - ESP-MESH 只有根节点使能 LWIP 协议栈，所有子节点设备想要与外部网络通信都需要通过根节点的转发。
+
+
+
+## ESPNOW 使用指南
+
+为了方便多个功能模块同时使用 ESPNOW 进行通信，Mesh-Lite 组件内部将 ESPNOW 功能进行了封装。用户如需使用 ESPNOW 功能，请按照以下步骤进行：
+
+1. 使用 `esp_mesh_lite_espnow_recv_cb_register()` 接口注册 ESPNOW 接收回调。第一个参数是所要发送和接收的 ESPNOW 数据类型。用户可以使用 `ESPNOW_DATA_TYPE_RESERVE`，或者自行在 `ESPNOW_DATA_TYPE_RESERVE` 后添加自定义类型。
+
+   需要注意的是：`ESPNOW_DATA_TYPE_RESERVE`、`ESPNOW_DATA_TYPE_RM_GROUP_CONTROL`、`ESPNOW_DATA_TYPE_RM_ZERO_PROV` 均已被占用。以下是代码使用示例：
+
+   ```c
+   static void espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len)
+   {
+       esp_mesh_lite_espnow_event_t evt;
+       espnow_recv_cb_t *recv_cb = &evt.info.recv_cb;
+   
+       if (mac_addr == NULL || data == NULL || len <= 0) {
+           ESP_LOGE(TAG, "Receive cb arg error");
+           return;
+       }
+   
+       // The receiving callback function when receiving ESP-NOW. The receiving callback function also runs from the Wi-Fi task. So, do not do lengthy operations in the callback function.
+       // Instead, post the necessary data to a queue and handle it from a lower priority task.
+   }
+   
+   esp_mesh_lite_espnow_recv_cb_register(ESPNOW_DATA_TYPE_RESERVE, espnow_recv_cb);
+   ```
+
+2. 调用 `esp_mesh_lite_espnow_send` 发送接口进行数据发送。以下是代码使用示例：
+
+   ```c
+   void user_send_espnow(uint8_t dst_mac[ESP_NOW_ETH_ALEN], const uint8_t *payload, uint8_t payload_len)
+   {
+       if (esp_now_is_peer_exist(dst_mac) == false) {
+           esp_now_peer_info_t *peer = malloc(sizeof(esp_now_peer_info_t));
+           if (peer == NULL) {
+               ESP_LOGE(TAG, "Malloc peer information fail");
+               return;
+           }
+           memset(peer, 0, sizeof(esp_now_peer_info_t));
+           peer->channel = 0;
+           peer->ifidx = ESP_IF_WIFI_STA;
+           peer->encrypt = false;
+           // memcpy(peer->lmk, CONFIG_ESPNOW_LMK, ESP_NOW_KEY_LEN);
+           memcpy(peer->peer_addr, dst_mac, ESP_NOW_ETH_ALEN);
+           esp_now_add_peer(peer);
+           free(peer);
+       }
+   
+       if (esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_RESERVE, dst_mac, payload, payload_len) != ESP_OK) {
+           ESP_LOGE(TAG, "Send error");
+       }
+       return;
+   }
+   ```
+
+**注意：** 
+
+> 1. 用户无需执行 `esp_now_init()` 和 `esp_now_register_recv_cb(espnow_recv_cb)`，这两个 API 都已在 esp_mesh_lite_espnow_init 中实现。
+> 2. 由于 payload 头会增加一个字节的 type 字段，因此单次发送的数据不能超过 249 字节（在 `esp_now_send()` 时需单次发送的数据不能超过 250 字节）。
+> 3. 如果用户有加密需求，可以在 `esp_mesh_lite_espnow_init()` 中取消注释 `esp_now_set_pmk()`，并自行设置 PMK。
 
 
 

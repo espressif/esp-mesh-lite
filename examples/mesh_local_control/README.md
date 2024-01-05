@@ -20,6 +20,8 @@ This example implements the function of device data transmission in the mesh net
 
 ## Process
 
+ESP-Mesh-Lite is developed based on ESP-IDF functions and tools. Therefore, the ESP-IDF development environment must be set up first. You can refer to [Setting up Development Environment](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html) for detailed steps. Afterward, you can build the example directly in ESP-Mesh-Lite, similar to building the example in ESP-IDF.
+
 ### Run TCP server
 
 1. Connect PC or the mobile phone to the router.
