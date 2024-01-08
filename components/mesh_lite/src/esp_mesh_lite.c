@@ -211,7 +211,6 @@ static void esp_mesh_lite_event_ip_changed_handler(void *arg, esp_event_base_t e
             ESP_LOGI(TAG, "netif network segment conflict check");
             if (esp_mesh_lite_get_level() > CONFIG_MESH_LITE_MAXIMUM_LEVEL_ALLOWED) {
                 ESP_LOGW(TAG, "The maximum level has been exceeded, and the Wi-Fi connection has been disconnected to search for a new parent node.");
-                esp_wifi_disconnect();
                 esp_mesh_lite_connect();
             }
             esp_bridge_netif_network_segment_conflict_update(NULL);

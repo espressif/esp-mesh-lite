@@ -11,6 +11,7 @@ extern "C"
 {
 #endif
 
+#include "esp_mesh_lite_log.h"
 #include "esp_mesh_lite_core.h"
 #include "esp_mesh_lite_espnow.h"
 
