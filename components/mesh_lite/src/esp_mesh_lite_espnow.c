@@ -13,7 +13,7 @@
 #include "esp_mac.h"
 #endif
 
-#include "esp_mesh_lite_espnow.h"
+#include "esp_mesh_lite.h"
 
 static const char *TAG = "Mesh-Lite-ESPNOW";
 

@@ -2,7 +2,17 @@
 
 # ChangeLog
 
-## v0.11.0 - 2024-1-3
+## v0.10.0 - 2024-1-9
+
+### Enhancements:
+
+#### Bugfix
+
+- Fix the issue where users accidentally pass an empty SSID or stop Wi-Fi, causing internal scanning to fail and not recover
+- Fix the issue of network failure when the SoftAP SSID is hidden.
+- Fix the issue of incorrect hierarchy display when the network topology is restored.
+
+## v0.9.2 - 2024-1-3
 
 ### Enhancements:
 
@@ -16,7 +26,7 @@
 
 - Fixed send msg to root fail when softap ssid is different
 
-## v0.10.0 - 2023-12-13
+## v0.9.1 - 2023-12-13
 
 ### Enhancements:
 
