@@ -18,18 +18,19 @@
 #include "app_espnow.h"
 #include "app_bridge.h"
 #include "esp_mesh_lite.h"
+#include "wifi_provisioning/manager.h"
 
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
 #include "esp_mac.h"
 #endif
 
-extern char group_control_payload[GROUP_CONTROL_PAYLOAD_MAX_LEN];
+extern char group_control_payload[ESPNOW_PAYLOAD_MAX_LEN];
 
 static const char *TAG = "app_espnow";
 static uint32_t current_seq = 0;
-static QueueHandle_t espnow_recv_queue;
-static SemaphoreHandle_t sent_msgs_mutex;
-static uint8_t s_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+static TaskHandle_t group_control_handle = NULL;
+static QueueHandle_t espnow_recv_queue = NULL;
+static SemaphoreHandle_t sent_msgs_mutex = NULL;
 
 typedef struct esp_now_msg_send {
     uint32_t retry_times;
@@ -46,7 +47,7 @@ esp_err_t espnow_data_parse(uint8_t *data, uint16_t data_len, uint32_t *seq, uin
     app_espnow_data_t *buf = (app_espnow_data_t *)data;
 
     if (data_len < sizeof(app_espnow_data_t)) {
-        ESP_LOGE(TAG, "Receive ESPNOW data too short, len:%d", data_len);
+        ESP_LOGD(TAG, "Receive ESPNOW data too short, len:%d", data_len);
         return ESP_FAIL;
     }
 
@@ -72,7 +73,7 @@ void espnow_data_prepare(uint8_t *buf, uint8_t* payload, size_t payload_len, boo
     temp->mesh_id = esp_mesh_lite_get_mesh_id();
 #if ESPNOW_DEBUG
     printf("send seq: %"PRIu32", current_seq: %"PRIu32"\r\n", temp->seq, current_seq);
-    ESP_LOGW(TAG, "free heap %d, minimum %d", esp_get_free_heap_size(), esp_get_minimum_free_heap_size());
+    ESP_LOGW(TAG, "free heap %"PRIu32", minimum %"PRIu32"", esp_get_free_heap_size(), esp_get_minimum_free_heap_size());
 #endif
     memcpy(temp->payload, payload, payload_len);
 }
@@ -84,7 +85,7 @@ static void esp_now_send_timer_cb(TimerHandle_t timer)
         if (sent_msgs->max_retry > sent_msgs->retry_times) {
             sent_msgs->retry_times++;
             if (sent_msgs->sent_msg) {
-                if (esp_now_send(s_broadcast_mac, sent_msgs->sent_msg, sent_msgs->msg_len) != ESP_OK) {
+                if (esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_RM_GROUP_CONTROL, s_broadcast_mac, sent_msgs->sent_msg, sent_msgs->msg_len) != ESP_OK) {
                     ESP_LOGE(TAG, "Send error");
                 }
             }
@@ -103,12 +104,12 @@ static void esp_now_send_timer_cb(TimerHandle_t timer)
     }
 }
 
-void esp_now_send_group_control(uint8_t* payload, bool seq_init)
+void esp_now_send_group_control(uint8_t *payload, bool seq_init)
 {
     size_t payload_len = strlen((char*)payload);
     uint8_t *buf = calloc(1, payload_len + ESPNOW_PAYLOAD_HEAD_LEN);
     espnow_data_prepare(buf, payload, payload_len, seq_init);
-    if (esp_now_send(s_broadcast_mac, buf, payload_len + ESPNOW_PAYLOAD_HEAD_LEN) != ESP_OK) {
+    if (esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_RM_GROUP_CONTROL, s_broadcast_mac, buf, payload_len + ESPNOW_PAYLOAD_HEAD_LEN) != ESP_OK) {
         ESP_LOGE(TAG, "Send error");
     }
 
@@ -156,15 +157,15 @@ static void espnow_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status
 
 static void espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len)
 {
-    app_espnow_event_t evt;
-    app_espnow_event_recv_cb_t *recv_cb = &evt.info.recv_cb;
+    esp_mesh_lite_espnow_event_t evt;
+    espnow_recv_cb_t *recv_cb = &evt.info.recv_cb;
 
     if (mac_addr == NULL || data == NULL || len <= 0) {
         ESP_LOGE(TAG, "Receive cb arg error");
         return;
     }
 
-    evt.id = APP_ESPNOW_RECV_CB;
+    evt.id = ESPNOW_RECV_CB;
     memcpy(recv_cb->mac_addr, mac_addr, ESP_NOW_ETH_ALEN);
     recv_cb->data = malloc(len);
     if (recv_cb->data == NULL) {
@@ -182,17 +183,17 @@ static void espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len
 
 static void espnow_task(void *pvParameter)
 {
-    app_espnow_event_t evt;
+    esp_mesh_lite_espnow_event_t evt;
 
     ESP_LOGI(TAG, "Start espnow task");
 
     while (xQueueReceive(espnow_recv_queue, &evt, portMAX_DELAY) == pdTRUE) {
         switch (evt.id) {
-            case APP_ESPNOW_RECV_CB:
+            case ESPNOW_RECV_CB:
             {
-                app_espnow_event_recv_cb_t *recv_cb = &evt.info.recv_cb;
+                espnow_recv_cb_t *recv_cb = &evt.info.recv_cb;
                 uint32_t recv_seq;
-                memset(group_control_payload, 0x0, GROUP_CONTROL_PAYLOAD_MAX_LEN);
+                memset(group_control_payload, 0x0, ESPNOW_PAYLOAD_MAX_LEN);
                 if (espnow_data_parse(recv_cb->data, recv_cb->data_len, &recv_seq, (uint8_t*)group_control_payload) != ESP_OK) {
                     goto cleanup;
                 }
@@ -243,7 +244,7 @@ static void espnow_task(void *pvParameter)
                     ESP_LOGI(TAG, "recv_seq: %"PRIu32", current_seq: %"PRIu32"", recv_seq, current_seq);
 #endif
                     // Data Forward
-                    if (esp_now_send(s_broadcast_mac, recv_cb->data, recv_cb->data_len) != ESP_OK) {
+                    if (esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_RM_GROUP_CONTROL, s_broadcast_mac, recv_cb->data, recv_cb->data_len) != ESP_OK) {
                         ESP_LOGE(TAG, "Send error");
                     }
 
@@ -323,32 +324,26 @@ static void ip_event_handler(void *arg, esp_event_base_t event_base,
     }
 }
 
-esp_err_t app_espnow_init(void)
+esp_err_t group_control_init(void)
 {
     ESP_ERROR_CHECK(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &ip_event_handler, NULL, NULL));
 
-    app_espnow_send_param_t *send_param = NULL;
-
-    espnow_recv_queue = xQueueCreate(ESPNOW_QUEUE_SIZE, sizeof(app_espnow_event_t));
+    espnow_recv_queue = xQueueCreate(ESPNOW_QUEUE_SIZE, sizeof(esp_mesh_lite_espnow_event_t));
     if (espnow_recv_queue == NULL) {
         ESP_LOGE(TAG, "Create mutex fail");
         return ESP_FAIL;
     }
 
-    /* Initialize ESPNOW and register sending and receiving callback function. */
-    ESP_ERROR_CHECK( esp_now_init() );
     ESP_ERROR_CHECK( esp_now_register_send_cb(espnow_send_cb) );
-    ESP_ERROR_CHECK( esp_now_register_recv_cb(espnow_recv_cb) );
-
-    /* Set primary master key. */
-    ESP_ERROR_CHECK( esp_now_set_pmk((uint8_t *)CONFIG_ESPNOW_PMK) );
+    esp_mesh_lite_espnow_recv_cb_register(ESPNOW_DATA_TYPE_RM_GROUP_CONTROL, espnow_recv_cb);
 
     /* Add broadcast peer information to peer list. */
     esp_now_peer_info_t *peer = malloc(sizeof(esp_now_peer_info_t));
     if (peer == NULL) {
         ESP_LOGE(TAG, "Malloc peer information fail");
+        esp_now_unregister_send_cb();
         vSemaphoreDelete(espnow_recv_queue);
-        esp_now_deinit();
+        espnow_recv_queue = NULL;
         return ESP_FAIL;
     }
     memset(peer, 0, sizeof(esp_now_peer_info_t));
@@ -359,9 +354,8 @@ esp_err_t app_espnow_init(void)
     memcpy(peer->peer_addr, s_broadcast_mac, ESP_NOW_ETH_ALEN);
     ESP_ERROR_CHECK( esp_now_add_peer(peer) );
     free(peer);
-    peer = NULL;
 
-    xTaskCreate(espnow_task, "espnow_task", 3 * 1024, send_param, 4, NULL);
+    xTaskCreate(espnow_task, "espnow_task", 3 * 1024, NULL, 4, &group_control_handle);
 
     sent_msgs = (esp_now_msg_send_t*)malloc(sizeof(esp_now_msg_send_t));
     sent_msgs->max_retry = 0;
@@ -377,17 +371,19 @@ esp_err_t app_espnow_init(void)
     return ESP_OK;
 }
 
-void espnow_deinit(app_espnow_send_param_t *send_param)
+esp_err_t group_control_deinit(void)
 {
     ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, &ip_event_handler));
-    if (send_param) {
-        if (send_param->buffer) {
-            free(send_param->buffer);
-            send_param->buffer = NULL;
-        }
-        free(send_param);
-        send_param = NULL;
+    esp_now_unregister_send_cb();
+
+    if (group_control_handle) {
+        vTaskDelete(group_control_handle);
+        group_control_handle = NULL;
     }
-    vSemaphoreDelete(espnow_recv_queue);
-    esp_now_deinit();
+
+    if (espnow_recv_queue) {
+        vSemaphoreDelete(espnow_recv_queue);
+        espnow_recv_queue = NULL;
+    }
+    return ESP_OK;
 }

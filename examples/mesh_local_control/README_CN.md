@@ -20,6 +20,8 @@
 
 ## 工作流程
 
+ESP-Mesh-Lite 是基于 ESP-IDF 的功能和工具开发的。因此，首先必须设置 ESP-IDF 开发环境。您可以参考[设置开发环境](https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/get-started/index.html)获取详细的步骤。之后，您可以直接在 ESP-Mesh-Lite 中构建示例，类似于在 ESP-IDF 中构建示例。
+
 ### 运行 TCP 服务器
 
 1. 将主机（PC 或手机）连接到路由器。

@@ -1,4 +1,4 @@
-set(srcs)
+set(srcs "src/esp_mesh_lite_espnow.c")
 set(require_components "json" "esp_wifi" "app_update")
 
 if (CONFIG_MESH_LITE_ENABLE)
