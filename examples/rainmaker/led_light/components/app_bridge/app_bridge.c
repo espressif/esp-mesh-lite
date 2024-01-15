@@ -549,7 +549,8 @@ esp_err_t app_rmaker_enable_bridge(void)
     if (esp_mesh_lite_get_softap_psw_from_nvs((char *)wifi_cfg.ap.password, &softap_psw_len) != ESP_OK) {
         strlcpy((char *)wifi_cfg.ap.password, CONFIG_BRIDGE_SOFTAP_PASSWORD, sizeof(wifi_cfg.ap.password));
     }
-    esp_bridge_wifi_set(WIFI_MODE_AP, (char *)wifi_cfg.ap.ssid, (char *)wifi_cfg.ap.password, NULL);
+    esp_bridge_wifi_set_config(WIFI_IF_AP, &wifi_cfg);
+
     esp_mesh_lite_config_t mesh_lite_config = ESP_MESH_LITE_DEFAULT_INIT();
     esp_mesh_lite_init(&mesh_lite_config);
 
