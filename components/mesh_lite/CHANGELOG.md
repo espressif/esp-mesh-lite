@@ -2,6 +2,14 @@
 
 # ChangeLog
 
+## v0.10.1 - 2024-1-16
+
+### Enhancements:
+
+#### Mesh
+
+- Support set fusion config
+
 ## v0.10.0 - 2024-1-9
 
 ### Enhancements:

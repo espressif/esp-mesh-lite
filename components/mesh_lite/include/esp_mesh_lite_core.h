@@ -134,6 +134,12 @@ typedef struct {
     const char* device_category;            /**< Device Category */
 } esp_mesh_lite_config_t;
 
+// Define a structure for mesh lite fusion configuration settings.
+typedef struct {
+    uint32_t fusion_start_time_sec; // The start time in seconds after getting ip when fusion will begin, default is 0 seconds.
+    uint32_t fusion_frequency_sec;  // The frequency in seconds at which fusion will occur after the start time, default is 600 seconds.
+} esp_mesh_lite_fusion_config_t;
+
 typedef esp_err_t (*extern_url_ota_cb_t)(void);
 typedef cJSON* (*msg_process_cb_t)(cJSON *payload, uint32_t seq);
 
@@ -342,6 +348,30 @@ esp_err_t esp_mesh_lite_set_leaf_node(bool enable);
  * @param status Soft AP status to set (either DISABLE_SOFTAP or ENABLE_SOFTAP).
  */
 void esp_mesh_lite_set_leaf_node_softap_status(esp_mesh_lite_leaf_node_softap_status_t status);
+
+/**
+ * @brief Set the mesh lite fusion configuration.
+ *
+ * This API is used to configure the timing parameters for mesh lite fusion process.
+ *
+ * Usage Example:
+ * @code{.c}
+ * // Initialize fusion configuration with specified values.
+ * esp_mesh_lite_fusion_config_t fusion_config = {
+ *     .fusion_start_time_sec = 60,   // Set the fusion to start 60 seconds after the mesh network is up.
+ *     .fusion_frequency_sec = 120,   // Set the network to perform fusion every 120 seconds thereafter.
+ * };
+ *
+ * // Apply the fusion configuration to the mesh network.
+ * esp_mesh_lite_set_fusion_config(&fusion_config);
+ * @endcode
+ *
+ * @param[in] config A pointer to the `esp_mesh_lite_fusion_config_t` struct that holds the fusion configuration.
+ * @return
+ *      - ESP_OK: Success
+ *      - ESP_FAIL: Failed to set the fusion config
+ */
+esp_err_t esp_mesh_lite_set_fusion_config(esp_mesh_lite_fusion_config_t *config);
 
 /**
  * @brief  Get the mesh_lite_id
