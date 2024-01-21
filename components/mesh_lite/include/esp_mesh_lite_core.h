@@ -61,14 +61,6 @@ extern const char* ESP_MESH_LITE_EVENT;
 #define OTA_WND_DEFAULT 0
 #endif
 
-/**
- * @brief Enumeration representing different networking modes for ESP-Mesh-Lite.
- */
-typedef enum {
-    ESP_MESH_LITE_ROUTER,
-    ESP_MESH_LITE_MESH,
-} esp_mesh_lite_networking_mode_t;
-
 #define ESP_MESH_LITE_DEFAULT_INIT() { \
     .vendor_id = {CONFIG_MESH_LITE_VENDOR_ID_0, CONFIG_MESH_LITE_VENDOR_ID_1}, \
     .mesh_id = CONFIG_MESH_LITE_ID, \
@@ -87,6 +79,63 @@ typedef enum {
 }
 
 /**
+ * @brief Define the type for the callback function.
+ */
+typedef const uint8_t*(*esp_mesh_lite_get_ssid_by_mac_cb_t)(const uint8_t *bssid);
+
+/**
+ * @brief Callback function pointer type for processing received messages.
+ *        This function should process received message payloads and return a cJSON pointer.
+ * 
+ * @param payload  cJSON object representing the message payload.
+ * @param seq      Sequence number of the message.
+ * 
+ * @return cJSON*  cJSON pointer representing the processed message.
+ */
+typedef cJSON* (*msg_process_cb_t)(cJSON *payload, uint32_t seq);
+
+/**
+ * @brief Callback function pointer type for providing LAN OTA file data.
+ *        This function should provide file data for LAN OTA.
+ * 
+ * @param filesize     Size of the entire firmware file.
+ * @param fw_version   Firmware version string.
+ * @param offset       Offset in the firmware file.
+ * @param data_size    Size of the data to be provided.
+ * @param data         Pointer to the data to be provided.
+ * 
+ * @return esp_err_t The result of the operation.
+ */
+typedef esp_err_t (*lan_ota_provide_file_cb_t)(int filesize, char *fw_version, size_t offset, size_t data_size, char *data);
+
+/**
+ * @brief Callback function pointer type for getting LAN OTA file data.
+ *        This function should get file data for LAN OTA.
+ * 
+ * @param data         Buffer to store the received data.
+ * @param data_size    Size of the data buffer.
+ * 
+ * @return esp_err_t The result of the operation.
+ */
+typedef esp_err_t (*lan_ota_get_file_cb_t)(char *data, size_t data_size);
+
+/**
+ * @brief Callback function pointer type for indicating LAN OTA file reception completion.
+ *        This function should be called when LAN OTA file reception is complete.
+ * 
+ * @return esp_err_t The result of the operation.
+ */
+typedef esp_err_t (*lan_ota_get_file_done_cb_t)(void);
+
+/**
+ * @brief Callback function pointer type for handling external URL OTA.
+ *        This function should return an esp_err_t indicating the result of the OTA operation.
+ * 
+ * @return esp_err_t The result of the OTA operation.
+ */
+typedef esp_err_t (*extern_url_ota_cb_t)(void);
+
+/**
  * @brief Mesh-Lite event declarations
  *
  */
@@ -97,12 +146,13 @@ typedef enum {
     ESP_MESH_LITE_EVENT_CORE_MAX,
 } esp_mesh_lite_event_core_t;
 
+/**
+ * @brief Enumeration representing different networking modes for ESP-Mesh-Lite.
+ */
 typedef enum {
-    ESP_MESH_LITE_EVENT_OTA_START = ESP_MESH_LITE_EVENT_CORE_MAX,
-    ESP_MESH_LITE_EVENT_OTA_FINISH,
-    ESP_MESH_LITE_EVENT_OTA_PROGRESS,
-    ESP_MESH_LITE_EVENT_OTA_MAX,
-} esp_mesh_lite_event_ota_t;
+    ESP_MESH_LITE_ROUTER,
+    ESP_MESH_LITE_MESH,
+} esp_mesh_lite_networking_mode_t;
 
 /**
  * @brief Enumeration for the soft AP status of ESP-Mesh-Lite leaf nodes.
@@ -113,6 +163,40 @@ typedef enum {
     DISABLE_SOFTAP,
     ENABLE_SOFTAP,
 } esp_mesh_lite_leaf_node_softap_status_t;
+
+/**
+ * @brief Enumeration of reasons for ESP-Mesh-Lite events.
+ *        These values indicate various outcomes of ESP-Mesh-Lite operations.
+ */
+typedef enum {
+    ESP_MESH_LITE_EVENT_OTA_START = ESP_MESH_LITE_EVENT_CORE_MAX,
+    ESP_MESH_LITE_EVENT_OTA_FINISH,
+    ESP_MESH_LITE_EVENT_OTA_PROGRESS,
+    ESP_MESH_LITE_EVENT_OTA_MAX,
+} esp_mesh_lite_event_ota_t;
+
+/**
+ * @brief Enumeration of reasons for OTA (Over-The-Air) update completion events in ESP-Mesh-Lite.
+ *        These values indicate various outcomes of OTA update operations.
+ */
+typedef enum {
+    ESP_MESH_LITE_EVENT_OTA_SUCCESS = 0,             /**< OTA update succeeded. */
+    ESP_MESH_LITE_EVENT_OTA_FAIL,                    /**< OTA update failed for an unspecified reason. */
+    ESP_MESH_LITE_EVENT_OTA_REJECTED,                /**< OTA update rejected by the device. */
+    ESP_MESH_LITE_EVENT_OTA_WRITE_ERR,               /**< Error occurred while writing OTA data. */
+    ESP_MESH_LITE_EVENT_OTA_BEGIN_FAIL,              /**< Failed to begin OTA update process. */
+    ESP_MESH_LITE_EVENT_OTA_PENDING_TIMEOUT,         /**< Timeout occurred while waiting for OTA update to begin. */
+    ESP_MESH_LITE_EVENT_OTA_GET_PARTITION_ERR,       /**< Error occurred while obtaining OTA partition information. */
+    ESP_MESH_LITE_EVENT_OTA_SET_BOOT_PARTITION_ERR,  /**< Error occurred while setting the boot partition after OTA update. */
+} esp_mesh_lite_ota_finish_reason_t;
+
+/**
+ * @brief Enumeration type definition for specifying the type of ESP-Mesh-Lite OTA transmission.
+ */
+typedef enum {
+    ESP_MESH_LITE_OTA_TRANSMIT_FIRMWARE, /**< Transmit firmware version */
+    ESP_MESH_LITE_OTA_TRANSMIT_BINARY,   /**< Transmit firmware binary file */
+} esp_mesh_lite_ota_transmit_type_t;
 
 /**
  * @brief Mesh-Lite configuration parameters passed to esp_mesh_lite_core_init call.
@@ -141,25 +225,31 @@ typedef struct {
     uint32_t fusion_frequency_sec;  // The frequency in seconds at which fusion will occur after the start time, default is 600 seconds.
 } esp_mesh_lite_fusion_config_t;
 
-typedef esp_err_t (*extern_url_ota_cb_t)(void);
-typedef cJSON* (*msg_process_cb_t)(cJSON *payload, uint32_t seq);
-
-typedef enum {
-    ESP_MESH_LITE_EVENT_OTA_SUCCESS = 0,
-    ESP_MESH_LITE_EVENT_OTA_FAIL,
-    ESP_MESH_LITE_EVENT_OTA_REJECTED,
-    ESP_MESH_LITE_EVENT_OTA_WRITE_ERR,
-    ESP_MESH_LITE_EVENT_OTA_GET_PARTITION_ERR,
-    ESP_MESH_LITE_EVENT_OTA_SET_BOOT_PARTITION_ERR,
-} ota_finish_reason_t;
-
+/**
+ * @brief Structure defining callback functions for LAN OTA (Over-The-Air) file transfer in ESP-Mesh-Lite.
+ *        These callback functions are used to provide, get, and indicate completion of file transfer.
+ */
 typedef struct {
-    ota_finish_reason_t reason;
-} mesh_lite_event_ota_finish_t;
+    lan_ota_provide_file_cb_t provide_file_cb;       /**< Callback function for providing LAN OTA file data. */
+    lan_ota_get_file_cb_t get_file_cb;               /**< Callback function for getting LAN OTA file data. */
+    lan_ota_get_file_done_cb_t get_file_done;        /**< Callback function for indicating completion of LAN OTA file reception. */
+} esp_mesh_lite_lan_ota_file_transfer_cb_t;
 
+/**
+ * @brief Structure representing an event indicating the completion of an OTA (Over-The-Air) update in ESP-Mesh-Lite.
+ *        It contains the reason for the OTA update completion.
+ */
 typedef struct {
-    uint8_t percentage;
-} mesh_lite_event_ota_progress_t;
+    esp_mesh_lite_ota_finish_reason_t reason; /**< Reason for the OTA update completion. */
+} esp_mesh_lite_event_ota_finish_t;
+
+/**
+ * @brief Structure representing an event indicating the progress of an OTA (Over-The-Air) update in ESP-Mesh-Lite.
+ *        It contains the percentage of completion.
+ */
+typedef struct {
+    uint8_t percentage; /**< Percentage of completion of the OTA update. */
+} esp_mesh_lite_event_ota_progress_t;
 
 /**
  * @brief Structure representing an RSSI threshold list for ESP-Mesh-Lite.
@@ -195,9 +285,18 @@ typedef struct esp_mesh_lite_scan_cb {
 } esp_mesh_lite_scan_cb_t;
 
 /**
- * @brief Define the type for the callback function.
+ * @brief Structure type definition for configuring ESP-Mesh-Lite OTA transmission parameters.
  */
-typedef const uint8_t*(*esp_mesh_lite_get_ssid_by_mac_cb_t)(const uint8_t *bssid);
+typedef struct {
+    esp_mesh_lite_ota_transmit_type_t type;                 /**< Transmission type */
+    union {
+        char fw_version[32];                                /**< Firmware version, used for ESP_MESH_LITE_OTA_TRANSMIT_FIRMWARE */
+        char file_name[32];                                 /**< Firmware file name, used for not ESP_MESH_LITE_OTA_TRANSMIT_FIRMWARE type */
+    };
+    size_t size;                                            /**< Size of the transmitted data */
+    extern_url_ota_cb_t extern_url_ota_cb;                  /**< External URL OTA callback function */
+} esp_mesh_lite_ota_transmit_config_t;
+
 
 /*****************************************************/
 /**************** ESP Wi-Fi Mesh Lite ****************/
@@ -517,6 +616,31 @@ esp_err_t esp_mesh_lite_wifi_scan_start(const wifi_scan_config_t *config, uint32
 /**
  * @brief Register a callback function to check if BSSID is contained.
  *
+ * Usage Example:
+ * @code{.c}
+ * typedef struct esp_mesh_lite_mac_table {
+ *     uint8_t bssid[6];
+ *     uint8_t ssid[33];
+ * } esp_mesh_lite_mac_table_t;
+ * 
+ * static const esp_mesh_lite_mac_table_t mac_table[] = {
+ *     {{0x4c, 0x1a, 0x3d, 0x9f, 0xc1, 0x71}, "ssid_83a1"},
+ *     {{0x71, 0x9b, 0xc6, 0x2e, 0x57, 0x82}, "ssid_3e52"},
+ * };
+ * 
+ * static const uint8_t* check_is_contains_bssid(const uint8_t *bssid) {
+ *     size_t mac_table_size = sizeof(mac_table) / sizeof(mac_table[0]);
+ *     for (uint8_t i = 0; i < mac_table_size; i++) {
+ *         if (!memcmp(mac_table[i].bssid, bssid, sizeof(mac_table[i].bssid))) {
+ *             return mac_table[i].ssid;
+ *         }
+ *     }
+ *     return NULL;
+ * }
+ * 
+ * esp_mesh_lite_bssid_check_cb_register(check_is_contains_bssid);
+ * @endcode
+ *
  * @param[in] callback Pointer to the callback function.
  *
  * @return
@@ -566,18 +690,83 @@ esp_err_t esp_mesh_lite_scan_cb_register(esp_mesh_lite_scan_cb_t *cb);
 /*****************************************************/
 
 /**
- * @brief Start Mesh-Lite OTA
- * 
- * @param[in] filesize: The size of the firmware file to be updated.
- * 
- * @param[in] fw_version: The version of the firmware file to be updated.
- * 
- * @param[in] extern_url_ota_cb: The callback function of ota from the external url,
- *                               when the local area network ota cannot be performed,
- *                               the callback function will be called to perform ota.
- * 
+ * @brief Function to start ESP-Mesh-Lite OTA transmission.
+ *
+ * @param[in] transmit_config Pointer to the transmission configuration parameters.
+ *
+ * @return
+ *     - ESP_OK: OTA transmission started successfully.
+ *     - Other: Error code indicating failure to start OTA transmission.
  */
-esp_err_t esp_mesh_lite_ota_start(int filesize, char *fw_version, extern_url_ota_cb_t extern_url_ota_cb);
+esp_err_t esp_mesh_lite_transmit_file_start(esp_mesh_lite_ota_transmit_config_t *transmit_config);
+
+/**
+ * @brief Set the file name to be provided during LAN OTA (Over-The-Air) updates in ESP-Mesh-Lite.
+ * 
+ * @param file_name Pointer to the file name string.
+ * 
+ * @return esp_err_t Returns ESP_OK if the file name is successfully set; otherwise, an error code indicating the reason for failure.
+ */
+esp_err_t esp_mesh_lite_lan_ota_set_file_name(char *file_name);
+
+/**
+ * @brief Register or unregister callback functions for LAN OTA (Over-The-Air) file transfer in ESP-Mesh-Lite.
+ *        These callback functions will be used to provide, get, and indicate completion of file transfer during LAN OTA updates.
+ *        To unregister the callbacks, pass NULL as the argument.
+ * 
+ * Usage Example:
+ * @code{.c}
+ * static esp_ota_handle_t update_handle = 0;
+ * static const esp_partition_t *next_app_partition = NULL;
+ * 
+ * static esp_err_t provide_file_cb(int filesize, char *fw_version, size_t offset, size_t data_size, char *data)
+ * {
+ *     // check filesize and fw_version
+ *     const esp_partition_t* running_partition = esp_ota_get_running_partition();
+ *     return esp_partition_read(running_partition, offset, data, data_size);
+ * }
+ * 
+ * static esp_err_t get_file_cb(char *data, size_t data_size)
+ * {
+ *     return esp_ota_write(update_handle, (const void *)data, data_size);
+ * }
+ * 
+ * static esp_err_t get_file_done(void)
+ * {
+ *     esp_ota_end(update_handle);
+ *     return esp_ota_set_boot_partition(next_app_partition);
+ * }
+ * 
+ * static void app_lan_ota_start(void)
+ * {
+ *     next_app_partition = esp_ota_get_next_update_partition(NULL);
+ *     if (next_app_partition) {
+ *         esp_ota_begin(next_app_partition, OTA_WITH_SEQUENTIAL_WRITES, &update_handle);
+ *         esp_mesh_lite_ota_transmit_config_t transmit_config = {
+ *             .type = ESP_MESH_LITE_OTA_TRANSMIT_FIRMWARE,
+ *             .fw_version = "6e90e2",
+ *             .size = 890880,
+ *             .extern_url_ota_cb = NULL,
+ *         };
+ *         esp_mesh_lite_transmit_file_start(&transmit_config);
+ *     }
+ * }
+ * 
+ * esp_mesh_lite_lan_ota_file_transfer_cb_t lan_ota_cb = {
+ *     .provide_file_cb = provide_file_cb,
+ *     .get_file_cb = get_file_cb,
+ *     .get_file_done = get_file_done,
+ * };
+ * 
+ * static void app_ota_file_transfer_cb_register(void)
+ * {
+ *     esp_mesh_lite_ota_register_file_transfer_cb(&lan_ota_cb);
+ * }
+ * @endcode
+ * 
+ * @param cb Pointer to the structure containing the callback functions, or NULL to unregister the callbacks.
+ */
+void esp_mesh_lite_ota_register_file_transfer_cb(esp_mesh_lite_lan_ota_file_transfer_cb_t *cb);
 
 /**
  * @brief 

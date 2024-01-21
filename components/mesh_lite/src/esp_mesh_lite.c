@@ -221,7 +221,7 @@ static void esp_mesh_lite_event_ip_changed_handler(void *arg, esp_event_base_t e
             ESP_LOGI(TAG, "OTA Start\r\n");
             break;
         case ESP_MESH_LITE_EVENT_OTA_FINISH: {
-            mesh_lite_event_ota_finish_t *event = (mesh_lite_event_ota_finish_t*)event_data;
+            esp_mesh_lite_event_ota_finish_t *event = (esp_mesh_lite_event_ota_finish_t*)event_data;
             if (event->reason == ESP_MESH_LITE_EVENT_OTA_SUCCESS) {
                 ESP_LOGI(TAG, "LAN OTA Success!");
                 esp_restart();
@@ -233,7 +233,7 @@ static void esp_mesh_lite_event_ip_changed_handler(void *arg, esp_event_base_t e
             break;
         }
         case ESP_MESH_LITE_EVENT_OTA_PROGRESS: {
-            mesh_lite_event_ota_progress_t *event = (mesh_lite_event_ota_progress_t*)event_data;
+            esp_mesh_lite_event_ota_progress_t *event = (esp_mesh_lite_event_ota_progress_t*)event_data;
             ESP_LOGI(TAG, "LAN OTA Percentage: %d%%", event->percentage);
             break;
         }
