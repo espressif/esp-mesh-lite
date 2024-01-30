@@ -2,6 +2,18 @@
 
 # ChangeLog
 
+## v0.10.3 - 2024-2-21
+
+### Enhancements:
+
+#### Mesh
+
+- Add lan ota rejected event
+
+#### Bugfix
+
+- Increase the compatibility of the temporary fixed version of hidden ssid
+
 ## v0.10.2 - 2024-1-31
 
 ### Enhancements:
