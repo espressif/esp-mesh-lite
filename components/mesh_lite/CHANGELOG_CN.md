@@ -1,5 +1,13 @@
 # ChangeLog
 
+## v0.10.2 - 2024-1-31
+
+### 功能:
+
+#### Bugfix
+
+- 修复设置 allowed level 和 disallowed level 时生效失败
+
 ## v0.10.1 - 2024-1-16
 
 ### 功能:
