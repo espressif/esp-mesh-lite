@@ -29,7 +29,8 @@ default:
   - chmod 600 ~/.ssh/id_rsa
   - echo -e "Host gitlab.espressif.cn\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - export IDF_PATH=/opt/esp/idf
-  - python -m pip install --upgrade idf-component-manager
+  # - python -m pip install --upgrade idf-component-manager
+  - pip install idf-component-manager==1.4.1
 
 .build_default_example: &build_default_example
   - cd examples/mesh_local_control
