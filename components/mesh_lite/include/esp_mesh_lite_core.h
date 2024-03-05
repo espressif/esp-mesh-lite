@@ -224,23 +224,23 @@ void esp_mesh_lite_connect(void);
 void esp_mesh_lite_set_mesh_id(uint8_t mesh_id, bool force_update_nvs);
 
 /**
- * @brief  Set which level this node is only allowed to be
+ * @brief Set the specific level to which this node is restricted.
  * 
- * @attention  1. Please call this API after  `esp_mesh_lite_init`
- * @attention  2. Please call this API before `esp_mesh_lite_start`
+ * @attention  1. Please invoke this API after `esp_mesh_lite_init`.
+ * @attention  2. Please invoke this API before `esp_mesh_lite_start`.
  *
- * @param[in]  level: 1 ~ CONFIG_MESH_LITE_MAXIMUM_LEVEL_ALLOWED, 0 is invalid.
+ * @param[in]  level: An integer from 1 to CONFIG_MESH_LITE_MAXIMUM_LEVEL_ALLOWED. Setting it to 0 will unset the restriction.
  * 
  */
 esp_err_t esp_mesh_lite_set_allowed_level(uint8_t level);
 
 /**
- * @brief  Set which level this node is not allowed to be used as
+ * @brief Set the level that this node is not allowed to use.
  * 
- * @attention  1. Please call this API after  `esp_mesh_lite_init`
- * @attention  2. Please call this API before `esp_mesh_lite_start`
+ * @attention  1. Please invoke this API after `esp_mesh_lite_init`.
+ * @attention  2. Please invoke this API before `esp_mesh_lite_start`.
  *
- * @param[in]  level: 1 ~ CONFIG_MESH_LITE_MAXIMUM_LEVEL_ALLOWED, 0 is invalid.
+ * @param[in]  level: An integer from 1 to CONFIG_MESH_LITE_MAXIMUM_LEVEL_ALLOWED. Setting it to 0 is invalid.
  *
  */
 esp_err_t esp_mesh_lite_set_disallowed_level(uint8_t level);

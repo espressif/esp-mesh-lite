@@ -2,33 +2,21 @@
 
 # ChangeLog
 
-## v0.10.3 - 2024-2-21
+## v0.10.1 - 2024-3-5
 
 ### Enhancements:
 
 #### Mesh
 
 - Add lan ota rejected event
-
-#### Bugfix
-
-- Increase the compatibility of the temporary fixed version of hidden ssid
-
-## v0.10.2 - 2024-1-31
-
-### Enhancements:
-
-#### Bugfix
-
-- Fix failed to take effect when setting allowed level and disallowed level
-
-## v0.10.1 - 2024-1-16
-
-### Enhancements:
-
-#### Mesh
-
 - Support set fusion config
+
+#### Bugfix
+
+- Fix memory leak when max_retry of esp_mesh_lite_try_sending_msg is 0
+- Fix unable cancel the allowed and disallowed level
+- Increase the compatibility of the temporary fixed version of hidden ssid
+- Fix failed to take effect when setting allowed level and disallowed level
 
 ## v0.10.0 - 2024-1-9
 

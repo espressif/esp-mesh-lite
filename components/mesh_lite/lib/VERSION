@@ -1,7 +1,7 @@
 version
-libesp_mesh_lite_esp32.a   :46b0275
-libesp_mesh_lite_esp32c2.a :46b0275
-libesp_mesh_lite_esp32c3.a :46b0275
-libesp_mesh_lite_esp32c6.a :46b0275
-libesp_mesh_lite_esp32s2.a :46b0275
-libesp_mesh_lite_esp32s3.a :46b0275
+libesp_mesh_lite_esp32.a   :d1e4943
+libesp_mesh_lite_esp32c2.a :d1e4943
+libesp_mesh_lite_esp32c3.a :d1e4943
+libesp_mesh_lite_esp32c6.a :d1e4943
+libesp_mesh_lite_esp32s2.a :d1e4943
+libesp_mesh_lite_esp32s3.a :d1e4943
