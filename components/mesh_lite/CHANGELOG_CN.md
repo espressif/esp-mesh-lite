@@ -1,32 +1,20 @@
 # ChangeLog
 
-## v0.10.3 - 2024-2-21
+## v0.10.1 - 2024-3-5
 
 ### 功能:
 
 #### Mesh
 
 - 增加 LAN OTA rejected 事件
-
-#### Bugfix
-
-- 兼容旧版本隐藏 ssid 组网
-
-## v0.10.2 - 2024-1-31
-
-### 功能:
-
-#### Bugfix
-
-- 修复设置 allowed level 和 disallowed level 时生效失败
-
-## v0.10.1 - 2024-1-16
-
-### 功能:
-
-#### Mesh
-
 - 支持设置融合参数
+
+#### Bugfix
+
+- 修复当 esp_mesh_lite_try_sending_msg 的 max_retry 为 0 时内存泄漏
+- 修复了无法取消设备固定或禁用的设置级别
+- 兼容旧版本隐藏 ssid 组网
+- 修复设置 allowed level 和 disallowed level 时生效失败
 
 ## v0.10.0 - 2024-1-9
 
