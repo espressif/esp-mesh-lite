@@ -58,7 +58,7 @@ static EventGroupHandle_t wifi_event_group;
 #define WIFI_MAC_ADDR_LEN       (6)
 #define MAX_SSID_LEN            (32)
 #define MAX_PASSWORD_LEN        (64)
-#define DEFAULT_SSID_PREFIX     "Nova_"
+#define DEFAULT_SSID_PREFIX     "Nova"
 #define DEFAULT_PASSWORD        "espressif"
 
 #define POP_STR_SIZE            (9)
@@ -353,7 +353,7 @@ static esp_err_t rainmaker_mesh_lite_handler(uint32_t session_id, const uint8_t 
         esp_mesh_lite_set_softap_info((char *)config.ssid, (char*)config.password);
     } else {
         out_ssid = (char *) calloc(1, MAX_SSID_LEN);
-        snprintf(out_ssid, MAX_SSID_LEN, DEFAULT_SSID_PREFIX "%02x%02x%02x", softap_mac[3], softap_mac[4], softap_mac[5]);
+        snprintf(out_ssid, MAX_SSID_LEN, DEFAULT_SSID_PREFIX);
         snprintf(softap_ssid, sizeof(softap_ssid), "%.25s_%02x%02x%02x", out_ssid, softap_mac[3], softap_mac[4], softap_mac[5]);
         memcpy((char *)config.ssid, softap_ssid, sizeof(config.ssid));
         esp_mesh_lite_set_softap_ssid_to_nvs((char *)config.ssid);
