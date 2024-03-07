@@ -189,10 +189,9 @@ esp_err_t __wrap_esp_rmaker_handle_set_params(char *data, size_t data_len, esp_r
                 if (group_id_js->valueint && (esp_rmaker_is_my_group_id(group_id_js->valueint) == false)) {
                     control = false;
                 }
-
-                cJSON_Delete(rmaker_data_js);
             }
         }
+        cJSON_Delete(rmaker_data_js);
     }
 
     if (control) {
