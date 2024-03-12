@@ -40,15 +40,26 @@ esp_err_t esp_mesh_lite_report_info(void)
 {
     uint8_t mac[6];
     cJSON *item = NULL;
+    cJSON *children = NULL;
     char mac_str[MAC_MAX_LEN];
+    wifi_sta_list_t wifi_sta_list   = {0x0};
 
     esp_wifi_get_mac(WIFI_IF_STA, mac);
     snprintf(mac_str, sizeof(mac_str), MACSTR, MAC2STR(mac));
+
+    esp_wifi_ap_get_sta_list(&wifi_sta_list);
 
     item = cJSON_CreateObject();
     if (item) {
         cJSON_AddNumberToObject(item, "level", esp_mesh_lite_get_level());
         cJSON_AddStringToObject(item, "mac", mac_str);
+        children = cJSON_AddArrayToObject(item, "children");
+        if (children) {
+            for (int i = 0; i < wifi_sta_list.num; i++) {
+                snprintf(mac_str, sizeof(mac_str), MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));
+                cJSON_AddItemToArray(children, cJSON_CreateString(mac_str));
+            }
+        }
         esp_mesh_lite_try_sending_msg("report_info", "report_info_ack", MAX_RETRY, item, &esp_mesh_lite_send_msg_to_root);
         cJSON_Delete(item);
     }
@@ -109,6 +120,9 @@ static cJSON* report_info_process(cJSON *payload, uint32_t seq)
     found = cJSON_GetObjectItem(payload, "level");
     uint8_t level = found->valueint;
     found = cJSON_GetObjectItem(payload, "mac");
+    char *string = cJSON_Print(payload);
+    ESP_LOGI(TAG, "received node information %s", string);
+    free(string);
 
     esp_mesh_lite_node_info_add(level, found->valuestring);
     return NULL;
