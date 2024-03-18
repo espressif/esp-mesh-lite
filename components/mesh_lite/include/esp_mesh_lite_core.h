@@ -136,6 +136,7 @@ typedef struct {
 
 // Define a structure for mesh lite fusion configuration settings.
 typedef struct {
+    int8_t fusion_rssi_threshold;   // During fusion, the device to be fused will scan the primary fusion device. If the signal strength of the primary fusion device is lower than this threshold, the fusion process will be aborted. By default, this value is set to -85.
     uint32_t fusion_start_time_sec; // The start time in seconds after getting ip when fusion will begin, default is 0 seconds.
     uint32_t fusion_frequency_sec;  // The frequency in seconds at which fusion will occur after the start time, default is 600 seconds.
 } esp_mesh_lite_fusion_config_t;
@@ -295,7 +296,7 @@ esp_err_t esp_mesh_lite_set_argot(uint32_t argot);
  *     {-75,  -125, 5},
  * };
  *
- * esp_err_t result = esp_mesh_lite_set_rssi_threshold(rssi_level, sizeof(rssi_level) / sizeof(esp_mesh_lite_rssi_threshold_list_t));
+ * esp_err_t result = esp_mesh_lite_set_rssi_threshold(rssi_level, sizeof(rssi_level) / sizeof(esp_mesh_lite_rssi_threshold_list_t), 0);
  * if (result == ESP_OK) {
  *     // RSSI threshold list set successfully
  * } else {
@@ -305,11 +306,12 @@ esp_err_t esp_mesh_lite_set_argot(uint32_t argot);
  *
  * @param[in] rssi_threshold_list An array of RSSI thresholds to be applied.
  * @param[in] size Number of elements in the rssi_threshold_list array.
+ * @param[in] min_rssi Minimum RSSI threshold value for parent node signal strength. Set to 0 to use the default value (-90).
  * @return
  *      - ESP_OK: Success
  *      - ESP_FAIL: Failed to set the RSSI threshold list
  */
-esp_err_t esp_mesh_lite_set_rssi_threshold(esp_mesh_lite_rssi_threshold_list_t rssi_threshold_list[], size_t size);
+esp_err_t esp_mesh_lite_set_rssi_threshold(esp_mesh_lite_rssi_threshold_list_t rssi_threshold_list[], size_t size, int8_t min_rssi);
 
 /**
  * @brief  Set SoftAP information.
