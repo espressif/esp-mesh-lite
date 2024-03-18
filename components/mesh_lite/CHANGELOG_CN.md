@@ -1,5 +1,19 @@
 # ChangeLog
 
+## v0.10.2 - 2024-3-18
+
+### 功能:
+
+#### Mesh
+
+- 支持自定义设置融合时信号强度阈值 ([ac502e19](https://github.com/espressif/esp-mesh-lite/commit/ac502e19347fb6e33a8e2462b102725505599206))
+- 支持路由器模式下，信号强度低于阈值的根节点发生融合 ([ac502e19](https://github.com/espressif/esp-mesh-lite/commit/ac502e19347fb6e33a8e2462b102725505599206))
+- 支持自定义设置设备选择父节点时的最小信号强度阈值 ([ac502e19](https://github.com/espressif/esp-mesh-lite/commit/ac502e19347fb6e33a8e2462b102725505599206))
+
+#### Bugfix
+
+- 修复了设备在寻找父节点时选择一个已经到达最高层级的节点 ([ac502e19](https://github.com/espressif/esp-mesh-lite/commit/ac502e19347fb6e33a8e2462b102725505599206))
+
 ## v0.10.1 - 2024-3-5
 
 ### 功能:

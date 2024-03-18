@@ -2,6 +2,20 @@
 
 # ChangeLog
 
+## v0.10.2 - 2024-3-18
+
+### 功能:
+
+#### Mesh
+
+- Support custom setting of rssi threshold during fusion ([ac502e19](https://github.com/espressif/esp-mesh-lite/commit/ac502e19347fb6e33a8e2462b102725505599206))
+- Support the fusion of root nodes with rssi below the threshold in router mode ([ac502e19](https://github.com/espressif/esp-mesh-lite/commit/ac502e19347fb6e33a8e2462b102725505599206))
+- Support custom setting of minimum rssi threshold for device selection of parent node ([ac502e19](https://github.com/espressif/esp-mesh-lite/commit/ac502e19347fb6e33a8e2462b102725505599206))
+
+#### Bugfix
+
+- Fixed device selection of a node that has reached the highest level when searching for a parent node ([ac502e19](https://github.com/espressif/esp-mesh-lite/commit/ac502e19347fb6e33a8e2462b102725505599206))
+
 ## v0.10.1 - 2024-3-5
 
 ### Enhancements:
