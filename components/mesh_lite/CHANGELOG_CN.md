@@ -6,6 +6,8 @@
 
 #### Mesh
 
+- 临时解决方案: 有时连接 AP 时没有 Wi-Fi 事件会导致 mesh-lite 不起作用 ([576fda94](https://github.com/espressif/esp-mesh-lite/commit/576fda945366f43656edc328654e89b09b5bf9a3))
+- 支持注册 mesh lite scan cb 接口 ([576fda94](https://github.com/espressif/esp-mesh-lite/commit/576fda945366f43656edc328654e89b09b5bf9a3))
 - 支持设置在连接路由器时最小 rssi 阈值 ([262920b](https://github.com/espressif/esp-mesh-lite/commit/262920bc614cb4e089a01447af1ffa020e9c113a))
 - 支持自定义设置融合时信号强度阈值 ([ac502e19](https://github.com/espressif/esp-mesh-lite/commit/ac502e19347fb6e33a8e2462b102725505599206))
 - 支持路由器模式下，信号强度低于阈值的根节点发生融合 ([ac502e19](https://github.com/espressif/esp-mesh-lite/commit/ac502e19347fb6e33a8e2462b102725505599206))
