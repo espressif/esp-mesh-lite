@@ -8,12 +8,14 @@
 
 #### Mesh
 
+- support custom setting min rssi threshold when connecting router ([262920b](https://github.com/espressif/esp-mesh-lite/commit/262920bc614cb4e089a01447af1ffa020e9c113a))
 - Support custom setting of rssi threshold during fusion ([ac502e19](https://github.com/espressif/esp-mesh-lite/commit/ac502e19347fb6e33a8e2462b102725505599206))
 - Support the fusion of root nodes with rssi below the threshold in router mode ([ac502e19](https://github.com/espressif/esp-mesh-lite/commit/ac502e19347fb6e33a8e2462b102725505599206))
 - Support custom setting of minimum rssi threshold for device selection of parent node ([ac502e19](https://github.com/espressif/esp-mesh-lite/commit/ac502e19347fb6e33a8e2462b102725505599206))
 
 #### Bugfix
 
+- Fixed esp_mesh_lite_get_ssid_by_mac_cb_t doesn't really work
 - Fixed device selection of a node that has reached the highest level when searching for a parent node ([ac502e19](https://github.com/espressif/esp-mesh-lite/commit/ac502e19347fb6e33a8e2462b102725505599206))
 
 ## v0.10.1 - 2024-3-5
