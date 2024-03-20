@@ -336,6 +336,25 @@ esp_err_t esp_mesh_lite_set_softap_info(const char* softap_ssid, const char* sof
 esp_err_t esp_mesh_lite_set_networking_mode(esp_mesh_lite_networking_mode_t mode, int8_t rssi_threshold);
 
 /**
+ * @brief Set the minimum RSSI threshold when connecting to a router.
+ *
+ * This function is used to set the minimum Received Signal Strength Indication (RSSI) threshold
+ * when connecting to a router. When a device attempts to connect to a router, available routers
+ * will be filtered based on the configured minimum RSSI threshold. If the RSSI of an available
+ * router is lower than this threshold, the device will not connect to that router.
+ *
+ * @param rssi_min The minimum RSSI threshold in dBm (decibels per milliwatt), ranging from -128 to 127.
+ *                 Negative values indicate weak signal strength, while positive values indicate strong
+ *                 signal strength. For example, -80 means the device will not connect to a router with
+ *                 a signal strength lower than -80 dBm.
+ *
+ * @note This function allows customization of the threshold according to specific requirements.
+ *       The threshold set by this function only takes effect when the device attempts to connect to a router.
+ *       Ensure that ESP-Mesh-Lite has been initialized before calling this function.
+ */
+void esp_mesh_lite_set_router_min_rssi_threshold(int8_t rssi_min);
+
+/**
  * @brief  Set Node as leaf node.
  *
  * @param[in]  enable: true -> Leaf Node; false -> Regular Node

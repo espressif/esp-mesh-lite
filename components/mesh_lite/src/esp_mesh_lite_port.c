@@ -73,6 +73,9 @@ esp_err_t esp_mesh_lite_set_wifi_config(mesh_lite_sta_config_t *cfg)
         memcpy((char *)wifi_cfg.sta.bssid, (char *)cfg->bssid, sizeof(wifi_cfg.sta.bssid));
     }
 
+    wifi_cfg.sta.threshold.rssi = cfg->threshold.rssi;
+    wifi_cfg.sta.threshold.authmode = cfg->threshold.authmode;
+
     if (esp_wifi_set_config(WIFI_IF_STA, &wifi_cfg) != ESP_OK) {
         return ESP_FAIL;
     }
@@ -99,6 +102,9 @@ esp_err_t esp_mesh_lite_get_wifi_config(mesh_lite_sta_config_t *cfg)
     } else {
         memset((char *)cfg->bssid, 0x0, sizeof(cfg->bssid));
     }
+
+    cfg->threshold.rssi = wifi_cfg.sta.threshold.rssi;
+    cfg->threshold.authmode = wifi_cfg.sta.threshold.authmode;
 
     return ESP_OK;
 }
