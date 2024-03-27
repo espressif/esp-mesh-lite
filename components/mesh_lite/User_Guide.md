@@ -83,7 +83,7 @@ Each node in ESP-MESH-LITE is assigned an IP address by its parent node to commu
 
 The total number of nodes in ESP-MESH-LITE depends on the maximum number of layers allowed and the maximum number of downstream connections that each node can have in the network. Therefore, these two variables can be used to configure the size of the ESP-MESH-LITE network.
 
->The maximum number of layers allowed in the network: 1-16
+>The maximum number of layers allowed in the network: 1-15
 >
 >The maximum number of downstream connections that each node can have: 1-10
 

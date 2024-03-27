@@ -29,7 +29,7 @@ menu "ESP Wi-Fi Mesh Lite"
         config MESH_LITE_MAXIMUM_LEVEL_ALLOWED
             int "The maximum level allowed"
             default 5
-            range 1 16
+            range 1 15
 
         config MESH_LITE_NODE_INFO_REPORT
             bool "Enable node info report"
