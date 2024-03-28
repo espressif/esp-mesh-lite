@@ -6,6 +6,7 @@
 
 #### Mesh
 
+- 支持通过 mesh lite lan ota 接口传输自定义文件 ([bffbdf9](https://github.com/espressif/esp-mesh-lite/commit/bffbdf9297163ffd97b1996bde9c01c5247f5716))
 - 设置 mesh id 时如果与当前 mesh id 不一致，则断开重新寻找新的父节点 ([c262be5](https://github.com/espressif/esp-mesh-lite/commit/c262be5f8dc2acfd75e89959e3d493c18e3069d2))
 - 限制最高层级为 15 级 ([c262be5](https://github.com/espressif/esp-mesh-lite/commit/c262be5f8dc2acfd75e89959e3d493c18e3069d2))
 - 临时解决方案: 有时连接 AP 时没有 Wi-Fi 事件会导致 mesh-lite 不起作用 ([576fda94](https://github.com/espressif/esp-mesh-lite/commit/576fda945366f43656edc328654e89b09b5bf9a3))
