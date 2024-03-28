@@ -143,6 +143,7 @@ typedef enum {
     ESP_MESH_LITE_EVENT_CORE_STARTED,
     ESP_MESH_LITE_EVENT_CORE_INHERITED_NET_SEGMENT_CHANGED,
     ESP_MESH_LITE_EVENT_CORE_ROUTER_INFO_CHANGED,
+    ESP_MESH_LITE_EVENT_CORE_STATUS_FAIL,
     ESP_MESH_LITE_EVENT_CORE_MAX,
 } esp_mesh_lite_event_core_t;
 
@@ -295,7 +296,7 @@ typedef struct {
     };
     size_t size;                                            /**< Size of the transmitted data */
     extern_url_ota_cb_t extern_url_ota_cb;                  /**< External URL OTA callback function */
-} esp_mesh_lite_ota_transmit_config_t;
+} esp_mesh_lite_file_transmit_config_t;
 
 
 /*****************************************************/
@@ -698,7 +699,7 @@ esp_err_t esp_mesh_lite_scan_cb_register(esp_mesh_lite_scan_cb_t *cb);
  *     - ESP_OK: OTA transmission started successfully.
  *     - Other: Error code indicating failure to start OTA transmission.
  */
-esp_err_t esp_mesh_lite_transmit_file_start(esp_mesh_lite_ota_transmit_config_t *transmit_config);
+esp_err_t esp_mesh_lite_transmit_file_start(esp_mesh_lite_file_transmit_config_t *transmit_config);
 
 /**
  * @brief Set the file name to be provided during LAN OTA (Over-The-Air) updates in ESP-Mesh-Lite.
@@ -742,7 +743,7 @@ esp_err_t esp_mesh_lite_lan_ota_set_file_name(char *file_name);
  *     next_app_partition = esp_ota_get_next_update_partition(NULL);
  *     if (next_app_partition) {
  *         esp_ota_begin(next_app_partition, OTA_WITH_SEQUENTIAL_WRITES, &update_handle);
- *         esp_mesh_lite_ota_transmit_config_t transmit_config = {
+ *         esp_mesh_lite_file_transmit_config_t transmit_config = {
  *             .type = ESP_MESH_LITE_OTA_TRANSMIT_FIRMWARE,
  *             .fw_version = "6e90e2",
  *             .size = 890880,

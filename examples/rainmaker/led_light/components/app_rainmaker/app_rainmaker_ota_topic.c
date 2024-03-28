@@ -170,7 +170,7 @@ static void esp_rmaker_mesh_lite_ota_url_handler(const char *topic, void *payloa
             ESP_LOGE(TAG, "image header verification failed");
             esp_rmaker_ota_report_status(ota_handle, OTA_STATUS_FAILED, "Image validation failed");
         } else {
-            esp_mesh_lite_ota_transmit_config_t transmit_config = {
+            esp_mesh_lite_file_transmit_config_t transmit_config = {
                 .type = ESP_MESH_LITE_OTA_TRANSMIT_FIRMWARE,
                 .size = filesize,
                 .extern_url_ota_cb = esp_mesh_lite_ota_from_extern_url,
