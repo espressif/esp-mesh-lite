@@ -8,6 +8,7 @@
 
 #### Mesh
 
+- Support for transferring custom files via the Mesh Lite LAN OTA interface ([bffbdf9](https://github.com/espressif/esp-mesh-lite/commit/bffbdf9297163ffd97b1996bde9c01c5247f5716))
 - Limit the maximum level to 15 ([c262be5](https://github.com/espressif/esp-mesh-lite/commit/c262be5f8dc2acfd75e89959e3d493c18e3069d2))
 - If the mesh ID is set and it does not match the current mesh ID, disconnect and search for a new parent node ([c262be5](https://github.com/espressif/esp-mesh-lite/commit/c262be5f8dc2acfd75e89959e3d493c18e3069d2))
 - Workaround: Sometimes there is no Wi-Fi event when connecting AP which will cause mesh-lite does not work ([576fda94](https://github.com/espressif/esp-mesh-lite/commit/576fda945366f43656edc328654e89b09b5bf9a3))
