@@ -2,12 +2,15 @@
 
 # ChangeLog
 
-## v0.10.2 - 2024-3-18
+## v0.10.2 - 2024-4-8
 
 ### 功能:
 
 #### Mesh
 
+- Add status fail event to monitor some abnormal state ([4b10eee](https://github.com/espressif/esp-mesh-lite/commit/4b10eee7bd76598f8093913672374ba97f9fd68b))
+- Control the output of certain debug logs. ([4b10eee](https://github.com/espressif/esp-mesh-lite/commit/4b10eee7bd76598f8093913672374ba97f9fd68b))
+- Support set softap network segment ([4b10eee](https://github.com/espressif/esp-mesh-lite/commit/4b10eee7bd76598f8093913672374ba97f9fd68b))
 - Support for transferring custom files via the Mesh Lite LAN OTA interface ([bffbdf9](https://github.com/espressif/esp-mesh-lite/commit/bffbdf9297163ffd97b1996bde9c01c5247f5716))
 - Limit the maximum level to 15 ([c262be5](https://github.com/espressif/esp-mesh-lite/commit/c262be5f8dc2acfd75e89959e3d493c18e3069d2))
 - If the mesh ID is set and it does not match the current mesh ID, disconnect and search for a new parent node ([c262be5](https://github.com/espressif/esp-mesh-lite/commit/c262be5f8dc2acfd75e89959e3d493c18e3069d2))
@@ -20,6 +23,7 @@
 
 #### Bugfix
 
+- Resolve fusion failure issue for root node devices in certain special scenarios ([4b10eee](https://github.com/espressif/esp-mesh-lite/commit/4b10eee7bd76598f8093913672374ba97f9fd68b))
 - Fixed esp_mesh_lite_get_ssid_by_mac_cb_t doesn't really work ([262920b](https://github.com/espressif/esp-mesh-lite/commit/262920bc614cb4e089a01447af1ffa020e9c113a))
 - Fixed device selection of a node that has reached the highest level when searching for a parent node ([ac502e19](https://github.com/espressif/esp-mesh-lite/commit/ac502e19347fb6e33a8e2462b102725505599206))
 
