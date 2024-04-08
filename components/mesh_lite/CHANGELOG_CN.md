@@ -1,11 +1,14 @@
 # ChangeLog
 
-## v0.10.2 - 2024-3-18
+## v0.10.2 - 2024-4-8
 
 ### 功能:
 
 #### Mesh
 
+- 添加状态失败事件以监控某些异常状态 ([4b10eee](https://github.com/espressif/esp-mesh-lite/commit/4b10eee7bd76598f8093913672374ba97f9fd68b))
+- 控制一些调试日志的输出 ([4b10eee](https://github.com/espressif/esp-mesh-lite/commit/4b10eee7bd76598f8093913672374ba97f9fd68b))
+- 支持设置 SoftAP IP 网段 ([4b10eee](https://github.com/espressif/esp-mesh-lite/commit/4b10eee7bd76598f8093913672374ba97f9fd68b))
 - 支持通过 mesh lite lan ota 接口传输自定义文件 ([bffbdf9](https://github.com/espressif/esp-mesh-lite/commit/bffbdf9297163ffd97b1996bde9c01c5247f5716))
 - 设置 mesh id 时如果与当前 mesh id 不一致，则断开重新寻找新的父节点 ([c262be5](https://github.com/espressif/esp-mesh-lite/commit/c262be5f8dc2acfd75e89959e3d493c18e3069d2))
 - 限制最高层级为 15 级 ([c262be5](https://github.com/espressif/esp-mesh-lite/commit/c262be5f8dc2acfd75e89959e3d493c18e3069d2))
@@ -18,6 +21,7 @@
 
 #### Bugfix
 
+- 解决某些特殊场景下根节点设备的融合失败问题 ([4b10eee](https://github.com/espressif/esp-mesh-lite/commit/4b10eee7bd76598f8093913672374ba97f9fd68b))
 - 修复了 esp_mesh_lite_get_ssid_by_mac_cb_t 不起作用的问题 ([262920b](https://github.com/espressif/esp-mesh-lite/commit/262920bc614cb4e089a01447af1ffa020e9c113a))
 - 修复了设备在寻找父节点时选择一个已经到达最高层级的节点 ([ac502e19](https://github.com/espressif/esp-mesh-lite/commit/ac502e19347fb6e33a8e2462b102725505599206))
 
