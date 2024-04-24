@@ -2,6 +2,14 @@
 
 # ChangeLog
 
+## v0.10.3 - 2024-4-24
+
+### 功能:
+
+#### Bugfix
+
+- Resolved the issue of memory leak in the root node caused by frequent power cycling of the child nodes ([79553a6](https://github.com/espressif/esp-mesh-lite/commit/79553a67a65b5644cf1c84800f1e619cea089ab7))
+
 ## v0.10.2 - 2024-4-8
 
 ### 功能:
