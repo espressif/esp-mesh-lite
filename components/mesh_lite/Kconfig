@@ -97,6 +97,10 @@ menu "ESP Wi-Fi Mesh Lite"
                 range OTA_DATA_LEN 8328
                 help
                     Must be a multiple of OTA_data_Len
+
+            config OTA_AUTO_RESTART
+                bool "After OTA successfully, chip restarts automatically"
+                default y
         endmenu
     endmenu
 endmenu

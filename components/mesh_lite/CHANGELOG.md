@@ -2,6 +2,12 @@
 
 # ChangeLog
 
+## v0.10.4 - 2024-5-8
+
+### 功能:
+
+- Add an configuration to restart chip automatically after OTA finish or user restart it ([ebeb361](https://github.com/espressif/esp-mesh-lite/commit/ebeb3617ae435f707a2e9aeabd41410513f6594f))
+
 ## v0.10.3 - 2024-4-24
 
 ### 功能:

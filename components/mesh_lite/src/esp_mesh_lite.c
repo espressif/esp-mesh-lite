@@ -228,7 +228,9 @@ static void esp_mesh_lite_event_ip_changed_handler(void *arg, esp_event_base_t e
             esp_mesh_lite_event_ota_finish_t *event = (esp_mesh_lite_event_ota_finish_t*)event_data;
             if (event->reason == ESP_MESH_LITE_EVENT_OTA_SUCCESS) {
                 ESP_LOGI(TAG, "LAN OTA Success!");
+#ifdef CONFIG_OTA_AUTO_RESTART
                 esp_restart();
+#endif
             } else if (event->reason == ESP_MESH_LITE_EVENT_OTA_REJECTED) {
                 ESP_LOGE(TAG, "LAN OTA Rejected\r\n");
             } else {
