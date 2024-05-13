@@ -217,10 +217,6 @@ static void esp_mesh_lite_event_ip_changed_handler(void *arg, esp_event_base_t e
             break;
         case ESP_MESH_LITE_EVENT_CORE_ROUTER_INFO_CHANGED:
             break;
-        case ESP_MESH_LITE_EVENT_CORE_STATUS_FAIL:
-            // ESP_LOGE(TAG, "Mesh-Lite Core is in abnormal state, preparing to reboot the device.");
-            // assert(0);
-            break;
         case ESP_MESH_LITE_EVENT_OTA_START:
             ESP_LOGI(TAG, "OTA Start\r\n");
             break;
