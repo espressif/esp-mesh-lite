@@ -143,7 +143,6 @@ typedef enum {
     ESP_MESH_LITE_EVENT_CORE_STARTED,
     ESP_MESH_LITE_EVENT_CORE_INHERITED_NET_SEGMENT_CHANGED,
     ESP_MESH_LITE_EVENT_CORE_ROUTER_INFO_CHANGED,
-    ESP_MESH_LITE_EVENT_CORE_STATUS_FAIL,
     ESP_MESH_LITE_EVENT_CORE_MAX,
 } esp_mesh_lite_event_core_t;
 
@@ -608,6 +607,56 @@ esp_err_t esp_mesh_lite_get_router_config(mesh_lite_sta_config_t *router_config)
  * @brief  Scan all available APs.
  *
  * @attention  If you want to scan externally, don't call esp_wifi_scan_start directly, please call this interface.
+ * 
+ * Usage Example:
+ * @code{.c}
+ * static volatile bool app_scan_stage1 = false;
+ * static volatile bool app_scan_stage2 = false;
+ * 
+ * void app_scan_start_post(void)
+ * {
+ *     if (app_scan_stage1) {
+ *         app_scan_stage2 = true;
+ *     }
+ * }
+ * 
+ * void app_scan_end_post(void)
+ * {
+ *     if (app_scan_stage1) {
+ *         app_scan_stage1 = false;
+ *         app_scan_stage2 = false;
+ *     }
+ * }
+ * 
+ * static void app_scan_done_handler(void* arg, esp_event_base_t event_base,
+ *                                   int32_t event_id, void* event_data)
+ * {
+ *     if (!app_scan_stage2) {
+ *         return;
+ *     }
+ *     // Application code
+ *     app_scan_end_post();
+ * }
+ * 
+ * static void app_scan(void)
+ * {
+ *     if (app_scan_stage2 == true) {
+ *         // App scan in progress
+ *         return;
+ *     }
+ * 
+ *     app_scan_stage1 = true;
+ *     if (esp_mesh_lite_wifi_scan_start(NULL, 1000 / portTICK_PERIOD_MS) != ESP_OK) {
+ *         app_scan_stage1 = false;
+ *     }
+ * }
+ * 
+ * esp_mesh_lite_scan_cb_t app_scan_cb = {
+ *     .scan_start_cb = app_scan_start_post,
+ *     .scan_end_cb = app_scan_end_post,
+ * };
+ * esp_mesh_lite_scan_cb_register(&app_scan_cb);
+ * @endcode
  *
  * @return
  *    - 0: scan start successful
