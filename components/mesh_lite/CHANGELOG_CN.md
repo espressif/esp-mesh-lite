@@ -1,10 +1,16 @@
 # ChangeLog
 
-## v0.10.4 - 2024-5-8
+## v0.10.4 - 2024-5-13
 
 ### 功能:
 
+#### Mesh
+
 - 增加配置项，OTA 结束后，直接重启芯片或者交由用户通过事件处理控制重启 ([ebeb361](https://github.com/espressif/esp-mesh-lite/commit/ebeb3617ae435f707a2e9aeabd41410513f6594f))
+
+#### Bugfix
+
+- 修复意外情况下重联机制无法生效 ([7148df7](https://github.com/espressif/esp-mesh-lite/commit/7148df7693929ea0e3eecd4628c8a10da611d33c))
 
 ## v0.10.3 - 2024-4-24
 
