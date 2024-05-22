@@ -1,6 +1,6 @@
 # ChangeLog
 
-## v0.10.4 - 2024-5-13
+## v0.10.4 - 2024-5-22
 
 ### 功能:
 
@@ -10,6 +10,9 @@
 
 #### Bugfix
 
+- 修复子节点上报根节点消息异常问题 ([50c2ed9](https://github.com/espressif/esp-mesh-lite/commit/50c2ed9ac72464c4491b1e614274e63a9d72e7ae))
+- 修复软重启后意外连接至其子节点形成环形 ([50c2ed9](https://github.com/espressif/esp-mesh-lite/commit/50c2ed9ac72464c4491b1e614274e63a9d72e7ae))
+- 修复子节点意外触发融合逻辑导致网络异常 ([50c2ed9](https://github.com/espressif/esp-mesh-lite/commit/50c2ed9ac72464c4491b1e614274e63a9d72e7ae))
 - 修复意外情况下重联机制无法生效 ([7148df7](https://github.com/espressif/esp-mesh-lite/commit/7148df7693929ea0e3eecd4628c8a10da611d33c))
 
 ## v0.10.3 - 2024-4-24

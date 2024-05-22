@@ -2,7 +2,7 @@
 
 # ChangeLog
 
-## v0.10.4 - 2024-5-13
+## v0.10.4 - 2024-5-22
 
 ### 功能:
 
@@ -12,6 +12,9 @@
 
 #### Bugfix
 
+- fix network anomalies caused by unexpected triggering of fusion logic by child nodes ([50c2ed9](https://github.com/espressif/esp-mesh-lite/commit/50c2ed9ac72464c4491b1e614274e63a9d72e7ae))
+- fix unexpected connection to its child nodes after soft restart, forming a ring ([50c2ed9](https://github.com/espressif/esp-mesh-lite/commit/50c2ed9ac72464c4491b1e614274e63a9d72e7ae))
+- fix the issue of abnormal root node message reported by child nodes ([50c2ed9](https://github.com/espressif/esp-mesh-lite/commit/50c2ed9ac72464c4491b1e614274e63a9d72e7ae))
 - fix the inability of reconnection mechanism to take effect in unexpected scenarios ([7148df7](https://github.com/espressif/esp-mesh-lite/commit/7148df7693929ea0e3eecd4628c8a10da611d33c))
 
 ## v0.10.3 - 2024-4-24
