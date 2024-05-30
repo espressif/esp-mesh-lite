@@ -1,5 +1,13 @@
 # ChangeLog
 
+## v0.10.5 - 2024-5-30
+
+### 功能:
+
+#### Bugfix
+
+- 修复子节点上报根节点消息异常问题 ([0dfe6b5](https://github.com/espressif/esp-mesh-lite/commit/0dfe6b5a0df3339472f32b7b263fab809405b734))
+
 ## v0.10.4 - 2024-5-22
 
 ### 功能:
