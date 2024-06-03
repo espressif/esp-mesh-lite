@@ -1,11 +1,15 @@
 # ChangeLog
 
-## v0.10.5 - 2024-5-30
+## v0.10.5 - 2024-6-3
 
 ### 功能:
 
 #### Bugfix
 
+- LAN OTA：修复一些升级失败问题 ([a99aeeb](https://github.com/espressif/esp-mesh-lite/commit/a99aeeb67aa48078f670053ca32a8d2487a70034))
+    - 优化一些机制，减少升级时高层级节点的压力
+    - 修复升级过程中拓扑结构变化导致的升级失败问题
+    - 修复父节点升级完成重启后，子节点不继续请求固件的问题
 - 修复子节点上报根节点消息异常问题 ([0dfe6b5](https://github.com/espressif/esp-mesh-lite/commit/0dfe6b5a0df3339472f32b7b263fab809405b734))
 
 ## v0.10.4 - 2024-5-22

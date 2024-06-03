@@ -2,12 +2,16 @@
 
 # ChangeLog
 
-## v0.10.5 - 2024-5-30
+## v0.10.5 - 2024-6-3
 
 ### 功能:
 
 #### Bugfix
 
+- LAN OTA: Fix some issues causing upgrade failures. ([a99aeeb](https://github.com/espressif/esp-mesh-lite/commit/a99aeeb67aa48078f670053ca32a8d2487a70034))
+    - Optimize some mechanisms to reduce the pressure on higher-level nodes during upgrades
+    - Fix the issue of upgrade failures caused by changes in the topology during the upgrade process
+    - Fix the issue where child nodes do not continue to request firmware after the parent node completes the upgrade and restarts
 - fix the issue of abnormal root node message reported by child nodes ([0dfe6b5](https://github.com/espressif/esp-mesh-lite/commit/0dfe6b5a0df3339472f32b7b263fab809405b734))
 
 ## v0.10.4 - 2024-5-22
