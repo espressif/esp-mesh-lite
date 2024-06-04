@@ -1,4 +1,4 @@
-version: "0.10.4"
+version: "0.10.5"
 description: A lite version Wi-Fi Mesh, each node can access the network over the IP layer.
 url: https://github.com/espressif/esp-mesh-lite/tree/master/components/mesh_lite
 repository: https://github.com/espressif/esp-mesh-lite.git
@@ -6,7 +6,7 @@ documentation: https://github.com/espressif/esp-mesh-lite/blob/master/components
 issues: https://github.com/espressif/esp-mesh-lite/issues
 dependencies:
   idf: ">=5.0"
-  espressif/iot_bridge: 0.*
+  espressif/iot_bridge: "0.11.7"
   espressif/cmake_utilities: 0.*
 examples:
   - path: ../../examples/mesh_local_control
