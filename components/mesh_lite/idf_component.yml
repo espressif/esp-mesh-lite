@@ -5,7 +5,7 @@ repository: https://github.com/espressif/esp-mesh-lite.git
 documentation: https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/User_Guide.md
 issues: https://github.com/espressif/esp-mesh-lite/issues
 dependencies:
-  idf: ">=4.3"
+  idf: ">=5.0"
   espressif/iot_bridge: 0.*
   espressif/cmake_utilities: 0.*
 examples:

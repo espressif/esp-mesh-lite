@@ -1,5 +1,8 @@
 dependencies:
-  idf: ">=4.3"
+  idf: ">=5.0"
+  espressif/cbor: "^0.6.0~1"
+  espressif/esp_insights: "^1.0.1"
+  espressif/esp_rainmaker: "^1.1.0"
 
   mesh_lite:
     version: "*"
@@ -13,69 +16,19 @@ dependencies:
     git: https://github.com/espressif/esp-iot-bridge.git
     rules:
       - if: "target in [esp32s2, esp32s3]"
-
-  espressif/cbor:
-    version: "*"
-    rules:
-      - if: "idf_version >=5.0"
-
-  esp_insights:
-    path: components/esp_insights
-    git: https://github.com/espressif/esp-insights.git
-    version: 203a87f
-
-  esp_diagnostics:
-    path: components/esp_diagnostics
-    git: https://github.com/espressif/esp-insights.git
-    version: 203a87f
-
-  rtc_store:
-    path: components/rtc_store
-    git: https://github.com/espressif/esp-insights.git
-    version: 203a87f
-
-  esp_schedule:
-    path: components/esp_schedule
-    git: https://github.com/espressif/esp-rainmaker.git
-    version: 3d5adc5
-
-  esp_rainmaker:
-    path: components/esp_rainmaker
-    git: https://github.com/espressif/esp-rainmaker.git
-    version: 3d5adc5
-
-  gpio_button:
-    path: components/gpio_button
-    git: https://github.com/espressif/esp-rainmaker.git
-    version: 3d5adc5
-
-  json_generator:
-    path: components/json_generator
-    git: https://github.com/espressif/esp-rainmaker.git
-    version: 3d5adc5
-
-  json_parser:
-    path: components/json_parser
-    public: true
-    git: https://github.com/espressif/esp-rainmaker.git
-    version: 3d5adc5
+      - if: "idf_version < 5.1.4"
 
   qrcode:
-    path: components/qrcode
+    path: examples/common/qrcode
     git: https://github.com/espressif/esp-rainmaker.git
-    version: 3d5adc5
+    version: 43444ff
 
-  rmaker_common:
-    path: components/rmaker_common
+  gpio_button:
+    path: examples/common/gpio_button
     git: https://github.com/espressif/esp-rainmaker.git
-    version: 3d5adc5
-
-  app_insights:
-    path: examples/common/app_insights
-    git: https://github.com/espressif/esp-rainmaker.git
-    version: 3d5adc5
+    version: 43444ff
 
   app_reset:
     path: examples/common/app_reset
     git: https://github.com/espressif/esp-rainmaker.git
-    version: 3d5adc5
+    version: 43444ff
