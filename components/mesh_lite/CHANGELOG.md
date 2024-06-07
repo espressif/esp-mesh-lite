@@ -2,17 +2,24 @@
 
 # ChangeLog
 
-## v0.10.5 - 2024-6-3
+## v0.10.5 - 2024-6-7
 
 ### 功能:
 
 #### Bugfix
 
+- Adapt iot-bridge component to 0.11.7 ([20e4eb9](https://github.com/espressif/esp-mesh-lite/commit/20e4eb96949538e3d2512c06c3495194af5b6ef8))
+- LAN OTA: Fix issue preventing upgrade re-trigger during the upgrade process ([20e4eb9](https://github.com/espressif/esp-mesh-lite/commit/20e4eb96949538e3d2512c06c3495194af5b6ef8))
 - LAN OTA: Fix some issues causing upgrade failures. ([a99aeeb](https://github.com/espressif/esp-mesh-lite/commit/a99aeeb67aa48078f670053ca32a8d2487a70034))
     - Optimize some mechanisms to reduce the pressure on higher-level nodes during upgrades
     - Fix the issue of upgrade failures caused by changes in the topology during the upgrade process
     - Fix the issue where child nodes do not continue to request firmware after the parent node completes the upgrade and restarts
 - fix the issue of abnormal root node message reported by child nodes ([0dfe6b5](https://github.com/espressif/esp-mesh-lite/commit/0dfe6b5a0df3339472f32b7b263fab809405b734))
+
+#### Mesh
+
+- Support idf/v5.2 & idf/v5.3 ([a27afb1](https://github.com/espressif/esp-mesh-lite/commit/a27afb1aaed3910ae22bb1b46a3c13264f044f8f))
+- Remove support for idf/v4.3 & idf/v4.4 ([a27afb1](https://github.com/espressif/esp-mesh-lite/commit/a27afb1aaed3910ae22bb1b46a3c13264f044f8f))
 
 ## v0.10.4 - 2024-5-22
 

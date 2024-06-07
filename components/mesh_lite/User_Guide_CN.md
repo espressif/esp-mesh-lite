@@ -25,16 +25,18 @@ ESP-MESH-LITE 是一套建立在 Wi-Fi 协议之上的网络协议。ESP-MESH-LI
 
 乐鑫 ESP-Mesh-Lite 方案已经适配乐鑫多种芯片：
 
-| 芯片     |  ESP-IDF Release/v4.3  |  ESP-IDF Release/v4.4  |  ESP-IDF Release/v5.0  |  ESP-IDF Release/v5.1  |
+| 芯片     |  ESP-IDF Release/v5.0  |  ESP-IDF Release/v5.1  |  ESP-IDF Release/v5.2  |  ESP-IDF Release/v5.3  |
 | :------- | :--------------------: | :--------------------: | :--------------------: | :--------------------: |
 | ESP32    | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
 | ESP32-C3 | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
 | ESP32-S2 | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
-| ESP32-S3 |                        | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
-| ESP32-C2 |                        |                        | ![alt text][supported] | ![alt text][supported] |
-| ESP32-C6 |                        |                        |                        | ![alt text][supported] |
+| ESP32-S3 | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
+| ESP32-C2 | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
+| ESP32-C6 |                        | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
 
 [supported]: https://img.shields.io/badge/-%E6%94%AF%E6%8C%81-green "supported"
+
+**注意**： 从 ([a27afb1](https://github.com/espressif/esp-mesh-lite/commit/a27afb1aaed3910ae22bb1b46a3c13264f044f8f)) 之后 esp-mesh-lite 只支持 esp-idf/v5.x 版本。
 
 ![传统网络架构示意图](https://docs.espressif.com/projects/esp-idf/zh_CN/v4.4.2/esp32/_images/mesh-traditional-network-architecture.png)
 

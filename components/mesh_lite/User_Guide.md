@@ -25,16 +25,18 @@ This ESP-MESH-LITE guide contains the following sections:
 
 ESP-Mesh-Lite is supported by various Espressif chips, as shown in the table below:
 
-| Chip     |  ESP-IDF Release/v4.3  |  ESP-IDF Release/v4.4  |  ESP-IDF Release/v5.0  |  ESP-IDF Release/v5.1  |
+| Chip     |  ESP-IDF Release/v5.0  |  ESP-IDF Release/v5.1  |  ESP-IDF Release/v5.2  |  ESP-IDF Release/v5.3  |
 | :------- | :--------------------: | :--------------------: | :--------------------: | :--------------------: |
 | ESP32    | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
 | ESP32-C3 | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
 | ESP32-S2 | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
-| ESP32-S3 |                        | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
-| ESP32-C2 |                        |                        | ![alt text][supported] | ![alt text][supported] |
-| ESP32-C6 |                        |                        |                        | ![alt text][supported] |
+| ESP32-S3 | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
+| ESP32-C2 | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
+| ESP32-C6 |                        | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
 
 [supported]: https://img.shields.io/badge/-supported-green "supported"
+
+**Note**: From commit ([a27afb1](https://github.com/espressif/esp-mesh-lite/commit/a27afb1aaed3910ae22bb1b46a3c13264f044f8f)) onwards, esp-mesh-lite only supports esp-idf version 5.x.
 
 ![Traditional Network Architecture](https://docs.espressif.com/projects/esp-idf/en/v4.4.2/esp32/_images/mesh-traditional-network-architecture.png)
 
