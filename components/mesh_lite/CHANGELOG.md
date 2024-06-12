@@ -2,6 +2,14 @@
 
 # ChangeLog
 
+## v0.10.6 - 2024-6-12
+
+### 功能:
+
+#### Bugfix
+
+- Fix the problem of failing to connect to a router with WEP/WPA encryption ([80adbff](https://github.com/espressif/esp-mesh-lite/commit/80adbffb478d852256cc5fb36a1bca96956427af))
+
 ## v0.10.5 - 2024-6-7
 
 ### 功能:
