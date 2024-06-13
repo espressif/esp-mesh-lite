@@ -1,3 +1,10 @@
+#define CONFIG_MESH_LITE_NODE_INFO_REPORT 1
+#ifndef CONFIG_MESH_LITE_NODE_INFO_REPORT
+#error "NOT DEFINED"
+#endif
+
+// #define CONFIG_MESH_LITE_NODE_INFO_REPORT
+
 /*
  * SPDX-FileCopyrightText: 2022-2023 Espressif Systems (Shanghai) CO LTD
  *
@@ -25,6 +32,37 @@
 
 static int g_sockfd    = -1;
 static const char *TAG = "local_control";
+
+static void mesh_event_handler(void* arg, esp_event_base_t event_base,
+                          int32_t event_id, void* event_data)
+{
+    if (event_base == ESP_MESH_LITE_EVENT) {
+        switch (event_id)
+        {
+            case ESP_MESH_LITE_EVENT_NODE_JOIN: {
+                ESP_LOGI(TAG, "EVENTHANDLER node join %s %s %d", ((esp_mesh_lite_node_info_t*)event_data)->mac, ((esp_mesh_lite_node_info_t*)event_data)->ip, ((esp_mesh_lite_node_info_t*)event_data)->level);
+                break;
+            }
+            case ESP_MESH_LITE_EVENT_NODE_LEAVE: {
+                ESP_LOGI(TAG, "EVENTHANDLER node leave %s %s %d", ((esp_mesh_lite_node_info_t*)event_data)->mac, ((esp_mesh_lite_node_info_t*)event_data)->ip, ((esp_mesh_lite_node_info_t*)event_data)->level);
+                break;
+            }
+            case ESP_MESH_LITE_EVENT_NODE_CHANGE: {
+                ESP_LOGI(TAG, "EVENTHANDLER node change %s %s %d", ((esp_mesh_lite_node_info_t*)event_data)->mac, ((esp_mesh_lite_node_info_t*)event_data)->ip, ((esp_mesh_lite_node_info_t*)event_data)->level);
+                break;
+            }
+
+
+            default: {
+                ESP_LOGI(TAG, "unhandled esp mesh lite event %ld", event_id); 
+                break;
+            } 
+        }
+    } else {
+        ESP_LOGW(TAG, "Unknown event received!");
+    }
+}
+
 
 /**
  * @brief Create a tcp client
@@ -231,6 +269,7 @@ void app_main()
      * @breif Create handler
      */
     ESP_ERROR_CHECK(esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &ip_event_sta_got_ip_handler, NULL, NULL));
+    ESP_ERROR_CHECK(esp_event_handler_register(ESP_MESH_LITE_EVENT, ESP_EVENT_ANY_ID, &mesh_event_handler, NULL));
 
     TimerHandle_t timer = xTimerCreate("print_system_info", 10000 / portTICK_PERIOD_MS,
                                        true, NULL, print_system_info_timercb);
