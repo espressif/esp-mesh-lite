@@ -57,7 +57,7 @@ static int socket_tcp_client_create(const char *ip, uint16_t port)
     ret = connect(sockfd, (struct sockaddr *)&server_addr, sizeof(struct sockaddr_in));
     if (ret < 0) {
         ESP_LOGD(TAG, "socket connect, ret: %d, ip: %s, port: %d",
-                   ret, ip, port);
+                 ret, ip, port);
         goto ERR_EXIT;
     }
     return sockfd;

@@ -260,7 +260,7 @@ esp_err_t wifi_prov_mgr_set_app_info(const char *label, const char *version,
 static cJSON* wifi_prov_get_info_json(void)
 {
     cJSON *full_info_json = prov_ctx->app_info_json ?
-                                cJSON_Duplicate(prov_ctx->app_info_json, 1) : cJSON_CreateObject();
+                            cJSON_Duplicate(prov_ctx->app_info_json, 1) : cJSON_CreateObject();
     cJSON *prov_info_json = cJSON_CreateObject();
     cJSON *prov_capabilities = cJSON_CreateArray();
 
@@ -510,10 +510,10 @@ esp_err_t wifi_prov_mgr_endpoint_create(const char *ep_name)
 
     ACQUIRE_LOCK(prov_ctx_lock);
     if (prov_ctx &&
-        prov_ctx->prov_state == WIFI_PROV_STATE_IDLE) {
+            prov_ctx->prov_state == WIFI_PROV_STATE_IDLE) {
         err = prov_ctx->mgr_config.scheme.set_config_endpoint(
-                prov_ctx->prov_scheme_config, ep_name,
-                prov_ctx->endpoint_uuid_used + 1);
+                  prov_ctx->prov_scheme_config, ep_name,
+                  prov_ctx->endpoint_uuid_used + 1);
     }
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "Failed to create additional endpoint");
@@ -535,8 +535,8 @@ esp_err_t wifi_prov_mgr_endpoint_register(const char *ep_name, protocomm_req_han
 
     ACQUIRE_LOCK(prov_ctx_lock);
     if (prov_ctx &&
-        prov_ctx->prov_state > WIFI_PROV_STATE_STARTING &&
-        prov_ctx->prov_state < WIFI_PROV_STATE_STOPPING) {
+            prov_ctx->prov_state > WIFI_PROV_STATE_STARTING &&
+            prov_ctx->prov_state < WIFI_PROV_STATE_STOPPING) {
         err = protocomm_add_endpoint(prov_ctx->pc, ep_name, handler, user_ctx);
     }
     RELEASE_LOCK(prov_ctx_lock);
@@ -556,8 +556,8 @@ void wifi_prov_mgr_endpoint_unregister(const char *ep_name)
 
     ACQUIRE_LOCK(prov_ctx_lock);
     if (prov_ctx &&
-        prov_ctx->prov_state > WIFI_PROV_STATE_STARTING &&
-        prov_ctx->prov_state < WIFI_PROV_STATE_STOPPING) {
+            prov_ctx->prov_state > WIFI_PROV_STATE_STARTING &&
+            prov_ctx->prov_state < WIFI_PROV_STATE_STOPPING) {
         protocomm_remove_endpoint(prov_ctx->pc, ep_name);
     }
     RELEASE_LOCK(prov_ctx_lock);
@@ -583,8 +583,7 @@ static void prov_stop_and_notify(bool is_async)
 
     /* This delay is so that the client side app is notified first
      * and then the provisioning is stopped. Generally 1000ms is enough. */
-    if (!is_async)
-    {
+    if (!is_async) {
         uint32_t cleanup_delay = prov_ctx->cleanup_delay > 100 ? prov_ctx->cleanup_delay : 100;
         vTaskDelay(cleanup_delay / portTICK_PERIOD_MS);
     }
@@ -711,8 +710,8 @@ static bool wifi_prov_mgr_stop_service(bool blocking)
         /* Wait for any ongoing calls to wifi_prov_mgr_start_service() or
          * wifi_prov_mgr_stop_service() from another thread to finish */
         while (prov_ctx && (
-            prov_ctx->prov_state == WIFI_PROV_STATE_STARTING ||
-            prov_ctx->prov_state == WIFI_PROV_STATE_STOPPING)) {
+                    prov_ctx->prov_state == WIFI_PROV_STATE_STARTING ||
+                    prov_ctx->prov_state == WIFI_PROV_STATE_STOPPING)) {
             RELEASE_LOCK(prov_ctx_lock);
             vTaskDelay(100 / portTICK_PERIOD_MS);
             ACQUIRE_LOCK(prov_ctx_lock);
@@ -721,7 +720,7 @@ static bool wifi_prov_mgr_stop_service(bool blocking)
         /* Wait for any ongoing call to wifi_prov_mgr_start_service()
          * from another thread to finish */
         while (prov_ctx &&
-            prov_ctx->prov_state == WIFI_PROV_STATE_STARTING) {
+                prov_ctx->prov_state == WIFI_PROV_STATE_STARTING) {
             RELEASE_LOCK(prov_ctx_lock);
             vTaskDelay(100 / portTICK_PERIOD_MS);
             ACQUIRE_LOCK(prov_ctx_lock);
@@ -961,7 +960,7 @@ static esp_err_t update_wifi_scan_results(void)
     }
 
     ret = ESP_OK;
-    exit:
+exit:
 
     if (!prov_ctx->channels_per_group) {
         /* All channel scan was performed
@@ -990,7 +989,7 @@ static esp_err_t update_wifi_scan_results(void)
     }
     ESP_LOGD(TAG, "Scan started");
 
-    final:
+final:
 
     return ret;
 }
@@ -1025,8 +1024,8 @@ static void wifi_prov_mgr_event_handler_internal(
 
     /* If scan completed then update scan result */
     if (prov_ctx->prov_state == WIFI_PROV_STATE_STARTED &&
-        event_base == WIFI_EVENT &&
-        event_id == WIFI_EVENT_SCAN_DONE) {
+            event_base == WIFI_EVENT &&
+            event_id == WIFI_EVENT_SCAN_DONE) {
         update_wifi_scan_results();
     }
 
@@ -1054,7 +1053,7 @@ static void wifi_prov_mgr_event_handler_internal(
          * stop provisioning after configured timeout. */
         if (!prov_ctx->mgr_info.capabilities.no_auto_stop) {
             ESP_LOGD(TAG, "Starting %d sec timer for stop_prov_timer_cb()",
-                        CONFIG_WIFI_PROV_AUTOSTOP_TIMEOUT);
+                     CONFIG_WIFI_PROV_AUTOSTOP_TIMEOUT);
             esp_timer_start_once(prov_ctx->autostop_timer, CONFIG_WIFI_PROV_AUTOSTOP_TIMEOUT * 1000000U);
         }
 
@@ -1135,13 +1134,13 @@ esp_err_t wifi_prov_mgr_wifi_scan_start(bool blocking, bool passive,
 
     if (passive) {
         prov_ctx->scan_cfg.scan_type = WIFI_SCAN_TYPE_PASSIVE;
-/* We do not recommend scan configuration modification in Wi-Fi and BT coexistence mode */
+        /* We do not recommend scan configuration modification in Wi-Fi and BT coexistence mode */
 #if !CONFIG_BT_ENABLED
         prov_ctx->scan_cfg.scan_time.passive = period_ms;
 #endif
     } else {
         prov_ctx->scan_cfg.scan_type = WIFI_SCAN_TYPE_ACTIVE;
-/* We do not recommend scan configuration modification in Wi-Fi and BT coexistence mode */
+        /* We do not recommend scan configuration modification in Wi-Fi and BT coexistence mode */
 #if !CONFIG_BT_ENABLED
         prov_ctx->scan_cfg.scan_time.active.min = period_ms;
         prov_ctx->scan_cfg.scan_time.active.max = period_ms;
@@ -1302,7 +1301,7 @@ static void debug_print_wifi_credentials(wifi_sta_config_t sta, const char* pret
 
     if (passlen) {
         /* Mask password partially if longer than 3, else mask it completely */
-        memset(sta.password + (passlen > 3), '*', passlen - 2*(passlen > 3));
+        memset(sta.password + (passlen > 3), '*', passlen - 2 * (passlen > 3));
         ESP_LOGD(TAG, "%s Wi-Fi Password : %s", pretext, (const char *) sta.password);
     }
 }
@@ -1404,11 +1403,11 @@ esp_err_t wifi_prov_mgr_configure_sta(wifi_config_t *wifi_cfg)
 esp_err_t wifi_prov_mgr_init(wifi_prov_mgr_config_t config)
 {
     if (!prov_ctx_lock) {
-       /* Create mutex if this is the first time init is being called.
-        * This is created only once and never deleted because if some
-        * other thread is trying to take this mutex while it is being
-        * deleted from another thread then the reference may become
-        * invalid and cause exception */
+        /* Create mutex if this is the first time init is being called.
+         * This is created only once and never deleted because if some
+         * other thread is trying to take this mutex while it is being
+         * deleted from another thread then the reference may become
+         * invalid and cause exception */
         prov_ctx_lock = xSemaphoreCreateMutex();
         if (!prov_ctx_lock) {
             ESP_LOGE(TAG, "Failed to create mutex");
@@ -1426,7 +1425,7 @@ esp_err_t wifi_prov_mgr_init(wifi_prov_mgr_config_t config)
     };
 
     /* All function pointers in the scheme structure must be non-null */
-    for (size_t i = 0; i < sizeof(fn_ptrs)/sizeof(fn_ptrs[0]); i++) {
+    for (size_t i = 0; i < sizeof(fn_ptrs) / sizeof(fn_ptrs[0]); i++) {
         if (!fn_ptrs[i]) {
             return ESP_ERR_INVALID_ARG;
         }
@@ -1524,7 +1523,7 @@ void wifi_prov_mgr_wait(void)
     while (1) {
         ACQUIRE_LOCK(prov_ctx_lock);
         if (prov_ctx &&
-            prov_ctx->prov_state != WIFI_PROV_STATE_IDLE) {
+                prov_ctx->prov_state != WIFI_PROV_STATE_IDLE) {
             RELEASE_LOCK(prov_ctx_lock);
             vTaskDelay(1000 / portTICK_PERIOD_MS);
             continue;
@@ -1551,8 +1550,8 @@ void wifi_prov_mgr_deinit(void)
      */
     bool service_was_running = wifi_prov_mgr_stop_service(1);
 
-     /* If service was not running, its also possible that manager
-      * was not even initialized */
+    /* If service was not running, its also possible that manager
+     * was not even initialized */
     if (!service_was_running && !prov_ctx) {
         ESP_LOGD(TAG, "Manager already de-initialized");
         RELEASE_LOCK(prov_ctx_lock);
@@ -1745,7 +1744,6 @@ esp_err_t wifi_prov_mgr_start_provisioning(wifi_prov_security_t security, const 
 #endif
     prov_ctx->security = security;
 
-
     esp_timer_create_args_t wifi_connect_timer_conf = {
         .callback = wifi_connect_timer_cb,
         .arg = NULL,
@@ -1790,10 +1788,10 @@ esp_err_t wifi_prov_mgr_start_provisioning(wifi_prov_security_t security, const 
     };
     ret = esp_timer_create(&cleanup_delay_timer, &prov_ctx->cleanup_delay_timer);
     if (ret != ESP_OK) {
-      ESP_LOGE(TAG, "Failed to create cleanup delay timer");
-      esp_timer_delete(prov_ctx->wifi_connect_timer);
-      esp_timer_delete(prov_ctx->autostop_timer);
-      goto err;
+        ESP_LOGE(TAG, "Failed to create cleanup delay timer");
+        esp_timer_delete(prov_ctx->wifi_connect_timer);
+        esp_timer_delete(prov_ctx->autostop_timer);
+        goto err;
     }
 #endif
 

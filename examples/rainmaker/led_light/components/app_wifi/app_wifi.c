@@ -1,10 +1,9 @@
 /*
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
+ * SPDX-FileCopyrightText: 2024 Espressif Systems (Shanghai) CO LTD
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
 #include <string.h>
 #include <inttypes.h>
 #include <freertos/FreeRTOS.h>
@@ -74,12 +73,12 @@ static uint64_t prov_timeout_period = (APP_WIFI_PROV_TIMEOUT_PERIOD * 60 * 10000
 #define ESP_RAINMAKER_INTRO_LINK    "https://rainmaker.espressif.com"
 #define ESP_RMAKER_PHONE_APP_LINK   "http://bit.ly/esp-rmaker"
 char esp_rainmaker_ascii_art[] = \
-"  ______  _____ _____    _____            _____ _   _ __  __          _  ________ _____\n"\
-" |  ____|/ ____|  __ \\  |  __ \\     /\\   |_   _| \\ | |  \\/  |   /\\   | |/ /  ____|  __ \\\n"\
-" | |__  | (___ | |__) | | |__) |   /  \\    | | |  \\| | \\  / |  /  \\  | ' /| |__  | |__) |\n"\
-" |  __|  \\___ \\|  ___/  |  _  /   / /\\ \\   | | | . ` | |\\/| | / /\\ \\ |  < |  __| |  _  /\n"\
-" | |____ ____) | |      | | \\ \\  / ____ \\ _| |_| |\\  | |  | |/ ____ \\| . \\| |____| | \\ \\\n"\
-" |______|_____/|_|      |_|  \\_\\/_/    \\_\\_____|_| \\_|_|  |_/_/    \\_\\_|\\_\\______|_|  \\_\\\n";
+                                 "  ______  _____ _____    _____            _____ _   _ __  __          _  ________ _____\n"\
+                                 " |  ____|/ ____|  __ \\  |  __ \\     /\\   |_   _| \\ | |  \\/  |   /\\   | |/ /  ____|  __ \\\n"\
+                                 " | |__  | (___ | |__) | | |__) |   /  \\    | | |  \\| | \\  / |  /  \\  | ' /| |__  | |__) |\n"\
+                                 " |  __|  \\___ \\|  ___/  |  _  /   / /\\ \\   | | | . ` | |\\/| | / /\\ \\ |  < |  __| |  _  /\n"\
+                                 " | |____ ____) | |      | | \\ \\  / ____ \\ _| |_| |\\  | |  | |/ ____ \\| . \\| |____| | \\ \\\n"\
+                                 " |______|_____/|_|      |_|  \\_\\/_/    \\_\\_____|_| \\_|_|  |_/_/    \\_\\_|\\_\\______|_|  \\_\\\n";
 
 static void intro_print(bool provisioned)
 {
@@ -97,7 +96,7 @@ static void intro_print(bool provisioned)
     printf("\nIf you want to reset Wi-Fi credentials, or reset to factory, press and hold the Boot button.\n");
     printf("\nThis application uses ESP RainMaker, which is based on ESP IDF.\n");
     printf("Check out the source code for this application here:\n   %s/%s\n",
-            ESP_RAINMAKER_GITHUB_EXAMPLES_PATH, RMAKER_DEMO_PROJECT_NAME);
+           ESP_RAINMAKER_GITHUB_EXAMPLES_PATH, RMAKER_DEMO_PROJECT_NAME);
     printf("\nPlease visit %s for additional information.\n\n", ESP_RAINMAKER_INTRO_LINK);
     printf("####################################################################################################\n");
 }
@@ -120,12 +119,12 @@ static void app_wifi_print_qr(const char *name, const char *pop, const char *tra
     char payload[150];
     if (pop) {
         snprintf(payload, sizeof(payload), "{\"ver\":\"%s\",\"name\":\"%s\"" \
-                ",\"pop\":\"%s\",\"transport\":\"%s\"}",
-                PROV_QR_VERSION, name, pop, transport);
+                 ",\"pop\":\"%s\",\"transport\":\"%s\"}",
+                 PROV_QR_VERSION, name, pop, transport);
     } else {
         snprintf(payload, sizeof(payload), "{\"ver\":\"%s\",\"name\":\"%s\"" \
-                ",\"transport\":\"%s\"}",
-                PROV_QR_VERSION, name, transport);
+                 ",\"transport\":\"%s\"}",
+                 PROV_QR_VERSION, name, transport);
     }
 #ifdef CONFIG_APP_WIFI_PROV_SHOW_QR
     ESP_LOGI(TAG, "Scan this QR code from the ESP RainMaker phone app for Provisioning.");
@@ -168,7 +167,7 @@ static esp_err_t app_wifi_keystore_set(const char *name_space, const char *key, 
         }
         nvs_close(handle);
     }
-    
+
     return err;
 }
 
@@ -194,8 +193,9 @@ static esp_err_t app_wifi_network_connect(void)
     wifi_config_t wifi_cfg_old;
     memset(&wifi_cfg_old, 0, sizeof(wifi_config_t));
     memcpy(wifi_cfg_old.sta.ssid, ssid, ssid_len);
-    if (password_len)
+    if (password_len) {
         memcpy(wifi_cfg_old.sta.password, password, password_len);
+    }
 
     ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_cfg_old));
     ESP_ERROR_CHECK(esp_wifi_start());
@@ -212,78 +212,78 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 #endif
     if (event_base == WIFI_PROV_EVENT) {
         switch (event_id) {
-            case WIFI_PROV_START:
-                ESP_LOGI(TAG, "Provisioning started");
-                break;
-            case WIFI_PROV_CRED_RECV: {
-                wifi_sta_config_t *wifi_sta_cfg = (wifi_sta_config_t *)event_data;
-                ESP_LOGI(TAG, "Received Wi-Fi credentials"
-                         "\n\tSSID     : %s\n\tPassword : %s",
-                         (const char *) wifi_sta_cfg->ssid,
-                         (const char *) wifi_sta_cfg->password);
-                app_wifi_keystore_set(KEYSTORE_NAMESPACE, KEY_STA_SSID, wifi_sta_cfg->ssid, strlen((const char *) wifi_sta_cfg->ssid));
-                if (strlen((const char *) wifi_sta_cfg->password)) {
-                    app_wifi_keystore_set(KEYSTORE_NAMESPACE, KEY_STA_PASSWORD, wifi_sta_cfg->password, strlen((const char *) wifi_sta_cfg->password));
-                }
+        case WIFI_PROV_START:
+            ESP_LOGI(TAG, "Provisioning started");
+            break;
+        case WIFI_PROV_CRED_RECV: {
+            wifi_sta_config_t *wifi_sta_cfg = (wifi_sta_config_t *)event_data;
+            ESP_LOGI(TAG, "Received Wi-Fi credentials"
+                     "\n\tSSID     : %s\n\tPassword : %s",
+                     (const char *) wifi_sta_cfg->ssid,
+                     (const char *) wifi_sta_cfg->password);
+            app_wifi_keystore_set(KEYSTORE_NAMESPACE, KEY_STA_SSID, wifi_sta_cfg->ssid, strlen((const char *) wifi_sta_cfg->ssid));
+            if (strlen((const char *) wifi_sta_cfg->password)) {
+                app_wifi_keystore_set(KEYSTORE_NAMESPACE, KEY_STA_PASSWORD, wifi_sta_cfg->password, strlen((const char *) wifi_sta_cfg->password));
+            }
 #if CONFIG_MESH_LITE_ENABLE
-                mesh_lite_sta_config_t config;
-                memcpy((char*)config.ssid, (char*)wifi_sta_cfg->ssid, sizeof(config.ssid));
-                memcpy((char*)config.password, (char*)wifi_sta_cfg->password, sizeof(config.password));
-                config.bssid_set = wifi_sta_cfg->bssid_set;
-                if (config.bssid_set) {
-                    memcpy((char*)config.bssid, (char*)wifi_sta_cfg->bssid, sizeof(config.bssid));
-                }
-                esp_mesh_lite_set_router_config(&config);
-                esp_mesh_lite_connect();
+            mesh_lite_sta_config_t config;
+            memcpy((char*)config.ssid, (char*)wifi_sta_cfg->ssid, sizeof(config.ssid));
+            memcpy((char*)config.password, (char*)wifi_sta_cfg->password, sizeof(config.password));
+            config.bssid_set = wifi_sta_cfg->bssid_set;
+            if (config.bssid_set) {
+                memcpy((char*)config.bssid, (char*)wifi_sta_cfg->bssid, sizeof(config.bssid));
+            }
+            esp_mesh_lite_set_router_config(&config);
+            esp_mesh_lite_connect();
 #else
-                esp_wifi_set_storage(WIFI_STORAGE_FLASH);
-                esp_wifi_set_config(ESP_IF_WIFI_STA, (wifi_config_t*)wifi_sta_cfg);
-                esp_wifi_set_storage(WIFI_STORAGE_RAM);
+            esp_wifi_set_storage(WIFI_STORAGE_FLASH);
+            esp_wifi_set_config(ESP_IF_WIFI_STA, (wifi_config_t*)wifi_sta_cfg);
+            esp_wifi_set_storage(WIFI_STORAGE_RAM);
 
-                esp_wifi_disconnect();
-                esp_wifi_connect();
+            esp_wifi_disconnect();
+            esp_wifi_connect();
 #endif /* CONFIG_MESH_LITE_ENABLE */
-                xEventGroupSetBits(wifi_event_group, WIFI_CONNECTED_EVENT);
-                break;
-            }
-            case WIFI_PROV_CRED_FAIL: {
-                wifi_prov_sta_fail_reason_t *reason = (wifi_prov_sta_fail_reason_t *)event_data;
-                ESP_LOGE(TAG, "Provisioning failed!\n\tReason : %s"
-                         "\n\tPlease reset to factory and retry provisioning",
-                         (*reason == WIFI_PROV_STA_AUTH_ERROR) ?
-                         "Wi-Fi station authentication failed" : "Wi-Fi access-point not found");
+            xEventGroupSetBits(wifi_event_group, WIFI_CONNECTED_EVENT);
+            break;
+        }
+        case WIFI_PROV_CRED_FAIL: {
+            wifi_prov_sta_fail_reason_t *reason = (wifi_prov_sta_fail_reason_t *)event_data;
+            ESP_LOGE(TAG, "Provisioning failed!\n\tReason : %s"
+                     "\n\tPlease reset to factory and retry provisioning",
+                     (*reason == WIFI_PROV_STA_AUTH_ERROR) ?
+                     "Wi-Fi station authentication failed" : "Wi-Fi access-point not found");
 #ifdef CONFIG_APP_WIFI_RESET_PROV_ON_FAILURE
-                retries++;
-                if (retries >= CONFIG_APP_WIFI_PROV_MAX_RETRY_CNT) {
+            retries++;
+            if (retries >= CONFIG_APP_WIFI_PROV_MAX_RETRY_CNT) {
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 3, 1)
-                    ESP_LOGI(TAG, "Failed to connect with provisioned AP, reseting provisioned credentials");
-                    wifi_prov_mgr_reset_sm_state_on_failure();
-                    esp_event_post(APP_WIFI_EVENT, APP_WIFI_EVENT_PROV_RESTART, NULL, 0, portMAX_DELAY);
+                ESP_LOGI(TAG, "Failed to connect with provisioned AP, reseting provisioned credentials");
+                wifi_prov_mgr_reset_sm_state_on_failure();
+                esp_event_post(APP_WIFI_EVENT, APP_WIFI_EVENT_PROV_RESTART, NULL, 0, portMAX_DELAY);
 #else
-                    ESP_LOGW(TAG, "Failed to connect with provisioned AP, please reset to provisioning manually");
+                ESP_LOGW(TAG, "Failed to connect with provisioned AP, please reset to provisioning manually");
 #endif
-                    retries = 0;
-                }
-#endif
-                break;
-            }
-            case WIFI_PROV_CRED_SUCCESS:
-                ESP_LOGI(TAG, "Provisioning successful");
-#ifdef CONFIG_APP_WIFI_RESET_PROV_ON_FAILURE
                 retries = 0;
+            }
 #endif
-                break;
-            case WIFI_PROV_END:
-                if (prov_stop_timer) {
-                    esp_timer_stop(prov_stop_timer);
-                    esp_timer_delete(prov_stop_timer);
-                    prov_stop_timer = NULL;
-                }
-                /* De-initialize manager once provisioning is finished */
-                wifi_prov_mgr_deinit();
-                break;
-            default:
-                break;
+            break;
+        }
+        case WIFI_PROV_CRED_SUCCESS:
+            ESP_LOGI(TAG, "Provisioning successful");
+#ifdef CONFIG_APP_WIFI_RESET_PROV_ON_FAILURE
+            retries = 0;
+#endif
+            break;
+        case WIFI_PROV_END:
+            if (prov_stop_timer) {
+                esp_timer_stop(prov_stop_timer);
+                esp_timer_delete(prov_stop_timer);
+                prov_stop_timer = NULL;
+            }
+            /* De-initialize manager once provisioning is finished */
+            wifi_prov_mgr_deinit();
+            break;
+        default:
+            break;
         }
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
         // esp_wifi_connect();
@@ -413,7 +413,7 @@ static esp_err_t read_random_bytes_from_nvs(uint8_t **random_bytes, size_t *len)
     *len = 0;
 
     if ((err = nvs_open_from_partition(CONFIG_ESP_RMAKER_FACTORY_PARTITION_NAME, CREDENTIALS_NAMESPACE,
-                                NVS_READONLY, &handle)) != ESP_OK) {
+                                       NVS_READONLY, &handle)) != ESP_OK) {
         ESP_LOGD(TAG, "NVS open for %s %s %s failed with error %d", CONFIG_ESP_RMAKER_FACTORY_PARTITION_NAME, CREDENTIALS_NAMESPACE, RANDOM_NVS_KEY, err);
         return ESP_FAIL;
     }
@@ -445,7 +445,7 @@ static esp_err_t get_device_service_name(char *service_name, size_t max)
         snprintf(service_name, max, "%s_%02x%02x%02x", ssid_prefix, sta_mac[3], sta_mac[4], sta_mac[5]);
     } else {
         snprintf(service_name, max, "%s_%02x%02x%02x", ssid_prefix, nvs_random[nvs_random_size - 3],
-                nvs_random[nvs_random_size - 2], nvs_random[nvs_random_size - 1]);
+                 nvs_random[nvs_random_size - 2], nvs_random[nvs_random_size - 1]);
     }
     if (nvs_random) {
         free(nvs_random);
@@ -476,7 +476,6 @@ static esp_err_t get_device_service_name(char *service_name, size_t max)
     }
     return ESP_OK;
 }
-
 
 static char *get_device_pop(app_wifi_pop_type_t pop_type)
 {
@@ -546,7 +545,7 @@ esp_err_t app_wifi_start_timer(void)
     if (esp_timer_create(&prov_stop_timer_conf, &prov_stop_timer) == ESP_OK) {
         esp_timer_start_once(prov_stop_timer, prov_timeout_period);
         ESP_LOGI(TAG, "Provisioning will auto stop after %d minute(s).",
-                APP_WIFI_PROV_TIMEOUT_PERIOD);
+                 APP_WIFI_PROV_TIMEOUT_PERIOD);
         prov_timeout = false;
         return ESP_OK;
     } else {

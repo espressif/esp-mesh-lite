@@ -8,8 +8,8 @@
 
 #include <iot_button.h>
 #include <esp_rmaker_core.h>
-#include <esp_rmaker_standard_types.h> 
-#include <esp_rmaker_standard_params.h> 
+#include <esp_rmaker_standard_types.h>
+#include <esp_rmaker_standard_params.h>
 #include <esp_rmaker_standard_devices.h>
 
 #include <app_reset.h>
@@ -38,8 +38,8 @@ esp_err_t app_light_set_led(uint32_t hue, uint32_t saturation, uint32_t brightne
     if (!g_power) {
         g_power = true;
         esp_rmaker_param_update_and_report(
-                esp_rmaker_device_get_param_by_type(light_device, ESP_RMAKER_PARAM_POWER),
-                esp_rmaker_bool(g_power));
+            esp_rmaker_device_get_param_by_type(light_device, ESP_RMAKER_PARAM_POWER),
+            esp_rmaker_bool(g_power));
     }
     return lightbulb_set_hsv(hue, saturation, brightness);
 }
@@ -86,8 +86,8 @@ esp_err_t app_light_init(void)
         .type = DRIVER_ESP_PWM,
         .driver_conf.pwm.freq_hz = CONFIG_PWM_FREQ_HZ,
 #ifdef CONFIG_IDF_TARGET_ESP32C2
-        /* Adapt to ESP8684-DevKitM-1 
-         * For details, please refer to: 
+        /* Adapt to ESP8684-DevKitM-1
+         * For details, please refer to:
          * https://docs.espressif.com/projects/espressif-esp-dev-kits/zh_CN/latest/esp8684/esp8684-devkitm-1/user_guide.html
         */
         .driver_conf.pwm.invert_level = true,

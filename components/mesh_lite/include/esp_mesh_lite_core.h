@@ -86,10 +86,10 @@ typedef const uint8_t*(*esp_mesh_lite_get_ssid_by_mac_cb_t)(const uint8_t *bssid
 /**
  * @brief Callback function pointer type for processing received messages.
  *        This function should process received message payloads and return a cJSON pointer.
- * 
+ *
  * @param payload  cJSON object representing the message payload.
  * @param seq      Sequence number of the message.
- * 
+ *
  * @return cJSON*  cJSON pointer representing the processed message.
  */
 typedef cJSON* (*msg_process_cb_t)(cJSON *payload, uint32_t seq);
@@ -97,13 +97,13 @@ typedef cJSON* (*msg_process_cb_t)(cJSON *payload, uint32_t seq);
 /**
  * @brief Callback function pointer type for providing LAN OTA file data.
  *        This function should provide file data for LAN OTA.
- * 
+ *
  * @param filesize     Size of the entire firmware file.
  * @param fw_version   Firmware version string.
  * @param offset       Offset in the firmware file.
  * @param data_size    Size of the data to be provided.
  * @param data         Pointer to the data to be provided.
- * 
+ *
  * @return esp_err_t The result of the operation.
  */
 typedef esp_err_t (*lan_ota_provide_file_cb_t)(int filesize, char *fw_version, size_t offset, size_t data_size, char *data);
@@ -111,10 +111,10 @@ typedef esp_err_t (*lan_ota_provide_file_cb_t)(int filesize, char *fw_version, s
 /**
  * @brief Callback function pointer type for getting LAN OTA file data.
  *        This function should get file data for LAN OTA.
- * 
+ *
  * @param data         Buffer to store the received data.
  * @param data_size    Size of the data buffer.
- * 
+ *
  * @return esp_err_t The result of the operation.
  */
 typedef esp_err_t (*lan_ota_get_file_cb_t)(char *data, size_t data_size);
@@ -122,7 +122,7 @@ typedef esp_err_t (*lan_ota_get_file_cb_t)(char *data, size_t data_size);
 /**
  * @brief Callback function pointer type for indicating LAN OTA file reception completion.
  *        This function should be called when LAN OTA file reception is complete.
- * 
+ *
  * @return esp_err_t The result of the operation.
  */
 typedef esp_err_t (*lan_ota_get_file_done_cb_t)(void);
@@ -130,7 +130,7 @@ typedef esp_err_t (*lan_ota_get_file_done_cb_t)(void);
 /**
  * @brief Callback function pointer type for handling external URL OTA.
  *        This function should return an esp_err_t indicating the result of the OTA operation.
- * 
+ *
  * @return esp_err_t The result of the OTA operation.
  */
 typedef esp_err_t (*extern_url_ota_cb_t)(void);
@@ -265,10 +265,9 @@ typedef struct {
  */
 typedef struct esp_mesh_lite_msg_action {
     const char* type;         /**< The type of message sent */
-    const char* rsp_type;     /**< The message type expected to be received*/
-                              /**< When a message of the expected type is received, stop retransmitting*/
-                              /**< If set to NULL, it will be sent until the maximum number of retransmissions is reached*/
-    msg_process_cb_t process; /**< The callback function when receiving the 'type' message, The cjson information in the type message can be processed in this cb*/
+    const char* rsp_type;     /**< The message type expected to be received. When a message of the expected type is received, stop retransmitting.
+                                If set to NULL, it will be sent until the maximum number of retransmissions is reached. */
+    msg_process_cb_t process; /**< The callback function when receiving the 'type' message. The cjson information in the type message can be processed in this cb. */
 } esp_mesh_lite_msg_action_t;
 
 /**
@@ -297,7 +296,6 @@ typedef struct {
     extern_url_ota_cb_t extern_url_ota_cb;                  /**< External URL OTA callback function */
 } esp_mesh_lite_file_transmit_config_t;
 
-
 /*****************************************************/
 /**************** ESP Wi-Fi Mesh Lite ****************/
 /*****************************************************/
@@ -313,7 +311,7 @@ bool esp_mesh_lite_network_segment_is_used(uint32_t ip);
 
 /**
  * @brief Initialization Mesh-Lite.
- * 
+ *
  * @return
  *     - OK   : successful
  *     - Other: fail
@@ -322,7 +320,7 @@ esp_err_t esp_mesh_lite_core_init(esp_mesh_lite_config_t* config);
 
 /**
  * @brief Scan to find a matched node and connect.
- * 
+ *
  */
 void esp_mesh_lite_connect(void);
 
@@ -330,26 +328,26 @@ void esp_mesh_lite_connect(void);
  * @brief Set the mesh_lite_id
  *
  * @param[in] mesh_id: Each mesh network should have a different and unique ID.
- * 
+ *
  * @param[in] force_update_nvs: Whether to force update the value of mesh_id in nvs.
- * 
+ *
  */
 void esp_mesh_lite_set_mesh_id(uint8_t mesh_id, bool force_update_nvs);
 
 /**
  * @brief Set the specific level to which this node is restricted.
- * 
+ *
  * @attention  1. Please invoke this API after `esp_mesh_lite_init`.
  * @attention  2. Please invoke this API before `esp_mesh_lite_start`.
  *
  * @param[in]  level: An integer from 1 to CONFIG_MESH_LITE_MAXIMUM_LEVEL_ALLOWED. Setting it to 0 will unset the restriction.
- * 
+ *
  */
 esp_err_t esp_mesh_lite_set_allowed_level(uint8_t level);
 
 /**
  * @brief Set the level that this node is not allowed to use.
- * 
+ *
  * @attention  1. Please invoke this API after `esp_mesh_lite_init`.
  * @attention  2. Please invoke this API before `esp_mesh_lite_start`.
  *
@@ -360,7 +358,7 @@ esp_err_t esp_mesh_lite_set_disallowed_level(uint8_t level);
 
 /**
  * @brief  Set router information
- * 
+ *
  * @attention  1. Please call this API after  `esp_mesh_lite_init`
  * @attention  2. Please call this API before `esp_mesh_lite_start`
  *
@@ -371,7 +369,7 @@ esp_err_t esp_mesh_lite_set_router_config(mesh_lite_sta_config_t *conf);
 
 /**
  * @brief  Whether to allow other nodes to join the mesh network.
- * 
+ *
  * @attention  1. Please call this API after  `esp_mesh_lite_init`
  * @attention  2. Please call this API before `esp_mesh_lite_start`
  *
@@ -382,7 +380,7 @@ esp_err_t esp_mesh_lite_allow_others_to_join(bool enable);
 
 /**
  * @brief  Set argot number.
- * 
+ *
  * @attention  1. Please call this API after  `esp_mesh_lite_init`
  * @attention  2. Please call this API before `esp_mesh_lite_start`
  *
@@ -509,7 +507,7 @@ esp_err_t esp_mesh_lite_set_fusion_config(esp_mesh_lite_fusion_config_t *config)
 
 /**
  * @brief  Get the mesh_lite_id
- * 
+ *
  * @return
  *      - mesh_lite_id
  */
@@ -607,19 +605,19 @@ esp_err_t esp_mesh_lite_get_router_config(mesh_lite_sta_config_t *router_config)
  * @brief  Scan all available APs.
  *
  * @attention  If you want to scan externally, don't call esp_wifi_scan_start directly, please call this interface.
- * 
+ *
  * Usage Example:
  * @code{.c}
  * static volatile bool app_scan_stage1 = false;
  * static volatile bool app_scan_stage2 = false;
- * 
+ *
  * void app_scan_start_post(void)
  * {
  *     if (app_scan_stage1) {
  *         app_scan_stage2 = true;
  *     }
  * }
- * 
+ *
  * void app_scan_end_post(void)
  * {
  *     if (app_scan_stage1) {
@@ -627,7 +625,7 @@ esp_err_t esp_mesh_lite_get_router_config(mesh_lite_sta_config_t *router_config)
  *         app_scan_stage2 = false;
  *     }
  * }
- * 
+ *
  * static void app_scan_done_handler(void* arg, esp_event_base_t event_base,
  *                                   int32_t event_id, void* event_data)
  * {
@@ -637,20 +635,20 @@ esp_err_t esp_mesh_lite_get_router_config(mesh_lite_sta_config_t *router_config)
  *     // Application code
  *     app_scan_end_post();
  * }
- * 
+ *
  * static void app_scan(void)
  * {
  *     if (app_scan_stage2 == true) {
  *         // App scan in progress
  *         return;
  *     }
- * 
+ *
  *     app_scan_stage1 = true;
  *     if (esp_mesh_lite_wifi_scan_start(NULL, 1000 / portTICK_PERIOD_MS) != ESP_OK) {
  *         app_scan_stage1 = false;
  *     }
  * }
- * 
+ *
  * esp_mesh_lite_scan_cb_t app_scan_cb = {
  *     .scan_start_cb = app_scan_start_post,
  *     .scan_end_cb = app_scan_end_post,
@@ -672,12 +670,12 @@ esp_err_t esp_mesh_lite_wifi_scan_start(const wifi_scan_config_t *config, uint32
  *     uint8_t bssid[6];
  *     uint8_t ssid[33];
  * } esp_mesh_lite_mac_table_t;
- * 
+ *
  * static const esp_mesh_lite_mac_table_t mac_table[] = {
  *     {{0x4c, 0x1a, 0x3d, 0x9f, 0xc1, 0x71}, "ssid_83a1"},
  *     {{0x71, 0x9b, 0xc6, 0x2e, 0x57, 0x82}, "ssid_3e52"},
  * };
- * 
+ *
  * static const uint8_t* check_is_contains_bssid(const uint8_t *bssid) {
  *     size_t mac_table_size = sizeof(mac_table) / sizeof(mac_table[0]);
  *     for (uint8_t i = 0; i < mac_table_size; i++) {
@@ -687,7 +685,7 @@ esp_err_t esp_mesh_lite_wifi_scan_start(const wifi_scan_config_t *config, uint32
  *     }
  *     return NULL;
  * }
- * 
+ *
  * esp_mesh_lite_bssid_check_cb_register(check_is_contains_bssid);
  * @endcode
  *
@@ -752,9 +750,9 @@ esp_err_t esp_mesh_lite_transmit_file_start(esp_mesh_lite_file_transmit_config_t
 
 /**
  * @brief Set the file name to be provided during LAN OTA (Over-The-Air) updates in ESP-Mesh-Lite.
- * 
+ *
  * @param file_name Pointer to the file name string.
- * 
+ *
  * @return esp_err_t Returns ESP_OK if the file name is successfully set; otherwise, an error code indicating the reason for failure.
  */
 esp_err_t esp_mesh_lite_lan_ota_set_file_name(char *file_name);
@@ -763,30 +761,30 @@ esp_err_t esp_mesh_lite_lan_ota_set_file_name(char *file_name);
  * @brief Register or unregister callback functions for LAN OTA (Over-The-Air) file transfer in ESP-Mesh-Lite.
  *        These callback functions will be used to provide, get, and indicate completion of file transfer during LAN OTA updates.
  *        To unregister the callbacks, pass NULL as the argument.
- * 
+ *
  * Usage Example:
  * @code{.c}
  * static esp_ota_handle_t update_handle = 0;
  * static const esp_partition_t *next_app_partition = NULL;
- * 
+ *
  * static esp_err_t provide_file_cb(int filesize, char *fw_version, size_t offset, size_t data_size, char *data)
  * {
  *     // check filesize and fw_version
  *     const esp_partition_t* running_partition = esp_ota_get_running_partition();
  *     return esp_partition_read(running_partition, offset, data, data_size);
  * }
- * 
+ *
  * static esp_err_t get_file_cb(char *data, size_t data_size)
  * {
  *     return esp_ota_write(update_handle, (const void *)data, data_size);
  * }
- * 
+ *
  * static esp_err_t get_file_done(void)
  * {
  *     esp_ota_end(update_handle);
  *     return esp_ota_set_boot_partition(next_app_partition);
  * }
- * 
+ *
  * static void app_lan_ota_start(void)
  * {
  *     next_app_partition = esp_ota_get_next_update_partition(NULL);
@@ -801,30 +799,30 @@ esp_err_t esp_mesh_lite_lan_ota_set_file_name(char *file_name);
  *         esp_mesh_lite_transmit_file_start(&transmit_config);
  *     }
  * }
- * 
+ *
  * esp_mesh_lite_lan_ota_file_transfer_cb_t lan_ota_cb = {
  *     .provide_file_cb = provide_file_cb,
  *     .get_file_cb = get_file_cb,
  *     .get_file_done = get_file_done,
  * };
- * 
+ *
  * static void app_ota_file_transfer_cb_register(void)
  * {
  *     esp_mesh_lite_ota_register_file_transfer_cb(&lan_ota_cb);
  * }
  * @endcode
- * 
+ *
  * @param cb Pointer to the structure containing the callback functions, or NULL to unregister the callbacks.
  */
 void esp_mesh_lite_ota_register_file_transfer_cb(esp_mesh_lite_lan_ota_file_transfer_cb_t *cb);
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  * @attention  Called when executing the external OTA process.
  *             When the higher-level node also starts the OTA process,
  *             the current external OTA process will be stopped.
- * 
+ *
  * @attention  Please refer to examples/rainmaker/led_light/components/app_rainmaker/app_rainmaker_ota.c
  *
  */
@@ -842,7 +840,6 @@ esp_err_t esp_mesh_lite_ota_notify_child_node_pause(void);
  */
 esp_err_t esp_mesh_lite_ota_notify_child_node_restart(void);
 
-
 /*****************************************************/
 /********* ESP Wi-Fi Mesh Lite Communication *********/
 /*****************************************************/
@@ -851,17 +848,17 @@ esp_err_t esp_mesh_lite_ota_notify_child_node_restart(void);
  * @brief  Send broadcast message to child nodes.
  *
  * @param[in]  payload
- * 
+ *
  */
 esp_err_t esp_mesh_lite_send_broadcast_msg_to_child(const char* payload);
 
 /**
  * @brief  Send broadcast message to parent node.
- * 
+ *
  * @attention For non-root nodes, Please choose `esp_mesh_lite_send_msg_to_parent(const char* payload)`
  *
  * @param[in]  payload
- * 
+ *
  */
 esp_err_t esp_mesh_lite_send_broadcast_msg_to_parent(const char* payload);
 
@@ -869,7 +866,7 @@ esp_err_t esp_mesh_lite_send_broadcast_msg_to_parent(const char* payload);
  * @brief  Send message to root node.
  *
  * @param[in]  payload
- * 
+ *
  */
 esp_err_t esp_mesh_lite_send_msg_to_root(const char* payload);
 
@@ -877,7 +874,7 @@ esp_err_t esp_mesh_lite_send_msg_to_root(const char* payload);
  * @brief  Send message to parent node.
  *
  * @param[in]  payload
- * 
+ *
  */
 esp_err_t esp_mesh_lite_send_msg_to_parent(const char* payload);
 
@@ -894,42 +891,42 @@ esp_err_t esp_mesh_lite_send_msg_to_parent(const char* payload);
  *                         - esp_mesh_lite_send_broadcast_msg_to_parent()
  *                         - esp_mesh_lite_send_msg_to_root()
  *                         - esp_mesh_lite_send_msg_to_parent()
- * 
+ *
  */
 esp_err_t esp_mesh_lite_try_sending_msg(char* send_msg,
-                                       char* expect_msg,
-                                       uint32_t max_retry,
-                                       cJSON* req_payload,
-                                       esp_err_t (*resend)(const char* payload));
+                                        char* expect_msg,
+                                        uint32_t max_retry,
+                                        cJSON* req_payload,
+                                        esp_err_t (*resend)(const char* payload));
 
 /**
  * @brief Register custom message reception and recovery logic
- * 
+ *
  * @attention  Please refer to components/mesh_lite/src/esp_mesh_lite.c
  *
  * @param[in] msg_action
- * 
+ *
  */
 esp_err_t esp_mesh_lite_msg_action_list_register(const esp_mesh_lite_msg_action_t* msg_action);
 
 /**
  * @brief Register custom message reception and recovery logic
- * 
+ *
  * @attention  Please refer to components/mesh_lite/src/esp_mesh_lite.c
  *
  * @param[in] msg_action
- * 
+ *
  */
 esp_err_t esp_mesh_lite_msg_action_list_unregister(const esp_mesh_lite_msg_action_t* msg_action);
 
 /**
   * @brief This function initialize AES context and set key schedule (encryption or decryption).
-  * 
+  *
   * @param[in]  key      encryption key
   * @param[in]  keybits  currently only supports 128
-  * 
+  *
   * @attention this function must be called before Mesh-Lite initialization.
-  * 
+  *
   * @return
   *     - ESP_OK : successful
   *     - Other  : fail

@@ -1,10 +1,9 @@
 /*
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
+ * SPDX-FileCopyrightText: 2024 Espressif Systems (Shanghai) CO LTD
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
 #include <esp_err.h>
 #include <esp_log.h>
 #ifdef CONFIG_ESP_INSIGHTS_ENABLED
@@ -56,21 +55,21 @@ static void rmaker_common_event_handler(void* arg, esp_event_base_t event_base,
         return;
     }
     esp_insights_transport_event_data_t data;
-    switch(event_id) {
-        case RMAKER_MQTT_EVENT_PUBLISHED:
-            memset(&data, 0, sizeof(data));
-            data.msg_id = *(int *)event_data;
-            esp_event_post(INSIGHTS_EVENT, INSIGHTS_EVENT_TRANSPORT_SEND_SUCCESS, &data, sizeof(data), portMAX_DELAY);
-            break;
+    switch (event_id) {
+    case RMAKER_MQTT_EVENT_PUBLISHED:
+        memset(&data, 0, sizeof(data));
+        data.msg_id = *(int *)event_data;
+        esp_event_post(INSIGHTS_EVENT, INSIGHTS_EVENT_TRANSPORT_SEND_SUCCESS, &data, sizeof(data), portMAX_DELAY);
+        break;
 #ifdef CONFIG_MQTT_REPORT_DELETED_MESSAGES
-        case RMAKER_MQTT_EVENT_MSG_DELETED:
-            memset(&data, 0, sizeof(data));
-            data.msg_id = *(int *)event_data;
-            esp_event_post(INSIGHTS_EVENT, INSIGHTS_EVENT_TRANSPORT_SEND_FAILED, &data, sizeof(data), portMAX_DELAY);
-            break;
+    case RMAKER_MQTT_EVENT_MSG_DELETED:
+        memset(&data, 0, sizeof(data));
+        data.msg_id = *(int *)event_data;
+        esp_event_post(INSIGHTS_EVENT, INSIGHTS_EVENT_TRANSPORT_SEND_FAILED, &data, sizeof(data), portMAX_DELAY);
+        break;
 #endif /* CONFIG_MQTT_REPORT_DELETED_MESSAGES */
-        default:
-            break;
+    default:
+        break;
     }
 }
 #endif /* CONFIG_ESP_INSIGHTS_ENABLED */

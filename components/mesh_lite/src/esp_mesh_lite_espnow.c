@@ -87,8 +87,8 @@ esp_err_t esp_mesh_lite_espnow_send(uint8_t type, uint8_t *peer_addr, const uint
 esp_err_t esp_mesh_lite_espnow_init(void)
 {
     /* Initialize ESPNOW and register sending and receiving callback function. */
-    ESP_ERROR_CHECK( esp_now_init() );
-    ESP_ERROR_CHECK( esp_now_register_recv_cb(espnow_recv_cb) );
+    ESP_ERROR_CHECK(esp_now_init());
+    ESP_ERROR_CHECK(esp_now_register_recv_cb(espnow_recv_cb));
 
     /* Set primary master key. */
     // ESP_ERROR_CHECK( esp_now_set_pmk((uint8_t *)CONFIG_ESPNOW_PMK) );

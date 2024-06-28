@@ -137,7 +137,7 @@ esp_err_t esp_rmaker_mesh_lite_add_child_info(char* mac, char* ip)
     new->next = child_info;
     child_info = new;
 
-    xSemaphoreGive(child_info_mutex);  
+    xSemaphoreGive(child_info_mutex);
     return ESP_OK;
 }
 
@@ -310,7 +310,7 @@ static void esp_mesh_lite_convert_str_to_group_id(char *mesh_group_str)
 }
 
 static esp_err_t esp_rmaker_mesh_service_cb(const esp_rmaker_device_t *device, const esp_rmaker_param_t *param,
-        const esp_rmaker_param_val_t val, void *priv_data, esp_rmaker_write_ctx_t *ctx)
+                                            const esp_rmaker_param_val_t val, void *priv_data, esp_rmaker_write_ctx_t *ctx)
 {
     if (ctx) {
         ESP_LOGI(TAG, "Received write request via : %s", esp_rmaker_device_cb_src_to_str(ctx->src));
@@ -346,33 +346,33 @@ static void ip_event_handler(void *arg, esp_event_base_t event_base,
 }
 
 static void esp_mesh_lite_handler(void *arg, esp_event_base_t event_base,
-                                 int32_t event_id, void *event_data)
+                                  int32_t event_id, void *event_data)
 {
     esp_mesh_lite_node_info_t *event = (esp_mesh_lite_node_info_t *) event_data;
     switch (event_id) {
-        case ESP_MESH_LITE_EVENT_CORE_INHERITED_NET_SEGMENT_CHANGED:
-            app_rmaker_mesh_lite_self_ip_update_and_report(NULL, NULL);
-            break;
-        case ESP_MESH_LITE_EVENT_CHILD_NODE_JOIN:
-            ESP_LOGI(TAG, "[Child Info Join]  Level:%d  Mac:%s IP %s\r\n", event->level, event->mac, event->ip);
-            esp_rmaker_mesh_lite_add_child_info(event->mac, event->ip);
-            esp_rmaker_mesh_lite_child_info_update_and_report();
-            break;
-        case ESP_MESH_LITE_EVENT_CHILD_NODE_LEAVE:
-            ESP_LOGI(TAG, "[Child Info Leave]  Level:%d  Mac:%s IP %s\r\n", event->level, event->mac, event->ip);
-            esp_rmaker_mesh_lite_remove_child_info(event->mac);
-            esp_rmaker_mesh_lite_child_info_update_and_report();
-            break;
+    case ESP_MESH_LITE_EVENT_CORE_INHERITED_NET_SEGMENT_CHANGED:
+        app_rmaker_mesh_lite_self_ip_update_and_report(NULL, NULL);
+        break;
+    case ESP_MESH_LITE_EVENT_CHILD_NODE_JOIN:
+        ESP_LOGI(TAG, "[Child Info Join]  Level:%d  Mac:%s IP %s\r\n", event->level, event->mac, event->ip);
+        esp_rmaker_mesh_lite_add_child_info(event->mac, event->ip);
+        esp_rmaker_mesh_lite_child_info_update_and_report();
+        break;
+    case ESP_MESH_LITE_EVENT_CHILD_NODE_LEAVE:
+        ESP_LOGI(TAG, "[Child Info Leave]  Level:%d  Mac:%s IP %s\r\n", event->level, event->mac, event->ip);
+        esp_rmaker_mesh_lite_remove_child_info(event->mac);
+        esp_rmaker_mesh_lite_child_info_update_and_report();
+        break;
 #if CONFIG_MESH_LITE_NODE_INFO_REPORT
-        case ESP_MESH_LITE_EVENT_NODE_JOIN:
-            ESP_LOGI(TAG, "[Node Info Join]  Level:%d  Mac:%s\r\n", event->level, event->mac);
-            break;
-        case ESP_MESH_LITE_EVENT_NODE_LEAVE:
-            ESP_LOGI(TAG, "[Node Info Leave]  Level:%d  Mac:%s\r\n", event->level, event->mac);
-            break;
-        case ESP_MESH_LITE_EVENT_NODE_CHANGE:
-            ESP_LOGI(TAG, "[Node Info change]  Level:%d  Mac:%s\r\n", event->level, event->mac);
-            break;
+    case ESP_MESH_LITE_EVENT_NODE_JOIN:
+        ESP_LOGI(TAG, "[Node Info Join]  Level:%d  Mac:%s\r\n", event->level, event->mac);
+        break;
+    case ESP_MESH_LITE_EVENT_NODE_LEAVE:
+        ESP_LOGI(TAG, "[Node Info Leave]  Level:%d  Mac:%s\r\n", event->level, event->mac);
+        break;
+    case ESP_MESH_LITE_EVENT_NODE_CHANGE:
+        ESP_LOGI(TAG, "[Node Info change]  Level:%d  Mac:%s\r\n", event->level, event->mac);
+        break;
 #endif
     }
 }

@@ -26,13 +26,13 @@ typedef enum {
 
 /**
  * @brief Initialization Mesh-Lite.
- * 
+ *
  */
 void esp_mesh_lite_init(esp_mesh_lite_config_t* config);
 
 /**
  * @brief Start Mesh-Lite.
- * 
+ *
  */
 void esp_mesh_lite_start(void);
 
@@ -45,7 +45,7 @@ typedef struct  esp_mesh_lite_node_info {
 #if CONFIG_MESH_LITE_NODE_INFO_REPORT
 /**
  * @brief child nodes report mac and level information to the root node.
- * 
+ *
  */
 esp_err_t esp_mesh_lite_report_info(void);
 #endif /* CONFIG_MESH_LITE_NODE_INFO_REPORT */
