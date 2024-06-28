@@ -1334,6 +1334,14 @@ static void wifi_connect_timer_cb(void *arg)
     // }
 }
 
+esp_err_t wifi_prov_mgr_configure_meshlite(void *data, uint32_t size)
+{
+    ACQUIRE_LOCK(prov_ctx_lock);
+    execute_event_cb(WIFI_PROV_CUST_DATA_RECV, data, size);
+    RELEASE_LOCK(prov_ctx_lock);
+    return ESP_OK;
+}
+
 esp_err_t wifi_prov_mgr_configure_sta(wifi_config_t *wifi_cfg)
 {
     if (!prov_ctx_lock) {
