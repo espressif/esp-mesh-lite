@@ -33,7 +33,7 @@ static void esp_rmaker_app_set_params_callback(const char *topic, void *payload,
 
 /* Callback to handle commands received from the RainMaker cloud */
 static esp_err_t write_cb(const esp_rmaker_device_t *device, const esp_rmaker_param_t *param,
-            const esp_rmaker_param_val_t val, void *priv_data, esp_rmaker_write_ctx_t *ctx)
+                          const esp_rmaker_param_val_t val, void *priv_data, esp_rmaker_write_ctx_t *ctx)
 {
     if (ctx) {
         ESP_LOGI(TAG, "Received write request via : %s", esp_rmaker_device_cb_src_to_str(ctx->src));
@@ -42,19 +42,19 @@ static esp_err_t write_cb(const esp_rmaker_device_t *device, const esp_rmaker_pa
     const char *param_name = esp_rmaker_param_get_name(param);
     if (strcmp(param_name, ESP_RMAKER_DEF_POWER_NAME) == 0) {
         ESP_LOGI(TAG, "Received value = %s for %s - %s",
-                val.val.b? "true" : "false", device_name, param_name);
+                 val.val.b ? "true" : "false", device_name, param_name);
         app_light_set_power(val.val.b);
     } else if (strcmp(param_name, ESP_RMAKER_DEF_BRIGHTNESS_NAME) == 0) {
         ESP_LOGI(TAG, "Received value = %d for %s - %s",
-                val.val.i, device_name, param_name);
+                 val.val.i, device_name, param_name);
         app_light_set_brightness(val.val.i);
     } else if (strcmp(param_name, ESP_RMAKER_DEF_HUE_NAME) == 0) {
         ESP_LOGI(TAG, "Received value = %d for %s - %s",
-                val.val.i, device_name, param_name);
+                 val.val.i, device_name, param_name);
         app_light_set_hue(val.val.i);
     } else if (strcmp(param_name, ESP_RMAKER_DEF_SATURATION_NAME) == 0) {
         ESP_LOGI(TAG, "Received value = %d for %s - %s",
-                val.val.i, device_name, param_name);
+                 val.val.i, device_name, param_name);
         app_light_set_saturation(val.val.i);
     } else {
         /* Silently ignoring invalid params */
@@ -70,59 +70,59 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 {
     if (event_base == RMAKER_EVENT) {
         switch (event_id) {
-            case RMAKER_EVENT_INIT_DONE:
-                ESP_LOGI(TAG, "RainMaker Initialised.");
-                break;
-            case RMAKER_EVENT_CLAIM_STARTED:
-                ESP_LOGI(TAG, "RainMaker Claim Started.");
-                break;
-            case RMAKER_EVENT_CLAIM_SUCCESSFUL:
-                ESP_LOGI(TAG, "RainMaker Claim Successful.");
-                break;
-            case RMAKER_EVENT_CLAIM_FAILED:
-                ESP_LOGI(TAG, "RainMaker Claim Failed.");
-                break;
-            default:
-                ESP_LOGW(TAG, "Unhandled RainMaker Event: %"PRId32"", event_id);
+        case RMAKER_EVENT_INIT_DONE:
+            ESP_LOGI(TAG, "RainMaker Initialised.");
+            break;
+        case RMAKER_EVENT_CLAIM_STARTED:
+            ESP_LOGI(TAG, "RainMaker Claim Started.");
+            break;
+        case RMAKER_EVENT_CLAIM_SUCCESSFUL:
+            ESP_LOGI(TAG, "RainMaker Claim Successful.");
+            break;
+        case RMAKER_EVENT_CLAIM_FAILED:
+            ESP_LOGI(TAG, "RainMaker Claim Failed.");
+            break;
+        default:
+            ESP_LOGW(TAG, "Unhandled RainMaker Event: %"PRId32"", event_id);
         }
     } else if (event_base == RMAKER_COMMON_EVENT) {
         switch (event_id) {
-            case RMAKER_MQTT_EVENT_PUBLISHED: {
-                static uint8_t resubscribe = 4;
-                if (resubscribe) {
-                    // "params/remote" topic resubscribe
-                    char subscribe_topic[MQTT_TOPIC_BUFFER_SIZE];
-                    memset(subscribe_topic, 0, sizeof(subscribe_topic));
-                    snprintf(subscribe_topic, sizeof(subscribe_topic), "node/%s/%s",
-                                esp_rmaker_get_node_id(), NODE_PARAMS_REMOTE_TOPIC_SUFFIX);
-                    esp_err_t err = esp_rmaker_mqtt_unsubscribe(subscribe_topic);
-                    if (err == ESP_OK) {
-                        err = esp_rmaker_mqtt_subscribe(subscribe_topic, esp_rmaker_app_set_params_callback, RMAKER_MQTT_QOS1, NULL);
-                        if (err != ESP_OK) {
-                            ESP_LOGE(TAG, "Failed to subscribe to %s. Error %d", subscribe_topic, err);
-                        }
+        case RMAKER_MQTT_EVENT_PUBLISHED: {
+            static uint8_t resubscribe = 4;
+            if (resubscribe) {
+                // "params/remote" topic resubscribe
+                char subscribe_topic[MQTT_TOPIC_BUFFER_SIZE];
+                memset(subscribe_topic, 0, sizeof(subscribe_topic));
+                snprintf(subscribe_topic, sizeof(subscribe_topic), "node/%s/%s",
+                         esp_rmaker_get_node_id(), NODE_PARAMS_REMOTE_TOPIC_SUFFIX);
+                esp_err_t err = esp_rmaker_mqtt_unsubscribe(subscribe_topic);
+                if (err == ESP_OK) {
+                    err = esp_rmaker_mqtt_subscribe(subscribe_topic, esp_rmaker_app_set_params_callback, RMAKER_MQTT_QOS1, NULL);
+                    if (err != ESP_OK) {
+                        ESP_LOGE(TAG, "Failed to subscribe to %s. Error %d", subscribe_topic, err);
                     }
-
-                    // "otaurl" topic resubscribe
-                    esp_rmaker_mesh_lite_ota_subscribe_topic();
-
-                    resubscribe--;
-                    ESP_LOGI(TAG, "MQTT Resubscribe [%s]", NODE_PARAMS_REMOTE_TOPIC_SUFFIX);
                 }
-                break;
+
+                // "otaurl" topic resubscribe
+                esp_rmaker_mesh_lite_ota_subscribe_topic();
+
+                resubscribe--;
+                ESP_LOGI(TAG, "MQTT Resubscribe [%s]", NODE_PARAMS_REMOTE_TOPIC_SUFFIX);
             }
-            case RMAKER_EVENT_REBOOT:
-                ESP_LOGI(TAG, "Rebooting in %d seconds.", *((uint8_t *)event_data));
-                break;
-            case RMAKER_EVENT_WIFI_RESET:
-                ESP_LOGI(TAG, "Wi-Fi credentials reset.");
-                break;
-            case RMAKER_EVENT_FACTORY_RESET:
-                ESP_LOGI(TAG, "Node reset to factory defaults.");
-                esp_mesh_lite_erase_rtc_store();
-                break;
-            default:
-                ESP_LOGW(TAG, "Unhandled RainMaker Common Event: %"PRId32"", event_id);
+            break;
+        }
+        case RMAKER_EVENT_REBOOT:
+            ESP_LOGI(TAG, "Rebooting in %d seconds.", *((uint8_t *)event_data));
+            break;
+        case RMAKER_EVENT_WIFI_RESET:
+            ESP_LOGI(TAG, "Wi-Fi credentials reset.");
+            break;
+        case RMAKER_EVENT_FACTORY_RESET:
+            ESP_LOGI(TAG, "Node reset to factory defaults.");
+            esp_mesh_lite_erase_rtc_store();
+            break;
+        default:
+            ESP_LOGW(TAG, "Unhandled RainMaker Common Event: %"PRId32"", event_id);
         }
     } else {
         ESP_LOGW(TAG, "Invalid event received!");
@@ -226,7 +226,7 @@ void app_rainmaker_start(void)
     esp_rmaker_node_t *node = esp_rmaker_node_init(&rainmaker_cfg, "ESP RainMaker Device", "Lightbulb");
     if (!node) {
         ESP_LOGE(TAG, "Could not initialise node. Aborting!!!");
-        vTaskDelay(5000/portTICK_PERIOD_MS);
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
         abort();
     }
     esp_rmaker_node_add_attribute(node, "LiteMeshDevice", "1");

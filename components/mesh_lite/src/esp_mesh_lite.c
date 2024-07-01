@@ -200,45 +200,45 @@ uint8_t esp_mesh_lite_get_child_node_number(void)
 }
 
 static void esp_mesh_lite_event_ip_changed_handler(void *arg, esp_event_base_t event_base,
-                                                  int32_t event_id, void *event_data)
+                                                   int32_t event_id, void *event_data)
 {
-    switch(event_id) {
-        case ESP_MESH_LITE_EVENT_CORE_STARTED:
-            ESP_LOGI(TAG, "Mesh-Lite connecting");
+    switch (event_id) {
+    case ESP_MESH_LITE_EVENT_CORE_STARTED:
+        ESP_LOGI(TAG, "Mesh-Lite connecting");
+        esp_mesh_lite_connect();
+        break;
+    case ESP_MESH_LITE_EVENT_CORE_INHERITED_NET_SEGMENT_CHANGED:
+        ESP_LOGI(TAG, "netif network segment conflict check");
+        if (esp_mesh_lite_get_level() > CONFIG_MESH_LITE_MAXIMUM_LEVEL_ALLOWED) {
+            ESP_LOGW(TAG, "The maximum level has been exceeded, and the Wi-Fi connection has been disconnected to search for a new parent node.");
             esp_mesh_lite_connect();
-            break;
-        case ESP_MESH_LITE_EVENT_CORE_INHERITED_NET_SEGMENT_CHANGED:
-            ESP_LOGI(TAG, "netif network segment conflict check");
-            if (esp_mesh_lite_get_level() > CONFIG_MESH_LITE_MAXIMUM_LEVEL_ALLOWED) {
-                ESP_LOGW(TAG, "The maximum level has been exceeded, and the Wi-Fi connection has been disconnected to search for a new parent node.");
-                esp_mesh_lite_connect();
-            }
-            esp_bridge_netif_network_segment_conflict_update(NULL);
-            break;
-        case ESP_MESH_LITE_EVENT_CORE_ROUTER_INFO_CHANGED:
-            break;
-        case ESP_MESH_LITE_EVENT_OTA_START:
-            ESP_LOGI(TAG, "OTA Start\r\n");
-            break;
-        case ESP_MESH_LITE_EVENT_OTA_FINISH: {
-            esp_mesh_lite_event_ota_finish_t *event = (esp_mesh_lite_event_ota_finish_t*)event_data;
-            if (event->reason == ESP_MESH_LITE_EVENT_OTA_SUCCESS) {
-                ESP_LOGI(TAG, "LAN OTA Success!");
+        }
+        esp_bridge_netif_network_segment_conflict_update(NULL);
+        break;
+    case ESP_MESH_LITE_EVENT_CORE_ROUTER_INFO_CHANGED:
+        break;
+    case ESP_MESH_LITE_EVENT_OTA_START:
+        ESP_LOGI(TAG, "OTA Start\r\n");
+        break;
+    case ESP_MESH_LITE_EVENT_OTA_FINISH: {
+        esp_mesh_lite_event_ota_finish_t *event = (esp_mesh_lite_event_ota_finish_t*)event_data;
+        if (event->reason == ESP_MESH_LITE_EVENT_OTA_SUCCESS) {
+            ESP_LOGI(TAG, "LAN OTA Success!");
 #ifdef CONFIG_OTA_AUTO_RESTART
-                esp_restart();
+            esp_restart();
 #endif
-            } else if (event->reason == ESP_MESH_LITE_EVENT_OTA_REJECTED) {
-                ESP_LOGE(TAG, "LAN OTA Rejected\r\n");
-            } else {
-                ESP_LOGE(TAG, "LAN OTA Fail! Reason: %d\r\n", event->reason);
-            }
-            break;
+        } else if (event->reason == ESP_MESH_LITE_EVENT_OTA_REJECTED) {
+            ESP_LOGE(TAG, "LAN OTA Rejected\r\n");
+        } else {
+            ESP_LOGE(TAG, "LAN OTA Fail! Reason: %d\r\n", event->reason);
         }
-        case ESP_MESH_LITE_EVENT_OTA_PROGRESS: {
-            esp_mesh_lite_event_ota_progress_t *event = (esp_mesh_lite_event_ota_progress_t*)event_data;
-            ESP_LOGI(TAG, "LAN OTA Percentage: %d%%", event->percentage);
-            break;
-        }
+        break;
+    }
+    case ESP_MESH_LITE_EVENT_OTA_PROGRESS: {
+        esp_mesh_lite_event_ota_progress_t *event = (esp_mesh_lite_event_ota_progress_t*)event_data;
+        ESP_LOGI(TAG, "LAN OTA Percentage: %d%%", event->percentage);
+        break;
+    }
     }
 }
 
@@ -258,10 +258,10 @@ void esp_mesh_lite_init(esp_mesh_lite_config_t* config)
     node_info_mutex = xSemaphoreCreateMutex();
     esp_mesh_lite_msg_action_list_register(node_report_action);
 
-    TimerHandle_t report_timer = xTimerCreate("report_timer", CONFIG_MESH_LITE_REPORT_INTERVAL * 1000 / portTICK_PERIOD_MS, 
+    TimerHandle_t report_timer = xTimerCreate("report_timer", CONFIG_MESH_LITE_REPORT_INTERVAL * 1000 / portTICK_PERIOD_MS,
                                               pdTRUE, NULL, report_timer_cb);
-    TimerHandle_t root_timer = xTimerCreate("root_timer", 1 * 1000 / portTICK_PERIOD_MS, 
-                                              pdTRUE, NULL, root_timer_cb);
+    TimerHandle_t root_timer = xTimerCreate("root_timer", 1 * 1000 / portTICK_PERIOD_MS,
+                                            pdTRUE, NULL, root_timer_cb);
     xTimerStart(report_timer, portMAX_DELAY);
     xTimerStart(root_timer, portMAX_DELAY);
 #endif /* MESH_LITE_NODE_INFO_REPORT */

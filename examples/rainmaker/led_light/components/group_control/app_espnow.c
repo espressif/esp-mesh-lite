@@ -190,7 +190,6 @@ static void espnow_task(void *pvParameter)
     while (xQueueReceive(espnow_recv_queue, &evt, portMAX_DELAY) == pdTRUE) {
         switch (evt.id) {
             case ESPNOW_RECV_CB:
-            {
                 espnow_recv_cb_t *recv_cb = &evt.info.recv_cb;
                 uint32_t recv_seq;
                 memset(group_control_payload, 0x0, ESPNOW_PAYLOAD_MAX_LEN);
@@ -285,7 +284,6 @@ cleanup:
                 free(recv_cb->data);
                 recv_cb->data = NULL;
                 break;
-            }
             default:
                 ESP_LOGE(TAG, "Callback type error: %d", evt.id);
                 break;

@@ -163,7 +163,7 @@ static void esp_rmaker_mesh_lite_ota_url_handler(const char *topic, void *payloa
         app_desc = esp_ota_get_app_description();
 #endif
         ESP_LOGI(TAG, "OTA Image version for Project: %s. Expected: %s",
-                app_desc->version, fw_version);
+                 app_desc->version, fw_version);
         if (!strncmp(app_desc->version, fw_version, strnlen(fw_version, sizeof(app_desc->version)))) {
             ESP_LOGW(TAG, "Current running version is same as the new. We will not continue the update.");
             esp_rmaker_ota_report_status(ota_handle, OTA_STATUS_REJECTED, "Same version received");
@@ -206,7 +206,7 @@ esp_err_t esp_rmaker_mesh_lite_ota_subscribe_topic(void)
     char subscribe_topic[MQTT_TOPIC_BUFFER_SIZE];
     memset(subscribe_topic, 0, sizeof(subscribe_topic));
     snprintf(subscribe_topic, sizeof(subscribe_topic), "node/%s/%s",
-                esp_rmaker_get_node_id(), OTAURL_TOPIC_SUFFIX);
+             esp_rmaker_get_node_id(), OTAURL_TOPIC_SUFFIX);
     esp_err_t err = esp_rmaker_mqtt_unsubscribe(subscribe_topic);
     if (err == ESP_OK) {
         err = esp_rmaker_mqtt_subscribe(subscribe_topic, esp_rmaker_mesh_lite_ota_url_handler, RMAKER_MQTT_QOS1, esp_rmaker_ota);

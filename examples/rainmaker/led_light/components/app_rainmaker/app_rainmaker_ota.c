@@ -14,7 +14,7 @@
 static const char *TAG = "app_rainmaker_ota";
 
 static esp_err_t validate_image_header(esp_rmaker_ota_handle_t ota_handle,
-        esp_app_desc_t *new_app_info)
+                                       esp_app_desc_t *new_app_info)
 {
     if (new_app_info == NULL) {
         return ESP_ERR_INVALID_ARG;
@@ -29,7 +29,7 @@ static esp_err_t validate_image_header(esp_rmaker_ota_handle_t ota_handle,
 #ifndef CONFIG_ESP_RMAKER_SKIP_PROJECT_NAME_CHECK
     if (memcmp(new_app_info->project_name, running_app_info.project_name, sizeof(new_app_info->project_name)) != 0) {
         ESP_LOGW(TAG, "OTA Image built for Project: %s. Expected: %s",
-                new_app_info->project_name, running_app_info.project_name);
+                 new_app_info->project_name, running_app_info.project_name);
         esp_rmaker_ota_report_status(ota_handle, OTA_STATUS_REJECTED, "Project Name mismatch");
         return ESP_FAIL;
     }
@@ -97,13 +97,13 @@ esp_err_t esp_rmaker_mesh_lite_ota_cb(esp_rmaker_ota_handle_t ota_handle, esp_rm
         return ESP_FAIL;
     }
 
-/* Get the current Wi-Fi power save type. In case OTA fails and we need this
- * to restore power saving.
- */
+    /* Get the current Wi-Fi power save type. In case OTA fails and we need this
+     * to restore power saving.
+     */
     wifi_ps_type_t ps_type;
     esp_wifi_get_ps(&ps_type);
-/* Disable Wi-Fi power save to speed up OTA, iff BT is controller is idle/disabled.
- * Co-ex requirement, device panics otherwise.*/
+    /* Disable Wi-Fi power save to speed up OTA, iff BT is controller is idle/disabled.
+     * Co-ex requirement, device panics otherwise.*/
 #if CONFIG_BT_ENABLED
     if (esp_bt_controller_get_status() == ESP_BT_CONTROLLER_STATUS_IDLE) {
         esp_wifi_set_ps(WIFI_PS_NONE);

@@ -16,35 +16,35 @@ void esp_mesh_lite_log_write(esp_log_level_t level, const char *tag, const char 
     char log_color[LOG_COLOR_LEN] = {0};
     memset(log_color, 0, sizeof(log_color));
     switch (level) {
-        case ESP_LOG_ERROR:
-            letter = 'E';
+    case ESP_LOG_ERROR:
+        letter = 'E';
 #ifdef CONFIG_LOG_COLORS
-            memcpy(log_color, "\033[0;" "31" "m", LOG_COLOR_LEN);
+        memcpy(log_color, "\033[0;" "31" "m", LOG_COLOR_LEN);
 #endif
-            break;
-        case ESP_LOG_WARN:
-            letter = 'W';
+        break;
+    case ESP_LOG_WARN:
+        letter = 'W';
 #ifdef CONFIG_LOG_COLORS
-            memcpy(log_color, "\033[0;" "33" "m", LOG_COLOR_LEN);
+        memcpy(log_color, "\033[0;" "33" "m", LOG_COLOR_LEN);
 #endif
-            break;
-        case ESP_LOG_INFO:
-            letter = 'I';
+        break;
+    case ESP_LOG_INFO:
+        letter = 'I';
 #ifdef CONFIG_LOG_COLORS
-            memcpy(log_color, "\033[0;" "32" "m", LOG_COLOR_LEN);
+        memcpy(log_color, "\033[0;" "32" "m", LOG_COLOR_LEN);
 #endif
-            break;
-        case ESP_LOG_DEBUG:
-            letter = 'D';
+        break;
+    case ESP_LOG_DEBUG:
+        letter = 'D';
 #ifdef CONFIG_LOG_COLORS
-            memcpy(log_color, "\033[0;" "36" "m", LOG_COLOR_LEN);
+        memcpy(log_color, "\033[0;" "36" "m", LOG_COLOR_LEN);
 #endif
-            break;
-        case ESP_LOG_VERBOSE:
-            letter = 'V';
-            break;
-        default:
-            break;
+        break;
+    case ESP_LOG_VERBOSE:
+        letter = 'V';
+        break;
+    default:
+        break;
     }
     va_list list;
     va_start(list, format);

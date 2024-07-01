@@ -179,10 +179,10 @@ void app_rmaker_mesh_lite_report_info_to_parent(void)
     report_child_info_mutex = xSemaphoreCreateMutex();
     esp_mesh_lite_msg_action_list_register(report_child_info_action);
 
-    TimerHandle_t report_timer = xTimerCreate("report_timer", 120 * 1000 / portTICK_PERIOD_MS, 
+    TimerHandle_t report_timer = xTimerCreate("report_timer", 120 * 1000 / portTICK_PERIOD_MS,
                                               pdTRUE, NULL, report_timer_cb);
-    TimerHandle_t root_timer = xTimerCreate("root_timer", 1 * 1000 / portTICK_PERIOD_MS, 
-                                              pdTRUE, NULL, root_timer_cb);
+    TimerHandle_t root_timer = xTimerCreate("root_timer", 1 * 1000 / portTICK_PERIOD_MS,
+                                            pdTRUE, NULL, root_timer_cb);
     xTimerStart(report_timer, portMAX_DELAY);
     xTimerStart(root_timer, portMAX_DELAY);
 }
