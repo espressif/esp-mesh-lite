@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2022-2023 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2022-2024 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -23,6 +23,7 @@
 #if defined(CONFIG_PROV_TRANSPORT_BLE)
 #include "wifi_prov_mgr.h"
 #endif
+#include "zero_provisioning.h"
 #define PAYLOAD_LEN       (1456) /**< Max payload size(in bytes) */
 
 static int g_sockfd    = -1;
@@ -59,7 +60,7 @@ static int socket_tcp_client_create(const char *ip, uint16_t port)
     ret = connect(sockfd, (struct sockaddr *)&server_addr, sizeof(struct sockaddr_in));
     if (ret < 0) {
         ESP_LOGD(TAG, "socket connect, ret: %d, ip: %s, port: %d",
-                   ret, ip, port);
+                 ret, ip, port);
         goto ERR_EXIT;
     }
     return sockfd;
@@ -174,16 +175,7 @@ static esp_err_t esp_storage_init(void)
 
 static void wifi_init(void)
 {
-    // Station
-    wifi_config_t wifi_config = {
-        .sta = {
-            .ssid = CONFIG_ROUTER_SSID,
-            .password = CONFIG_ROUTER_PASSWORD,
-        },
-    };
-    esp_bridge_wifi_set_config(WIFI_IF_STA, &wifi_config);
-
-    // Softap
+    wifi_config_t wifi_config = {0};
     snprintf((char *)wifi_config.ap.ssid, sizeof(wifi_config.ap.ssid), "%s", CONFIG_BRIDGE_SOFTAP_SSID);
     strlcpy((char *)wifi_config.ap.password, CONFIG_BRIDGE_SOFTAP_PASSWORD, sizeof(wifi_config.ap.password));
     esp_bridge_wifi_set_config(WIFI_IF_AP, &wifi_config);
@@ -229,11 +221,10 @@ void app_main()
 
     esp_mesh_lite_start();
 
-#if defined(CONFIG_PROV_TRANSPORT_SOFTAP)
-    StartWebServer();
-#endif /* CONFIG_APP_BRIDGE_USE_WEB_SERVER */
+    zero_prov_init(NULL, NULL);
+
 #if defined(CONFIG_PROV_TRANSPORT_BLE)
-    esp_bridge_wifi_prov_mgr();
+    esp_mesh_lite_wifi_prov_mgr_init();
 #endif /* CONFIG_APP_BRIDGE_USE_WIFI_PROVISIONING_OVER_BLE */
 
     /**
@@ -244,10 +235,4 @@ void app_main()
     TimerHandle_t timer = xTimerCreate("print_system_info", 10000 / portTICK_PERIOD_MS,
                                        true, NULL, print_system_info_timercb);
     xTimerStart(timer, 0);
-}
-
-
-void ip_napt_table_clear()
-{
-
 }

@@ -18,11 +18,6 @@ dependencies:
       - if: "target in [esp32s2, esp32s3]"
       - if: "idf_version < 5.1.4"
 
-  qrcode:
-    path: examples/common/qrcode
-    git: https://github.com/espressif/esp-rainmaker.git
-    version: 43444ff
-
   gpio_button:
     path: examples/common/gpio_button
     git: https://github.com/espressif/esp-rainmaker.git

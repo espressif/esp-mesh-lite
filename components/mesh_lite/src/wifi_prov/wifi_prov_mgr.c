@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2022 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2022-2024 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -28,13 +28,33 @@
 #include "qrcode.h"
 
 #include "esp_mesh_lite.h"
-static const char *TAG = "esp_bridge_wifi_prov_mgr";
+
+#define PROV_QR_VERSION         "v1"
+#define PROV_TRANSPORT_SOFTAP   "softap"
+#define PROV_TRANSPORT_BLE      "ble"
+#define QRCODE_BASE_URL         "https://espressif.github.io/esp-jumpstart/qrcode.html"
+
+typedef struct mesh_lite_config {
+    uint8_t ssid[32];                         /**< SSID of target AP. */
+    uint8_t password[64];
+    uint32_t mesh_id;
+} mesh_lite_config_t;
+
+static const char *TAG = "esp_mesh_lite_wifi_prov_mgr";
+
+static bool wifi_prov_status = false;
+const int WIFI_CONNECTED_EVENT = BIT0;
+static mesh_lite_config_t wifi_prov_mgr_mesh_lite_cfg;
+static esp_timer_handle_t deinit_wifi_prov_mgr_timer = NULL;
+
+/* Register Wi-Fi Provisioning events */
+static void wifi_prov_event_register(void);
 
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 #if CONFIG_PROV_SECURITY_VERSION_2
 #if CONFIG_PROV_SEC2_DEV_MODE
-#define BRIDGE_PROV_SEC2_USERNAME          "wifiprov"
-#define BRIDGE_PROV_SEC2_PWD               "abcd1234"
+#define MESH_LITE_PROV_SEC2_USERNAME          "wifiprov"
+#define MESH_LITE_PROV_SEC2_PWD               "abcd1234"
 
 /* This salt,verifier has been generated for username = "wifiprov" and password = "abcd1234"
  * IMPORTANT NOTE: For production cases, this must be unique to every device
@@ -71,7 +91,7 @@ static const char sec2_verifier[] = {
 };
 #endif
 
-static esp_err_t esp_bridge_get_sec2_salt(const char **salt, uint16_t *salt_len)
+static esp_err_t esp_mesh_lite_get_sec2_salt(const char **salt, uint16_t *salt_len)
 {
 #if CONFIG_PROV_SEC2_DEV_MODE
     ESP_LOGI(TAG, "Development mode: using hard coded salt");
@@ -84,7 +104,7 @@ static esp_err_t esp_bridge_get_sec2_salt(const char **salt, uint16_t *salt_len)
 #endif
 }
 
-static esp_err_t esp_bridge_get_sec2_verifier(const char **verifier, uint16_t *verifier_len)
+static esp_err_t esp_mesh_lite_get_sec2_verifier(const char **verifier, uint16_t *verifier_len)
 {
 #if CONFIG_PROV_SEC2_DEV_MODE
     ESP_LOGI(TAG, "Development mode: using hard coded verifier");
@@ -99,20 +119,6 @@ static esp_err_t esp_bridge_get_sec2_verifier(const char **verifier, uint16_t *v
 }
 #endif
 #endif /* ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0) */
-
-static bool wifi_prov_status = false;
-static esp_timer_handle_t deinit_wifi_prov_mgr_timer = NULL;
-
-/* Signal Wi-Fi events on this event-group */
-const int WIFI_CONNECTED_EVENT = BIT0;
-
-#define PROV_QR_VERSION         "v1"
-#define PROV_TRANSPORT_SOFTAP   "softap"
-#define PROV_TRANSPORT_BLE      "ble"
-#define QRCODE_BASE_URL         "https://espressif.github.io/esp-jumpstart/qrcode.html"
-
-/* Register Wi-Fi Provisioning events */
-static void wifi_prov_event_register(void);
 
 bool wifi_provision_in_progress(void)
 {
@@ -130,22 +136,6 @@ esp_err_t __attribute__((weak)) wifi_prov_wifi_connect(wifi_sta_config_t *conf)
     if (config.bssid_set) {
         memcpy((char*)config.bssid, (char*)conf->bssid, sizeof(config.bssid));
     }
-//     esp_mesh_lite_set_mesh_id(wifi_prov_mgr_mesh_lite_cfg.mesh_id);
-
-//     char softap_ssid[32];
-//     uint8_t softap_mac[6];
-//     esp_wifi_get_mac(WIFI_IF_AP, softap_mac);
-//     memset(softap_ssid, 0x0, sizeof(softap_ssid));
-
-// #ifdef CONFIG_BRIDGE_SOFTAP_SSID_END_WITH_THE_MAC
-//     snprintf(softap_ssid, sizeof(softap_ssid), "%.25s_%02x%02x%02x", wifi_prov_mgr_mesh_lite_cfg.ssid, softap_mac[3], softap_mac[4], softap_mac[5]);
-// #else
-//     snprintf(softap_ssid, sizeof(softap_ssid), "%.32s", wifi_prov_mgr_mesh_lite_cfg.ssid);
-// #endif
-//     esp_mesh_lite_set_softap_ssid_to_nvs(softap_ssid);
-//     esp_mesh_lite_set_softap_psw_to_nvs(wifi_prov_mgr_mesh_lite_cfg.password);
-//     esp_mesh_lite_set_softap_info(softap_ssid, wifi_prov_mgr_mesh_lite_cfg.password);
-
     esp_mesh_lite_set_router_config(&config);
     esp_mesh_lite_connect();
 #else
@@ -165,13 +155,10 @@ static void deinit_wifi_prov_mgr_timer_callback(void *arg)
     esp_event_post(WIFI_PROV_EVENT, WIFI_PROV_END, NULL, 0, portMAX_DELAY);
 }
 
-typedef struct mesh_lite_config {
-    uint8_t ssid[32];                         /**< SSID of target AP. */
-    uint8_t password[64];
-    uint32_t mesh_id;
-} mesh_lite_config_t;
-
-static mesh_lite_config_t wifi_prov_mgr_mesh_lite_cfg;
+void wifi_provision_stop(void)
+{
+    wifi_prov_mgr_stop_provisioning();
+}
 
 /* Event handler for catching system events */
 static void event_handler(void *arg, esp_event_base_t event_base,
@@ -197,9 +184,9 @@ static void event_handler(void *arg, esp_event_base_t event_base,
             uint8_t softap_mac[6];
             esp_wifi_get_mac(WIFI_IF_AP, softap_mac);
             memset(softap_ssid, 0x0, sizeof(softap_ssid));
-            ESP_LOGI(TAG, "Received Mesh credentials\n\tSSID     : %s\n\tPassword : %s\n\MeshID : %ld",
-                (const char *)mesh_lite_cfg->ssid, (const char *)mesh_lite_cfg->password, mesh_lite_cfg->mesh_id);
-            if (strlen((char*)mesh_lite_cfg->ssid)) {
+            ESP_LOGI(TAG, "Received Mesh credentials\n\tSSID     : %s\n\tPassword : %s\n\tMeshID : %ld",
+                     (const char *)mesh_lite_cfg->ssid, (const char *)mesh_lite_cfg->password, mesh_lite_cfg->mesh_id);
+            if (strlen((char *)mesh_lite_cfg->ssid)) {
                 memcpy(&wifi_prov_mgr_mesh_lite_cfg, mesh_lite_cfg, sizeof(wifi_prov_mgr_mesh_lite_cfg));
 #ifdef CONFIG_BRIDGE_SOFTAP_SSID_END_WITH_THE_MAC
                 snprintf(softap_ssid, sizeof(softap_ssid), "%.25s_%02x%02x%02x", mesh_lite_cfg->ssid, softap_mac[3], softap_mac[4], softap_mac[5]);
@@ -282,7 +269,7 @@ static void wifi_prov_event_register(void)
     ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler, NULL));
 }
 
-static void get_device_service_name(char *service_name, size_t max)
+void get_device_service_name(char *service_name, size_t max)
 {
     uint8_t eth_mac[6];
     const char *ssid_prefix = "PROV_";
@@ -354,7 +341,7 @@ static void wifi_prov_print_qr(const char *name, const char *username, const cha
     ESP_LOGI(TAG, "If QR code is not visible, copy paste the below URL in a browser.\n%s?data=%s", QRCODE_BASE_URL, payload);
 }
 
-void esp_bridge_wifi_prov_mgr(void)
+void esp_mesh_lite_wifi_prov_mgr_init(void)
 {
     wifi_prov_status = true;
 
@@ -399,6 +386,14 @@ void esp_bridge_wifi_prov_mgr(void)
     wifi_prov_mgr_reset_provisioning();
 #endif
 
+    bool provisioned = false;
+    /* Let's find out if the device is provisioned */
+    ESP_ERROR_CHECK(wifi_prov_mgr_is_provisioned(&provisioned));
+    /* If device is not yet provisioned start provisioning service */
+    if (provisioned) {
+        return;
+    }
+
     ESP_LOGI(TAG, "Starting provisioning");
 
     /* What is the Device Service Name that we want
@@ -442,8 +437,8 @@ void esp_bridge_wifi_prov_mgr(void)
     /* This pop field represents the password that will be used to generate salt and verifier.
      * The field is present here in order to generate the QR code containing password.
      * In production this password field shall not be stored on the device */
-    const char *username = BRIDGE_PROV_SEC2_USERNAME;
-    pop = BRIDGE_PROV_SEC2_PWD;
+    const char *username = MESH_LITE_PROV_SEC2_USERNAME;
+    pop = MESH_LITE_PROV_SEC2_PWD;
 #elif CONFIG_PROV_SEC2_PROD_MODE
     /* The username and password shall not be embedded in the firmware,
      * they should be provided to the user by other means.
@@ -457,8 +452,8 @@ void esp_bridge_wifi_prov_mgr(void)
      */
     wifi_prov_security2_params_t sec2_params = {};
 
-    ESP_ERROR_CHECK(esp_bridge_get_sec2_salt(&sec2_params.salt, &sec2_params.salt_len));
-    ESP_ERROR_CHECK(esp_bridge_get_sec2_verifier(&sec2_params.verifier, &sec2_params.verifier_len));
+    ESP_ERROR_CHECK(esp_mesh_lite_get_sec2_salt(&sec2_params.salt, &sec2_params.salt_len));
+    ESP_ERROR_CHECK(esp_mesh_lite_get_sec2_verifier(&sec2_params.verifier, &sec2_params.verifier_len));
 
     wifi_prov_security2_params_t *sec_params = &sec2_params;
 #endif

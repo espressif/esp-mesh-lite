@@ -11,8 +11,6 @@ This example will introduce how to implement a device connection to a remote ext
 
 This example implements the function of device data transmission in the mesh network to the TCP server.
 
-**It is recommended to compile with esp-idf version 4.4**
-
 ## Hardware
 
 * At least 2 x ESP32 development boards

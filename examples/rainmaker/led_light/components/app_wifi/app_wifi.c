@@ -128,7 +128,7 @@ static void app_wifi_print_qr(const char *name, const char *pop, const char *tra
     }
 #ifdef CONFIG_APP_WIFI_PROV_SHOW_QR
     ESP_LOGI(TAG, "Scan this QR code from the ESP RainMaker phone app for Provisioning.");
-    qrcode_display(payload);
+    // qrcode_display(payload);
 #endif /* CONFIG_APP_WIFI_PROV_SHOW_QR */
     ESP_LOGI(TAG, "If QR code is not visible, copy paste the below URL in a browser.\n%s?data=%s", QRCODE_BASE_URL, payload);
     esp_event_post(APP_WIFI_EVENT, APP_WIFI_EVENT_QR_DISPLAY, payload, strlen(payload) + 1, portMAX_DELAY);
