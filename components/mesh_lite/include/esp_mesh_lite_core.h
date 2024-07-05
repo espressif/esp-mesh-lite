@@ -325,6 +325,19 @@ esp_err_t esp_mesh_lite_core_init(esp_mesh_lite_config_t* config);
 void esp_mesh_lite_connect(void);
 
 /**
+ * @brief Disconnect from the ESP-Mesh-Lite network.
+ *
+ * This function disconnects the device from the ESP-Mesh-Lite network.
+ * After executing this function, the device will stop attempting to reconnect
+ * to the network.
+ *
+ * @return
+ *     - ESP_OK if the disconnection was successful.
+ *     - ESP_FAIL if the disconnection failed, for example due to invalid state.
+ */
+esp_err_t esp_mesh_lite_disconnect(void);
+
+/**
  * @brief Set the mesh_lite_id
  *
  * @param[in] mesh_id: Each mesh network should have a different and unique ID.
@@ -733,6 +746,7 @@ esp_err_t esp_mesh_lite_bssid_check_cb_register(esp_mesh_lite_get_ssid_by_mac_cb
  */
 esp_err_t esp_mesh_lite_scan_cb_register(esp_mesh_lite_scan_cb_t *cb);
 
+#ifdef CONFIG_ESP_MESH_LITE_OTA_ENABLE
 /*****************************************************/
 /************ ESP Wi-Fi Mesh Lite LAN OTA ************/
 /*****************************************************/
@@ -839,6 +853,8 @@ esp_err_t esp_mesh_lite_ota_notify_child_node_pause(void);
  *
  */
 esp_err_t esp_mesh_lite_ota_notify_child_node_restart(void);
+
+#endif /* CONFIG_ESP_MESH_LITE_OTA_ENABLE */
 
 /*****************************************************/
 /********* ESP Wi-Fi Mesh Lite Communication *********/

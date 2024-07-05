@@ -1,8 +1,13 @@
 # ChangeLog
 
-## v0.10.6 - 2024-6-12
+## v0.10.6 - 2024-7-5
 
 ### 功能:
+
+#### Mesh
+
+- 新增 esp_mesh_lite_disconnect API ([5075c94](https://github.com/espressif/esp-mesh-lite/commit/5075c94dd026a5fb12e569b693fd59b8781abc3d))
+- 优化最佳父节点的选择 ([5075c94](https://github.com/espressif/esp-mesh-lite/commit/5075c94dd026a5fb12e569b693fd59b8781abc3d))
 
 #### Bugfix
 
