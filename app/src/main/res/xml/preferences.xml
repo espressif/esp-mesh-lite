@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="@string/device_settings">
+
+        <ListPreference
+            app:defaultValue="both"
+            app:entries="@array/device_entries"
+            app:entryValues="@array/device_values"
+            app:iconSpaceReserved="false"
+            app:key="device_types"
+            app:title="@string/device_selection_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:iconSpaceReserved="false"
+            app:key="security_type"
+            app:summary="@string/summary_secured"
+            app:title="@string/security_selection_title" />
+
+        <EditTextPreference
+            app:defaultValue="wifiprov"
+            app:iconSpaceReserved="false"
+            app:key="sec2_username"
+            app:title="@string/username_pref_title"
+            app:dialogTitle="@string/username_selection_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:iconSpaceReserved="false"
+            app:key="mesh_root_mode"
+            app:summary="@string/mesh_root_node"
+            app:title="@string/mesh_root_selection_title" />
+
+        <EditTextPreference
+            app:defaultValue="ESP_MESH_LITE"
+            app:iconSpaceReserved="false"
+            app:key="ESP_MESH_LITE_SSID"
+            app:title="@string/mesh_softap_ssid"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:defaultValue="12345678"
+            app:iconSpaceReserved="false"
+            app:key="ESP_MESH_LITE_PASSWORD"
+            app:title="@string/mesh_softap_password"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:defaultValue="77"
+            app:iconSpaceReserved="false"
+            app:key="ESP_MESH_LITE_ID"
+            app:title="@string/mesh_id"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
