@@ -128,6 +128,7 @@ void app_main()
     esp_mesh_lite_set_allowed_level(1);
 #else
     ESP_LOGI(TAG, "Child node");
+    esp_mesh_lite_set_disallowed_level(1);
 #endif
 
     esp_mesh_lite_start();
