@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2022-2023 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2022-2024 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -93,6 +93,20 @@ typedef const uint8_t*(*esp_mesh_lite_get_ssid_by_mac_cb_t)(const uint8_t *bssid
  * @return cJSON*  cJSON pointer representing the processed message.
  */
 typedef cJSON* (*msg_process_cb_t)(cJSON *payload, uint32_t seq);
+
+/**
+ * @brief Callback function pointer type for processing received raw messages.
+ *        This function should process received raw message data and produce output data.
+ *
+ * @param data     Pointer to the raw message data.
+ * @param len      Length of the raw message data.
+ * @param[out] out_data Pointer to a variable that will be set to the processed output data.
+ * @param[out] out_len  Pointer to a variable that will be set to the length of the processed output data.
+ * @param seq      Sequence number of the message.
+ *
+ * @return esp_err_t ESP_OK on success, or an appropriate error code on failure.
+ */
+typedef esp_err_t (*raw_msg_process_cb_t)(uint8_t *data, uint32_t len, uint8_t **out_data, uint32_t* out_len, uint32_t seq);
 
 /**
  * @brief Callback function pointer type for providing LAN OTA file data.
@@ -269,6 +283,16 @@ typedef struct esp_mesh_lite_msg_action {
                                 If set to NULL, it will be sent until the maximum number of retransmissions is reached. */
     msg_process_cb_t process; /**< The callback function when receiving the 'type' message. The cjson information in the type message can be processed in this cb. */
 } esp_mesh_lite_msg_action_t;
+
+/**
+ * @brief Mesh-Lite raw message action parameters passed to esp_mesh_lite_raw_msg_action_list_register call.
+ */
+typedef struct esp_mesh_lite_raw_msg_action {
+    uint32_t msg_id;                  /**< The ID of the raw message sent */
+    uint32_t resp_msg_id;             /**< The ID of the response message expected to be received. When a message with the expected ID is received, stop retransmitting.
+                                       If set to 0, the message will be sent until the maximum number of retransmissions is reached. */
+    raw_msg_process_cb_t raw_process; /**< The callback function when receiving the raw message. The raw message data can be processed in this callback. */
+} esp_mesh_lite_raw_msg_action_t;
 
 /**
  * @brief Callback structure for ESP-Mesh-Lite scanning events.
@@ -914,6 +938,97 @@ esp_err_t esp_mesh_lite_try_sending_msg(char* send_msg,
                                         uint32_t max_retry,
                                         cJSON* req_payload,
                                         esp_err_t (*resend)(const char* payload));
+
+/**
+ * @brief  Send broadcast raw message to child nodes.
+ *
+ * This function sends a raw broadcast message to all child nodes in the mesh network.
+ *
+ * @param[in] data Pointer to the data to be sent.
+ * @param[in] size Size of the data to be sent.
+ *
+ */
+esp_err_t esp_mesh_lite_send_broadcast_raw_msg_to_child(const uint8_t* data, size_t size);
+
+/**
+ * @brief  Send broadcast raw message to parent node.
+ *
+ * This function sends a raw broadcast message to the parent node in the mesh network.
+ *
+ * @attention For non-root nodes, please use `esp_mesh_lite_send_raw_msg_to_parent(const uint8_t* data, size_t size)`.
+ *
+ * @param[in] data Pointer to the data to be sent.
+ * @param[in] size Size of the data to be sent.
+ *
+ */
+esp_err_t esp_mesh_lite_send_broadcast_raw_msg_to_parent(const uint8_t* data, size_t size);
+
+/**
+ * @brief  Send raw message to root node.
+ *
+ * This function sends a raw message directly to the root node in the mesh network.
+ *
+ * @param[in] data Pointer to the data to be sent.
+ * @param[in] size Size of the data to be sent.
+ *
+ */
+esp_err_t esp_mesh_lite_send_raw_msg_to_root(const uint8_t* data, size_t size);
+
+/**
+ * @brief  Send raw message to parent node.
+ *
+ * This function sends a raw message to the parent node in the mesh network.
+ *
+ * @param[in] data Pointer to the data to be sent.
+ * @param[in] size Size of the data to be sent.
+ *
+ */
+esp_err_t esp_mesh_lite_send_raw_msg_to_parent(const uint8_t* data, size_t size);
+
+/**
+ * @brief Send a specific type of message and set the number of retransmissions.
+ *
+ * This function sends a raw message of a specific type and handles retransmissions.
+ * The message will be retransmitted until a message with the expected response message ID
+ * is received or the maximum number of retransmissions is reached.
+ *
+ * @param[in] msg_id            ID of the message to be sent.
+ * @param[in] expect_resp_msg_id ID of the expected response message.
+ * @param[in] max_retry         Maximum number of retransmissions.
+ * @param[in] data              Pointer to the data to be sent.
+ * @param[in] size              Size of the data to be sent.
+ * @param[in] raw_resend        Function pointer to the send message function.
+ *                              - esp_mesh_lite_send_broadcast_raw_msg_to_child()
+ *                              - esp_mesh_lite_send_broadcast_raw_msg_to_parent()
+ *                              - esp_mesh_lite_send_raw_msg_to_root()
+ *                              - esp_mesh_lite_send_raw_msg_to_parent()
+ *
+ * @return
+ *      - ESP_OK: Successfully sent the message.
+ *      - ESP_FAIL: Failed to send the message.
+ *      - Other error codes: As defined in esp_err_t.
+ */
+esp_err_t esp_mesh_lite_try_sending_raw_msg(uint32_t msg_id,
+                                            uint32_t expect_resp_msg_id,
+                                            uint32_t max_retry,
+                                            const uint8_t* data,
+                                            size_t size,
+                                            esp_err_t (*raw_resend)(const uint8_t* data, size_t size));
+
+/**
+ * @brief Register a raw message action with the Mesh-Lite message action list.
+ *
+ * This function registers a raw message action, which includes the message ID,
+ * response message ID, and the callback function to process the raw message.
+ *
+ * @param[in] msg_action Pointer to the raw message action structure to be registered.
+ *
+ * @return
+ *      - ESP_OK: Successfully registered the message action.
+ *      - ESP_FAIL: Failed to register the message action.
+ *      - Other error codes: As defined in esp_err_t.
+ */
+esp_err_t esp_mesh_lite_raw_msg_action_list_register(const esp_mesh_lite_raw_msg_action_t* msg_action);
 
 /**
  * @brief Register custom message reception and recovery logic

@@ -22,14 +22,14 @@
 
 #define MAX_RETRY  5
 
-typedef struct node_info_list {
-    esp_mesh_lite_node_info_t* node;
+typedef struct app_node_info_list {
+    app_node_info_t* node;
     uint32_t ttl;
-    struct node_info_list* next;
-} node_info_list_t;
+    struct app_node_info_list* next;
+} app_node_info_list_t;
 
 static const char* TAG = "Mesh-Lite";
-static node_info_list_t* node_info_list = NULL;
+static app_node_info_list_t* app_node_info_list = NULL;
 static SemaphoreHandle_t report_child_info_mutex;
 
 esp_err_t app_rmaker_mesh_lite_report_child_info(void)
@@ -62,7 +62,7 @@ esp_err_t app_rmaker_mesh_lite_report_child_info(void)
 static esp_err_t esp_mesh_lite_child_node_info_add(uint8_t level, char* mac, char* ip)
 {
     xSemaphoreTake(report_child_info_mutex, portMAX_DELAY);
-    node_info_list_t* new = node_info_list;
+    app_node_info_list_t* new = app_node_info_list;
 
     while (new) {
         if (!strncmp(new->node->mac, mac, (MAC_MAX_LEN - 1))) {
@@ -74,14 +74,14 @@ static esp_err_t esp_mesh_lite_child_node_info_add(uint8_t level, char* mac, cha
     }
 
     /* not found, create a new */
-    new = (node_info_list_t*)malloc(sizeof(node_info_list_t));
+    new = (app_node_info_list_t*)malloc(sizeof(app_node_info_list_t));
     if (new == NULL) {
         ESP_LOGE(TAG, "node info add fail(no mem)");
         xSemaphoreGive(report_child_info_mutex);
         return ESP_ERR_NO_MEM;
     }
 
-    new->node = (esp_mesh_lite_node_info_t*)malloc(sizeof(esp_mesh_lite_node_info_t));
+    new->node = (app_node_info_t*)malloc(sizeof(app_node_info_t));
     if (new->node == NULL) {
         free(new);
         ESP_LOGE(TAG, "node info add fail(no mem)");
@@ -94,10 +94,10 @@ static esp_err_t esp_mesh_lite_child_node_info_add(uint8_t level, char* mac, cha
     new->node->level = level;
     new->ttl = (120 + 10);
 
-    new->next = node_info_list;
-    node_info_list = new;
+    new->next = app_node_info_list;
+    app_node_info_list = new;
 
-    esp_event_post(ESP_MESH_LITE_EVENT, ESP_MESH_LITE_EVENT_CHILD_NODE_JOIN, new->node, sizeof(esp_mesh_lite_node_info_t), 0);
+    esp_event_post(ESP_MESH_LITE_EVENT, ESP_MESH_LITE_EVENT_CHILD_NODE_JOIN, new->node, sizeof(app_node_info_t), 0);
     xSemaphoreGive(report_child_info_mutex);
     return ESP_OK;
 }
@@ -140,17 +140,17 @@ static void root_timer_cb(TimerHandle_t timer)
         return;
     }
 
-    node_info_list_t* current = node_info_list;
-    node_info_list_t* prev = NULL;
+    app_node_info_list_t* current = app_node_info_list;
+    app_node_info_list_t* prev = NULL;
 
     while (current) {
         if (current->ttl == 0) {
-            esp_event_post(ESP_MESH_LITE_EVENT, ESP_MESH_LITE_EVENT_CHILD_NODE_LEAVE, current->node, sizeof(esp_mesh_lite_node_info_t), 0);
-            if (node_info_list == current) {
-                node_info_list = current->next;
+            esp_event_post(ESP_MESH_LITE_EVENT, ESP_MESH_LITE_EVENT_CHILD_NODE_LEAVE, current->node, sizeof(app_node_info_t), 0);
+            if (app_node_info_list == current) {
+                app_node_info_list = current->next;
                 free(current->node);
                 free(current);
-                current = node_info_list;
+                current = app_node_info_list;
             } else {
                 prev->next = current->next;
                 free(current->node);

@@ -15,8 +15,6 @@
 
 #include "esp_mesh_lite.h"
 
-static const char *TAG = "Mesh-Lite-ESPNOW";
-
 static uint8_t espnow_data[ESPNOW_PAYLOAD_MAX_LEN];
 static espnow_cb_register_t *esp_mesh_lite_espnow_cb_list = NULL;
 

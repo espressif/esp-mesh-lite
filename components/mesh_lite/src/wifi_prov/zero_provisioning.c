@@ -34,6 +34,8 @@
 
 static const char *TAG = "zero";
 
+static uint8_t s_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+
 typedef struct {
     zero_prov_event_id_t event;
     void (*eventfun)(void *);

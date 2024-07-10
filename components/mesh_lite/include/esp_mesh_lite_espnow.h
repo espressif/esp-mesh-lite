@@ -13,8 +13,8 @@
 #define ESPNOW_MAXDELAY                  (512)
 #define ESPNOW_PAYLOAD_MAX_LEN           (250)
 
-static uint8_t s_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-#define IS_BROADCAST_ADDR(addr) (memcmp(addr, s_broadcast_mac, ESP_NOW_ETH_ALEN) == 0)
+#define IS_BROADCAST_ADDR(addr) ((((uint8_t*)addr)[0] == 0xFF) && (((uint8_t*)addr)[1] == 0xFF) && (((uint8_t*)addr)[2] == 0xFF) \
+                                    && (((uint8_t*)addr)[3] == 0xFF) && (((uint8_t*)addr)[4] == 0xFF) && (((uint8_t*)addr)[5] == 0xFF))
 
 typedef enum {
     ESPNOW_DATA_TYPE_MESH_LITE_CORE,

@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package mesh_lite;
+
+message node_data {
+  uint32 node_level = 1;
+  uint32 node_ip = 2;
+  bytes node_mac = 3;
+}
+
+message data {
+  repeated node_data nodes = 1;
+}
