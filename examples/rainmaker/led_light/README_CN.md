@@ -115,4 +115,4 @@ $ idf.py flash
 
 ### 7. 注意事项
 
-- 目前 Nova Home 仅支持 Wi-Fi Provisioning 配网（BLE），故该方案目前不支持 ESP32-S2 芯片
+- 目前 Nova Home 仅支持 Wi-Fi Provisioning 配网（BLE），故该示例目前不支持 ESP32-S2 芯片

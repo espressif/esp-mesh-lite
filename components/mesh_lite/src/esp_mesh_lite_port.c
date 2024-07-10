@@ -5,13 +5,10 @@
  */
 
 #include <string.h>
+#include "esp_mac.h"
 #include "esp_log.h"
 #include "esp_wifi.h"
 #include "esp_mesh_lite_port.h"
-
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
-#include "esp_mac.h"
-#endif
 
 __attribute__((weak)) const esp_app_desc_t *esp_app_get_description(void)
 {

@@ -6,6 +6,7 @@ documentation: https://github.com/espressif/esp-mesh-lite/blob/master/components
 issues: https://github.com/espressif/esp-mesh-lite/issues
 dependencies:
   idf: ">=5.0"
+  espressif/qrcode: "^0.1.0"
   espressif/iot_bridge: "0.11.8"
   espressif/cmake_utilities: 0.*
 examples:

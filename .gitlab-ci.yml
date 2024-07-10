@@ -47,6 +47,11 @@ default:
   - idf.py set-target ${idf_target}
   - idf.py build
   - cd -
+  - cd examples/mesh_wifi_provisioning
+  - rm -rf build sdkconfig
+  - idf.py set-target ${idf_target}
+  - idf.py build
+  - cd -
 
 .build_rainmaker_example: &build_rainmaker_example
   - cd examples/rainmaker/led_light

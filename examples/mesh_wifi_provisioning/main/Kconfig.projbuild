@@ -1,0 +1,15 @@
+menu "Example Configuration"
+
+config SERVER_IP
+    string "Server IP address"
+        default "192.168.0.1"
+        help
+            Server IP address.
+
+config SERVER_PORT
+    int "Server port"
+        default "8070"
+        help
+            Server port.
+
+endmenu
