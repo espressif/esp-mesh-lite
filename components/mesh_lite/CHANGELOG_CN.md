@@ -1,6 +1,6 @@
 # ChangeLog
 
-## v0.10.6 - 2024-7-5
+## v1.0.0 - 2024-7-12
 
 ### 功能:
 
@@ -11,6 +11,7 @@
 
 #### Bugfix
 
+- 修复内部通信数据解析异常导致的 crash ([1881ef8](https://github.com/espressif/esp-mesh-lite/commit/1881ef8ad900e31902131e62e27b7b848c1a686a))
 - 修复连接加密方式为 WEP/WPA 的路由器失败 ([80adbff](https://github.com/espressif/esp-mesh-lite/commit/80adbffb478d852256cc5fb36a1bca96956427af))
 
 ## v0.10.5 - 2024-6-7
