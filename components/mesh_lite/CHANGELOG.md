@@ -2,9 +2,20 @@
 
 # ChangeLog
 
+## v1.0.1 - 2024-7-15
+
+### Enhancements:
+
+#### Mesh
+
+- feat: optimize networking speed ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
+- feat: add eth_got_ip event handler for lan ota ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
+- feat: Attempt to optimize the current topology when changing levels ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
+- feat: Optimize fusion handler when the rssi between two roots is to low ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
+
 ## v1.0.0 - 2024-7-12
 
-### 功能:
+### Enhancements:
 
 #### Mesh
 
@@ -18,7 +29,7 @@
 
 ## v0.10.5 - 2024-6-7
 
-### 功能:
+### Enhancements:
 
 #### Bugfix
 
@@ -37,7 +48,7 @@
 
 ## v0.10.4 - 2024-5-22
 
-### 功能:
+### Enhancements:
 
 #### Mesh
 
@@ -52,7 +63,7 @@
 
 ## v0.10.3 - 2024-4-24
 
-### 功能:
+### Enhancements:
 
 #### Bugfix
 
@@ -60,7 +71,7 @@
 
 ## v0.10.2 - 2024-4-8
 
-### 功能:
+### Enhancements:
 
 #### Mesh
 
