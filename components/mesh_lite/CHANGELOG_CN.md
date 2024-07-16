@@ -1,11 +1,12 @@
 # ChangeLog
 
-## v1.0.1 - 2024-7-15
+## v1.0.1 - 2024-7-16
 
 ### 功能:
 
 #### Mesh
 
+- 支持内部通信通过 Proto buffer 来传输二进制数据 ([27c511c](https://github.com/espressif/esp-mesh-lite/commit/27c511cc9a80304f68f5bf7e6e7fe3e073d21095))
 - 优化网络组建速度 ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
 - 在层级变更时尝试优化当前拓扑结构 ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
 - 在 LAN OTA 中增加 eth_got_ip 事件处理 ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))

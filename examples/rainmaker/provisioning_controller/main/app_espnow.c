@@ -29,6 +29,8 @@ static TaskHandle_t group_control_handle = NULL;
 static QueueHandle_t espnow_recv_queue = NULL;
 static SemaphoreHandle_t sent_msgs_mutex = NULL;
 
+static uint8_t s_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+
 typedef struct esp_now_msg_send {
     uint32_t retry_times;
     uint32_t max_retry;
