@@ -1,8 +1,8 @@
 set(srcs "src/esp_mesh_lite_espnow.c")
-set(require_components "json" "esp_wifi" "app_update" "wifi_provisioning" "qrcode" "nvs_flash")
+set(require_components "json" "esp_wifi" "app_update" "wifi_provisioning" "qrcode" "nvs_flash" "protobuf-c")
 
 if (CONFIG_MESH_LITE_ENABLE)
-    list(APPEND srcs "src/esp_mesh_lite.c" "src/esp_mesh_lite_port.c" "src/esp_mesh_lite_log.c")
+    list(APPEND srcs "src/esp_mesh_lite.c" "src/esp_mesh_lite_port.c" "src/esp_mesh_lite_log.c" "src/mesh_lite.pb-c.c")
     list(APPEND srcs "src/wifi_prov/wifi_prov_mgr.c" "src/wifi_prov/zero_provisioning.c")
 
     set(OLD_PROV_MGR "${IDF_PATH}/components/wifi_provisioning/src/")

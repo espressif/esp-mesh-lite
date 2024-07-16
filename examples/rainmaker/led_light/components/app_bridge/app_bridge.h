@@ -16,6 +16,12 @@ typedef enum {
     ESP_MESH_LITE_EVENT_CHILD_NODE_LEAVE,
 } mesh_lite_event_child_node_info_t;
 
+typedef struct app_node_info {
+    uint8_t level;
+    char ip[IP_MAX_LEN];
+    char mac[MAC_MAX_LEN];
+} app_node_info_t;
+
 /* Enable ESP IoT Bridge in the application
  *
  * @return ESP_OK on success.

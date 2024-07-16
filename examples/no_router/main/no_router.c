@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2022-2023 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2022-2024 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -48,6 +48,16 @@ static void print_system_info_timercb(TimerHandle_t timer)
 
     for (int i = 0; i < wifi_sta_list.num; i++) {
         ESP_LOGI(TAG, "Child mac: " MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));
+    }
+
+    uint32_t size = 0;
+    node_info_list_t *node = esp_mesh_lite_get_nodes_list(&size);
+    printf("MeshLite nodes %ld:\r\n", size);
+    for (uint32_t loop = 0; (loop < size) && (node != NULL); loop++) {
+        struct in_addr ip_struct;
+        ip_struct.s_addr = node->node->ip_addr;
+        printf("%ld: %d, "MACSTR", %s\r\n" , loop + 1, node->node->level, MAC2STR(node->node->mac_addr), inet_ntoa(ip_struct));
+        node = node->next;
     }
 }
 
@@ -98,9 +108,7 @@ void app_wifi_set_softap_info(void)
 
 void app_main()
 {
-    /**
-     * @brief Set the log level for serial port printing.
-     */
+    // Set the log level for serial port printing.
     esp_log_level_set("*", ESP_LOG_INFO);
 
     esp_storage_init();

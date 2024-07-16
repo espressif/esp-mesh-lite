@@ -348,7 +348,7 @@ static void ip_event_handler(void *arg, esp_event_base_t event_base,
 static void esp_mesh_lite_handler(void *arg, esp_event_base_t event_base,
                                   int32_t event_id, void *event_data)
 {
-    esp_mesh_lite_node_info_t *event = (esp_mesh_lite_node_info_t *) event_data;
+    app_node_info_t *event = (app_node_info_t *) event_data;
     switch (event_id) {
     case ESP_MESH_LITE_EVENT_CORE_INHERITED_NET_SEGMENT_CHANGED:
         app_rmaker_mesh_lite_self_ip_update_and_report(NULL, NULL);

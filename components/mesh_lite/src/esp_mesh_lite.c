@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2022-2023 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2022-2024 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -20,6 +20,7 @@
 #include "esp_bridge.h"
 
 #include "esp_mesh_lite.h"
+#include "mesh_lite.pb-c.h"
 
 static const char *TAG = "Mesh-Lite";
 
@@ -27,49 +28,73 @@ static const char *TAG = "Mesh-Lite";
 
 #define MAX_RETRY  5
 
-typedef struct node_info_list {
-    esp_mesh_lite_node_info_t* node;
-    uint32_t ttl;
-    struct node_info_list* next;
-} node_info_list_t;
-
-static node_info_list_t* node_info_list = NULL;
+static uint32_t nodes_num = 0;
+static node_info_list_t *node_info_list = NULL;
 static SemaphoreHandle_t node_info_mutex;
+
+static esp_err_t esp_mesh_lite_node_info_add(uint8_t level, char* mac);
+static esp_err_t esp_mesh_lite_node_info_update(uint8_t level, uint8_t* mac, uint32_t ip_addr);
+static esp_err_t esp_mesh_lite_update_nodes_info_to_children(void);
+
+const node_info_list_t *esp_mesh_lite_get_nodes_list(uint32_t *size)
+{
+    if (size) {
+        *size = nodes_num;
+    }
+    return node_info_list;
+}
 
 esp_err_t esp_mesh_lite_report_info(void)
 {
     uint8_t mac[6];
-    cJSON *item = NULL;
-    char mac_str[MAC_MAX_LEN];
+    esp_netif_ip_info_t ip_addr;
+    esp_netif_t *external_netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF");
 
     esp_wifi_get_mac(WIFI_IF_STA, mac);
-    snprintf(mac_str, sizeof(mac_str), MACSTR, MAC2STR(mac));
+    esp_netif_get_ip_info(external_netif, &ip_addr);
 
-    item = cJSON_CreateObject();
-    if (item) {
-        cJSON_AddNumberToObject(item, "level", esp_mesh_lite_get_level());
-        cJSON_AddStringToObject(item, "mac", mac_str);
-        esp_mesh_lite_try_sending_msg("report_info", "report_info_ack", MAX_RETRY, item, &esp_mesh_lite_send_msg_to_root);
-        cJSON_Delete(item);
+    if (esp_mesh_lite_get_level() < ROOT) {
+        return ESP_OK;
     }
+
+    if (esp_mesh_lite_get_level() == ROOT) {
+        esp_mesh_lite_node_info_update(ROOT, mac, ip_addr.ip.addr);
+        return ESP_OK;
+    }
+
+    MeshLite__NodeData req;
+    mesh_lite__node_data__init(&req);
+    req.node_level = esp_mesh_lite_get_level();
+    req.node_ip = ip_addr.ip.addr;
+    req.node_mac.len = ETH_HWADDR_LEN;
+    req.node_mac.data = mac;
+    uint32_t outlen = mesh_lite__node_data__get_packed_size(&req);
+    uint8_t *outdata = malloc(outlen);
+    mesh_lite__node_data__pack(&req, outdata);
+    esp_mesh_lite_try_sending_raw_msg(MESH_LITE_MSG_ID_REPORT_NODE_INFO, MESH_LITE_MSG_ID_REPORT_NODE_INFO_RESP, 3, outdata, outlen, esp_mesh_lite_send_raw_msg_to_root);
+    free(outdata);
 
     return ESP_OK;
 }
 
-static esp_err_t esp_mesh_lite_node_info_add(uint8_t level, char* mac)
+static esp_err_t esp_mesh_lite_node_info_update(uint8_t level, uint8_t* mac, uint32_t ip_addr)
 {
     xSemaphoreTake(node_info_mutex, portMAX_DELAY);
     node_info_list_t* new = node_info_list;
 
     while (new) {
-        if (!strncmp(new->node->mac, mac, (MAC_MAX_LEN - 1))) {
-            if (new->node->level != level) {
+        if (!memcmp(new->node->mac_addr, mac, ETH_HWADDR_LEN)) {
+            new->ttl = (CONFIG_MESH_LITE_REPORT_INTERVAL + MESH_LITE_REPORT_INTERVAL_BUFFER);
+            if ((new->node->level != level) || (new->node->ip_addr != ip_addr)) {
                 new->node->level = level;
-                esp_event_post(ESP_MESH_LITE_EVENT, ESP_MESH_LITE_EVENT_NODE_CHANGE, new->node, sizeof(esp_mesh_lite_node_info_t), 0);
+                new->node->ip_addr = ip_addr;
+            } else {
+                xSemaphoreGive(node_info_mutex);
+                return ESP_ERR_DUPLICATE_ADDITION;
             }
-            new->ttl = (CONFIG_MESH_LITE_REPORT_INTERVAL + 10);
             xSemaphoreGive(node_info_mutex);
-            return ESP_ERR_DUPLICATE_ADDITION;
+            esp_event_post(ESP_MESH_LITE_EVENT, ESP_MESH_LITE_EVENT_NODE_CHANGE, new->node, sizeof(esp_mesh_lite_node_info_t), 0);
+            return ESP_OK;
         }
         new = new->next;
     }
@@ -90,41 +115,124 @@ static esp_err_t esp_mesh_lite_node_info_add(uint8_t level, char* mac)
         return ESP_ERR_NO_MEM;
     }
 
-    memcpy(new->node->mac, mac, MAC_MAX_LEN);
+    memcpy(new->node->mac_addr, mac, ETH_HWADDR_LEN);
     new->node->level = level;
-    new->ttl = (CONFIG_MESH_LITE_REPORT_INTERVAL + 10);
+    new->node->ip_addr = ip_addr;
+    new->ttl = (CONFIG_MESH_LITE_REPORT_INTERVAL + MESH_LITE_REPORT_INTERVAL_BUFFER);
 
     new->next = node_info_list;
     node_info_list = new;
+    nodes_num++;
 
-    esp_event_post(ESP_MESH_LITE_EVENT, ESP_MESH_LITE_EVENT_NODE_JOIN, new->node, sizeof(esp_mesh_lite_node_info_t), 0);
     xSemaphoreGive(node_info_mutex);
+    esp_event_post(ESP_MESH_LITE_EVENT, ESP_MESH_LITE_EVENT_NODE_JOIN, new->node, sizeof(esp_mesh_lite_node_info_t), 0);
     return ESP_OK;
 }
 
-static cJSON* report_info_process(cJSON *payload, uint32_t seq)
+static esp_err_t mesh_lite_report_nodes_handler(uint8_t *data, uint32_t len, uint8_t **out_data, uint32_t* out_len, uint32_t seq)
 {
-    cJSON *found = NULL;
+    MeshLite__NodeData* req = NULL;
+    esp_err_t ret = ESP_FAIL;
 
-    found = cJSON_GetObjectItem(payload, "level");
-    uint8_t level = found->valueint;
-    found = cJSON_GetObjectItem(payload, "mac");
+    *out_len = 0;
+    if (esp_mesh_lite_get_level() != ROOT) {
+        return ESP_ERR_NOT_SUPPORTED;
+    }
 
-    esp_mesh_lite_node_info_add(level, found->valuestring);
-    return NULL;
+    req = mesh_lite__node_data__unpack(NULL, len, data);
+
+    if (req) {
+        if (req->node_mac.len > 0) {
+            if ((req->node_level > 0) && (req->node_ip > 0)) {
+                ret = esp_mesh_lite_node_info_update(req->node_level, req->node_mac.data, req->node_ip);
+                if (ret == ESP_OK) {
+                    esp_mesh_lite_update_nodes_info_to_children();
+                } else if (ret == ESP_ERR_DUPLICATE_ADDITION) {
+                    ret = ESP_OK;
+                }
+            }
+        }
+        mesh_lite__node_data__free_unpacked(req, NULL);
+    }
+
+    return ret;
 }
 
-static cJSON* report_info_ack_process(cJSON *payload, uint32_t seq)
+static esp_err_t mesh_lite_update_nodes_list(uint8_t *data, uint32_t len, uint8_t **out_data, uint32_t* out_len, uint32_t seq)
 {
-    return NULL;
+    esp_err_t ret = ESP_OK;
+    MeshLite__Data* req = NULL;
+
+    *out_len = 0;
+    if (esp_mesh_lite_get_level() <= ROOT) {
+        return ESP_ERR_NOT_SUPPORTED;
+    }
+
+    req = mesh_lite__data__unpack(NULL, len, data);
+    if (req) {
+        if (req->n_nodes > 0) {
+            MeshLite__NodeData** node_data = req->nodes;
+            xSemaphoreTake(node_info_mutex, portMAX_DELAY);
+            node_info_list_t* current = node_info_list;
+            while (current) {
+                current->ttl = MESH_LITE_REPORT_INTERVAL_BUFFER;
+                current = current->next;
+            }
+            xSemaphoreGive(node_info_mutex);
+            for (uint32_t loop = 0; loop < req->n_nodes; loop++) {
+                if (node_data[loop]->node_mac.len > 0) {
+                    ret = esp_mesh_lite_node_info_update(node_data[loop]->node_level, node_data[loop]->node_mac.data, node_data[loop]->node_ip);
+                    if ((ret != ESP_ERR_DUPLICATE_ADDITION) && (ret != ESP_OK)) {
+                        ret = ESP_FAIL;
+                        break;
+                    }
+                }
+            }
+            xSemaphoreTake(node_info_mutex, portMAX_DELAY);
+            current = node_info_list;
+            node_info_list_t* prev = NULL;
+
+            while (current) {
+                if (current->ttl <= MESH_LITE_REPORT_INTERVAL_BUFFER) {
+                    esp_event_post(ESP_MESH_LITE_EVENT, ESP_MESH_LITE_EVENT_NODE_LEAVE, current->node, sizeof(esp_mesh_lite_node_info_t), 0);
+                    if (node_info_list == current) {
+                        node_info_list = current->next;
+                        free(current->node);
+                        free(current);
+                        current = node_info_list;
+                    } else {
+                        prev->next = current->next;
+                        free(current->node);
+                        free(current);
+                        current = prev->next;
+                    }
+                    nodes_num--;
+                    continue;
+                }
+                prev = current;
+                current = current->next;
+            }
+            xSemaphoreGive(node_info_mutex);
+        }
+        mesh_lite__data__free_unpacked(req, NULL);
+    }
+
+    esp_mesh_lite_try_sending_raw_msg(MESH_LITE_MSG_ID_UPDATE_NODES_LIST, 0, 3, data, len, esp_mesh_lite_send_broadcast_raw_msg_to_child);
+    return ret;
 }
 
-static const esp_mesh_lite_msg_action_t node_report_action[] = {
+static esp_err_t mesh_lite_report_nodes_resp_handler(uint8_t *data, uint32_t len, uint8_t **out_data, uint32_t* out_len, uint32_t seq)
+{
+    return ESP_OK;
+}
+
+static const esp_mesh_lite_raw_msg_action_t raw_msgs_action[] = {
     /* Report information to the root node */
-    {"report_info", "report_info_ack", report_info_process},
-    {"report_info_ack", NULL, report_info_ack_process},
+    {MESH_LITE_MSG_ID_REPORT_NODE_INFO, MESH_LITE_MSG_ID_REPORT_NODE_INFO_RESP, mesh_lite_report_nodes_handler},
+    {MESH_LITE_MSG_ID_REPORT_NODE_INFO_RESP, 0, mesh_lite_report_nodes_resp_handler},
 
-    {NULL, NULL, NULL} /* Must be NULL terminated */
+    {MESH_LITE_MSG_ID_UPDATE_NODES_LIST, 0, mesh_lite_update_nodes_list},
+    {0, 0, NULL}
 };
 
 static void root_timer_cb(TimerHandle_t timer)
@@ -154,6 +262,7 @@ static void root_timer_cb(TimerHandle_t timer)
                 free(current);
                 current = prev->next;
             }
+            nodes_num--;
             continue;
         } else {
             current->ttl--;
@@ -164,39 +273,71 @@ static void root_timer_cb(TimerHandle_t timer)
     xSemaphoreGive(node_info_mutex);
 }
 
+static esp_err_t esp_mesh_lite_update_nodes_info_to_children(void)
+{
+    MeshLite__Data req;
+    uint32_t total_num = 0;
+
+    mesh_lite__data__init(&req);
+    const node_info_list_t *node = esp_mesh_lite_get_nodes_list(&total_num);
+    if (total_num > 0) {
+        uint32_t loop = 0;
+        req.nodes = malloc(total_num * sizeof(MeshLite__NodeData*));
+        for (loop = 0; (loop < total_num) && (node != NULL); loop++) {
+            req.nodes[loop] = malloc(sizeof(MeshLite__NodeData));
+            mesh_lite__node_data__init(req.nodes[loop]);
+            req.nodes[loop]->node_level = node->node->level;
+            req.nodes[loop]->node_ip = node->node->ip_addr;
+            req.nodes[loop]->node_mac.len = ETH_HWADDR_LEN;
+            req.nodes[loop]->node_mac.data = malloc(ETH_HWADDR_LEN);
+            memcpy(req.nodes[loop]->node_mac.data, node->node->mac_addr, ETH_HWADDR_LEN);
+            node = node->next;
+        }
+        req.n_nodes = loop;
+        size_t outlen = mesh_lite__data__get_packed_size(&req);
+        uint8_t* outdata = malloc(outlen);
+        mesh_lite__data__pack(&req, outdata);
+        for (uint32_t i = 0; i < loop; i++) {
+            free(req.nodes[i]->node_mac.data);
+            free(req.nodes[i]);
+        }
+        free(req.nodes);
+
+        esp_mesh_lite_try_sending_raw_msg(MESH_LITE_MSG_ID_UPDATE_NODES_LIST, 0, 3, outdata, outlen, esp_mesh_lite_send_broadcast_raw_msg_to_child);
+        free(outdata);
+    }
+    return ESP_OK;
+}
+
 static void report_timer_cb(TimerHandle_t timer)
 {
-    if (esp_mesh_lite_get_level() > ROOT) {
-        esp_mesh_lite_report_info();
+    esp_mesh_lite_report_info();
+
+    if (esp_mesh_lite_get_level() == ROOT) {
+        esp_mesh_lite_update_nodes_info_to_children();
     }
 }
 
-static void esp_mesh_lite_event_ip_event_handler(void *arg, esp_event_base_t event_base,
-                                                 int32_t event_id, void *event_data)
+static void esp_mesh_lite_event_got_ip_handler(void *arg, esp_event_base_t event_base,
+                                               int32_t event_id, void *event_data)
 {
-    if (esp_mesh_lite_get_level() > 1) {
-        esp_mesh_lite_report_info();
-    }
+    esp_mesh_lite_report_info();
 }
-#endif /* MESH_LITE_NODE_INFO_REPORT */
 
-uint8_t esp_mesh_lite_get_child_node_number(void)
+static void esp_mesh_lite_event_ap_sta_ip_assigned_handler(void *arg, esp_event_base_t event_base,
+                                                           int32_t event_id, void *event_data)
 {
-    uint8_t node_number = 0;
+    esp_mesh_lite_report_info();
+}
+#endif // CONFIG_MESH_LITE_NODE_INFO_REPORT
+
+uint32_t esp_mesh_lite_get_child_node_number(void)
+{
 #ifdef CONFIG_MESH_LITE_NODE_INFO_REPORT
-    node_info_list_t* current = node_info_list;
-
-    if (xSemaphoreTake(node_info_mutex, portMAX_DELAY) != pdTRUE) {
-        return node_number;
-    }
-
-    while (current) {
-        node_number++;
-        current = current->next;
-    }
-    xSemaphoreGive(node_info_mutex);
-#endif /* MESH_LITE_NODE_INFO_REPORT */
-    return node_number;
+    return nodes_num;
+#else
+    return 0;
+#endif
 }
 
 static void esp_mesh_lite_event_ip_changed_handler(void *arg, esp_event_base_t event_base,
@@ -253,10 +394,12 @@ void esp_mesh_lite_init(esp_mesh_lite_config_t* config)
 
     esp_mesh_lite_core_init(config);
 #if CONFIG_MESH_LITE_NODE_INFO_REPORT
-    esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &esp_mesh_lite_event_ip_event_handler, NULL, NULL);
+    esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &esp_mesh_lite_event_got_ip_handler, NULL, NULL);
+    esp_event_handler_instance_register(IP_EVENT, IP_EVENT_AP_STAIPASSIGNED, &esp_mesh_lite_event_ap_sta_ip_assigned_handler, NULL, NULL);
 
     node_info_mutex = xSemaphoreCreateMutex();
-    esp_mesh_lite_msg_action_list_register(node_report_action);
+
+    esp_mesh_lite_raw_msg_action_list_register(raw_msgs_action);
 
     TimerHandle_t report_timer = xTimerCreate("report_timer", CONFIG_MESH_LITE_REPORT_INTERVAL * 1000 / portTICK_PERIOD_MS,
                                               pdTRUE, NULL, report_timer_cb);

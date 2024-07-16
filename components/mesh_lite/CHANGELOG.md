@@ -2,14 +2,15 @@
 
 # ChangeLog
 
-## v1.0.1 - 2024-7-15
+## v1.0.1 - 2024-7-16
 
 ### Enhancements:
 
 #### Mesh
 
-- feat: optimize networking speed ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
-- feat: add eth_got_ip event handler for lan ota ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
+- feat: Support internal communication to transmit binary data through Proto buffer ([27c511c](https://github.com/espressif/esp-mesh-lite/commit/27c511cc9a80304f68f5bf7e6e7fe3e073d21095))
+- feat: Optimize networking speed ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
+- feat: Add eth_got_ip event handler for lan ota ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
 - feat: Attempt to optimize the current topology when changing levels ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
 - feat: Optimize fusion handler when the rssi between two roots is to low ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
 

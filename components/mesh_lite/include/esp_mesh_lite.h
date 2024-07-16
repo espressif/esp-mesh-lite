@@ -36,18 +36,62 @@ void esp_mesh_lite_init(esp_mesh_lite_config_t* config);
  */
 void esp_mesh_lite_start(void);
 
+#if CONFIG_MESH_LITE_NODE_INFO_REPORT
+#define MESH_LITE_REPORT_INTERVAL_BUFFER            10
+
+#ifndef ETH_HWADDR_LEN
+#define ETH_HWADDR_LEN       6
+#endif
+
 typedef struct  esp_mesh_lite_node_info {
     uint8_t level;
-    char mac[MAC_MAX_LEN];
-    char ip[IP_MAX_LEN];
+    uint32_t ip_addr;
+    uint8_t mac_addr[ETH_HWADDR_LEN];
 } esp_mesh_lite_node_info_t;
 
-#if CONFIG_MESH_LITE_NODE_INFO_REPORT
+typedef struct node_info_list {
+    struct node_info_list* next;
+    esp_mesh_lite_node_info_t* node;
+    uint32_t ttl;
+} node_info_list_t;
+
+typedef enum {
+    MESH_LITE_MSG_ID_INVALID = 0,
+    MESH_LITE_MSG_ID_REPORT_NODE_INFO,
+    MESH_LITE_MSG_ID_REPORT_NODE_INFO_RESP,
+    MESH_LITE_MSG_ID_UPDATE_NODES_LIST,
+} esp_mesh_lite_msg_id_t;
+
 /**
- * @brief child nodes report mac and level information to the root node.
+ * @brief Child nodes report MAC and level information to the root node.
  *
+ * This function is used by child nodes in the mesh network to report their MAC address
+ * and network level information to the root node.
+ *
+ * @return
+ *      - ESP_OK: Successfully reported the information.
+ *      - ESP_FAIL: Failed to report the information.
+ *      - Other error codes: As defined in esp_err_t.
  */
 esp_err_t esp_mesh_lite_report_info(void);
+
+/**
+ * @brief Get the list of nodes in the mesh network.
+ *
+ * This function retrieves the list of nodes currently connected in the mesh network.
+ * The list includes details such as the MAC address and network level of each node.
+ *
+ * @param[out] size Pointer to a variable where the number of nodes in the list will be stored.
+ *                  This value will be set to the number of nodes in the returned list.
+ *
+ * @return
+ *      - Pointer to the list of node information structures (node_info_list_t*).
+ *      - NULL: If the list could not be retrieved or is empty.
+ *
+ * @note The returned pointer should not be modified or freed by the caller.
+ */
+const node_info_list_t *esp_mesh_lite_get_nodes_list(uint32_t *size);
+
 #endif /* CONFIG_MESH_LITE_NODE_INFO_REPORT */
 
 /**
@@ -57,7 +101,7 @@ esp_err_t esp_mesh_lite_report_info(void);
  *
  * @return the child node number of Mesh-Lite
  */
-uint8_t esp_mesh_lite_get_child_node_number(void);
+uint32_t esp_mesh_lite_get_child_node_number(void);
 
 /**
  * @brief Get the softap ssid from NVS
