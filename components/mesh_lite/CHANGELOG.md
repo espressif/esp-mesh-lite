@@ -2,7 +2,7 @@
 
 # ChangeLog
 
-## v1.0.1 - 2024-7-16
+## v1.0.1 - 2024-7-19
 
 ### Enhancements:
 
@@ -13,6 +13,11 @@
 - feat: Add eth_got_ip event handler for lan ota ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
 - feat: Attempt to optimize the current topology when changing levels ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
 - feat: Optimize fusion handler when the rssi between two roots is to low ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
+
+#### Bugfix
+
+- Fix the crash caused by internal communication issues introduced by [27c511c](https://github.com/espressif/esp-mesh-lite/commit/27c511cc9a80304f68f5bf7e6e7fe3e073d21095) ([2979846](https://github.com/espressif/esp-mesh-lite/commit/29798464f85f636eb640e867371fa7716d31d8ff))
+- Fix the memory leak introduced by [27c511c](https://github.com/espressif/esp-mesh-lite/commit/27c511cc9a80304f68f5bf7e6e7fe3e073d21095) ([2979846](https://github.com/espressif/esp-mesh-lite/commit/29798464f85f636eb640e867371fa7716d31d8ff))
 
 ## v1.0.0 - 2024-7-12
 
