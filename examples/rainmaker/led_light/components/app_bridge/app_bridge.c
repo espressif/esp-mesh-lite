@@ -15,14 +15,11 @@
 
 #include "nvs.h"
 #include "esp_log.h"
+#include "esp_mac.h"
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_system.h"
 #include "esp_netif.h"
-
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
-#include "esp_mac.h"
-#endif
 
 #include "esp_bridge.h"
 #include "esp_mesh_lite.h"

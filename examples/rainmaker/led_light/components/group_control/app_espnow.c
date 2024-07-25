@@ -11,6 +11,7 @@
 #include "freertos/semphr.h"
 #include "cJSON.h"
 #include "esp_log.h"
+#include "esp_mac.h"
 #include "esp_timer.h"
 #include "esp_netif_types.h"
 
@@ -19,10 +20,6 @@
 #include "app_bridge.h"
 #include "esp_mesh_lite.h"
 #include "wifi_provisioning/manager.h"
-
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
-#include "esp_mac.h"
-#endif
 
 extern char group_control_payload[ESPNOW_PAYLOAD_MAX_LEN];
 

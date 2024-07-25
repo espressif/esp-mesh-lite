@@ -13,16 +13,7 @@
 #include <esp_event.h>
 #include <esp_log.h>
 #include <esp_idf_version.h>
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 1, 0)
-// Features supported in 4.1+
-#define ESP_NETIF_SUPPORTED
-#endif
-
-#ifdef ESP_NETIF_SUPPORTED
 #include <esp_netif.h>
-#else
-#include <tcpip_adapter.h>
-#endif
 
 #include <wifi_provisioning/manager.h>
 #ifdef CONFIG_APP_WIFI_PROV_TRANSPORT_BLE
@@ -255,13 +246,9 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 #ifdef CONFIG_APP_WIFI_RESET_PROV_ON_FAILURE
             retries++;
             if (retries >= CONFIG_APP_WIFI_PROV_MAX_RETRY_CNT) {
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 3, 1)
                 ESP_LOGI(TAG, "Failed to connect with provisioned AP, reseting provisioned credentials");
                 wifi_prov_mgr_reset_sm_state_on_failure();
                 esp_event_post(APP_WIFI_EVENT, APP_WIFI_EVENT_PROV_RESTART, NULL, 0, portMAX_DELAY);
-#else
-                ESP_LOGW(TAG, "Failed to connect with provisioned AP, please reset to provisioning manually");
-#endif
                 retries = 0;
             }
 #endif
@@ -600,9 +587,8 @@ esp_err_t app_wifi_start(app_wifi_pop_type_t pop_type)
     /* If device is not yet provisioned start provisioning service */
     if (!provisioned) {
         ESP_LOGI(TAG, "Starting provisioning");
-#ifdef ESP_NETIF_SUPPORTED
+
         // esp_netif_create_default_wifi_ap();
-#endif
 
         /* What is the Device Service Name that we want
          * This translates to :

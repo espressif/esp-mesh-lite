@@ -157,11 +157,7 @@ static void esp_rmaker_mesh_lite_ota_url_handler(const char *topic, void *payloa
 #ifdef CONFIG_ESP_MESH_LITE_OTA_ENABLE
     if (esp_mesh_lite_get_level() > 1) {
         const esp_app_desc_t *app_desc;
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
         app_desc = esp_app_get_description();
-#else
-        app_desc = esp_ota_get_app_description();
-#endif
         ESP_LOGI(TAG, "OTA Image version for Project: %s. Expected: %s",
                  app_desc->version, fw_version);
         if (!strncmp(app_desc->version, fw_version, strnlen(fw_version, sizeof(app_desc->version)))) {

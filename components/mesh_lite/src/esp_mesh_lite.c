@@ -12,13 +12,8 @@
 #include "freertos/task.h"
 #include "freertos/timers.h"
 #include "freertos/FreeRTOS.h"
-
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
 #include "esp_mac.h"
-#endif
-
 #include "esp_bridge.h"
-
 #include "esp_mesh_lite.h"
 #include "mesh_lite.pb-c.h"
 

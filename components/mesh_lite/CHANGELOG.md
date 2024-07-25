@@ -2,12 +2,13 @@
 
 # ChangeLog
 
-## v1.0.1 - 2024-7-19
+## v1.0.1 - 2024-7-25
 
 ### Enhancements:
 
 #### Mesh
 
+- feat: Supports receiving data sent by the native ESP-NOW API ([a6f1544](https://github.com/espressif/esp-mesh-lite/commit/a6f15443857f87b721952bec79f237b98d39f66f))
 - feat: Support internal communication to transmit binary data through Proto buffer ([27c511c](https://github.com/espressif/esp-mesh-lite/commit/27c511cc9a80304f68f5bf7e6e7fe3e073d21095))
 - feat: Optimize networking speed ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
 - feat: Add eth_got_ip event handler for lan ota ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
