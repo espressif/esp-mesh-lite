@@ -1,11 +1,12 @@
 # ChangeLog
 
-## v1.0.1 - 2024-7-19
+## v1.0.1 - 2024-7-25
 
 ### 功能:
 
 #### Mesh
 
+- 支持接收原生 espnow API 发送的的数据 ([a6f1544](https://github.com/espressif/esp-mesh-lite/commit/a6f15443857f87b721952bec79f237b98d39f66f))
 - 支持内部通信通过 Proto buffer 来传输二进制数据 ([27c511c](https://github.com/espressif/esp-mesh-lite/commit/27c511cc9a80304f68f5bf7e6e7fe3e073d21095))
 - 优化网络组建速度 ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
 - 在层级变更时尝试优化当前拓扑结构 ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))

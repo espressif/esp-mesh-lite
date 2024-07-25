@@ -16,7 +16,7 @@
 #define IS_BROADCAST_ADDR(addr) ((((uint8_t*)addr)[0] == 0xFF) && (((uint8_t*)addr)[1] == 0xFF) && (((uint8_t*)addr)[2] == 0xFF) \
                                     && (((uint8_t*)addr)[3] == 0xFF) && (((uint8_t*)addr)[4] == 0xFF) && (((uint8_t*)addr)[5] == 0xFF))
 
-typedef void (*espnow_recv_failed_hook_t)(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len);
+typedef void (*esp_mesh_lite_espnow_handler_failed_hook_t)(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len);
 
 typedef enum {
     ESPNOW_DATA_TYPE_MESH_LITE_CORE,
@@ -105,7 +105,7 @@ esp_err_t esp_mesh_lite_espnow_recv_cb_register(esp_mesh_lite_espnow_data_type_t
                                                 void (*recv_cb)(const uint8_t *mac_addr, const uint8_t *data, int len));
 
 /**
- * @brief Register ESP-Mesh-Lite ESP-NOW receive failed callback function
+ * @brief Register ESP-Mesh-Lite ESP-NOW failed handler callback function
  *
  * @param[in] cb  The callback function to be registered.
  *
@@ -113,4 +113,4 @@ esp_err_t esp_mesh_lite_espnow_recv_cb_register(esp_mesh_lite_espnow_data_type_t
  *      - ESP_OK: Callback registration successful
  *      - ESP_FAIL: Failed to register the callback
  */
-esp_err_t esp_mesh_lite_espnow_register_failed_recv_callback(espnow_recv_failed_hook_t cb);
+esp_err_t esp_mesh_lite_espnow_register_handler_failed_callback(esp_mesh_lite_espnow_handler_failed_hook_t cb);

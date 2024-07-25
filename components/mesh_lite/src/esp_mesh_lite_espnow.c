@@ -12,10 +12,10 @@
 #include "esp_mesh_lite.h"
 
 static uint8_t espnow_data[ESPNOW_PAYLOAD_MAX_LEN];
-static espnow_recv_failed_hook_t espnow_recv_failed_hook = NULL;
+static esp_mesh_lite_espnow_handler_failed_hook_t espnow_recv_failed_hook = NULL;
 static espnow_cb_register_t *esp_mesh_lite_espnow_cb_list = NULL;
 
-esp_err_t esp_mesh_lite_espnow_register_failed_recv_callback(espnow_recv_failed_hook_t cb)
+esp_err_t esp_mesh_lite_espnow_register_handler_failed_callback(esp_mesh_lite_espnow_handler_failed_hook_t cb)
 {
     espnow_recv_failed_hook = cb;
     return ESP_OK;
