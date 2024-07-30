@@ -1063,6 +1063,22 @@ esp_err_t esp_mesh_lite_msg_action_list_unregister(const esp_mesh_lite_msg_actio
   *     - Other  : fail
   */
 esp_err_t esp_mesh_lite_aes_set_key(const unsigned char* key, unsigned int keybits);
+
+/**
+  * @brief Get mesh lite log status
+  *
+  * @return
+  *     - true : log is enabled
+  *     - false  : log is disabled
+  */
+bool esp_mesh_lite_core_log_is_enable(void);
+
+/**
+  * @brief Set mesh lite log status
+  *
+  * @param[in]  enable true: enable log output; false: disable log output
+  */
+void esp_mesh_lite_core_log_enable(bool enable);
 #ifdef __cplusplus
 }
 #endif

@@ -10,7 +10,7 @@
 
 #define LOG_COLOR_LEN    8
 
-void esp_mesh_lite_log_write(esp_log_level_t level, const char *tag, const char *format, ...)
+__attribute__((weak)) void esp_mesh_lite_log_write(esp_log_level_t level, const char *tag, const char *format, ...)
 {
     char letter = 'I';
     char log_color[LOG_COLOR_LEN] = {0};
