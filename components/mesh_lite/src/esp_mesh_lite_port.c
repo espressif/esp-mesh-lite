@@ -105,3 +105,20 @@ esp_err_t esp_mesh_lite_get_wifi_config(mesh_lite_sta_config_t *cfg)
 
     return ESP_OK;
 }
+
+esp_err_t esp_mesh_lite_get_ap_config(mesh_lite_ap_config_t *cfg)
+{
+    if (!cfg) {
+        return ESP_FAIL;
+    }
+
+    wifi_config_t wifi_cfg;
+    if (esp_wifi_get_config(WIFI_IF_AP, &wifi_cfg) != ESP_OK) {
+        return ESP_FAIL;
+    }
+
+    memcpy((char *)cfg->ssid, (char *)wifi_cfg.ap.ssid, sizeof(cfg->ssid));
+    strlcpy((char *)cfg->password, (char *)wifi_cfg.ap.password, sizeof(cfg->password));
+
+    return ESP_OK;
+}

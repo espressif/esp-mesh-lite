@@ -6,6 +6,7 @@
 
 #### Mesh
 
+- 兼容旧版本的融合机制 ([870642f](https://github.com/espressif/esp-mesh-lite/commit/870642fb799ec23dc87966d22572dc847a371a3c))
 - 支持接收原生 espnow API 发送的的数据 ([a6f1544](https://github.com/espressif/esp-mesh-lite/commit/a6f15443857f87b721952bec79f237b98d39f66f))
 - 支持内部通信通过 Proto buffer 来传输二进制数据 ([27c511c](https://github.com/espressif/esp-mesh-lite/commit/27c511cc9a80304f68f5bf7e6e7fe3e073d21095))
 - 优化网络组建速度 ([0ba98f0](https://github.com/espressif/esp-mesh-lite/commit/0ba98f0b66a914cee527997fb51cd5106b9f5272))
@@ -15,6 +16,9 @@
 
 #### Bugfix
 
+- 修复层级显示异常 ([870642f](https://github.com/espressif/esp-mesh-lite/commit/870642fb799ec23dc87966d22572dc847a371a3c))
+- 修复层级变更导致拓扑优化时选择最优父节点异常 ([870642f](https://github.com/espressif/esp-mesh-lite/commit/870642fb799ec23dc87966d22572dc847a371a3c))
+- 修复 SSID 隐藏时组网失败 ([870642f](https://github.com/espressif/esp-mesh-lite/commit/870642fb799ec23dc87966d22572dc847a371a3c))
 - 修复 [27c511c](https://github.com/espressif/esp-mesh-lite/commit/27c511cc9a80304f68f5bf7e6e7fe3e073d21095) 引入的内部通信异常导致的 crash ([2979846](https://github.com/espressif/esp-mesh-lite/commit/29798464f85f636eb640e867371fa7716d31d8ff))
 - 修复 [27c511c](https://github.com/espressif/esp-mesh-lite/commit/27c511cc9a80304f68f5bf7e6e7fe3e073d21095) 引入的内存泄漏 ([2979846](https://github.com/espressif/esp-mesh-lite/commit/29798464f85f636eb640e867371fa7716d31d8ff))
 
