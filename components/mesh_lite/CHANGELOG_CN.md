@@ -1,11 +1,12 @@
 # ChangeLog
 
-## v1.0.1 - 2024-7-25
+## v1.0.1 - 2024-7-31
 
 ### 功能:
 
 #### Mesh
 
+- 开放 mesh-lite log 控制 API([defe726](https://github.com/espressif/esp-mesh-lite/commit/defe726f1f98de17f8d1795507dab15ba0bf3917))
 - 兼容旧版本的融合机制 ([870642f](https://github.com/espressif/esp-mesh-lite/commit/870642fb799ec23dc87966d22572dc847a371a3c))
 - 支持接收原生 espnow API 发送的的数据 ([a6f1544](https://github.com/espressif/esp-mesh-lite/commit/a6f15443857f87b721952bec79f237b98d39f66f))
 - 支持内部通信通过 Proto buffer 来传输二进制数据 ([27c511c](https://github.com/espressif/esp-mesh-lite/commit/27c511cc9a80304f68f5bf7e6e7fe3e073d21095))
