@@ -105,7 +105,7 @@ esp_err_t zero_prov_connect_ap(wifi_config_t *wifi_cfg)
 {
     ESP_LOGI(TAG, "ssid:%s, password:%s", wifi_cfg->sta.ssid, wifi_cfg->sta.password);
 #if CONFIG_MESH_LITE_ENABLE
-    mesh_lite_sta_config_t config;
+    mesh_lite_sta_config_t config = {0};
     memcpy((char*)config.ssid, (char*)wifi_cfg->sta.ssid, sizeof(config.ssid));
     memcpy((char*)config.password, (char*)wifi_cfg->sta.password, sizeof(config.password));
     config.bssid_set = wifi_cfg->sta.bssid_set;

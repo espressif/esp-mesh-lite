@@ -129,7 +129,7 @@ esp_err_t __attribute__((weak)) wifi_prov_wifi_connect(wifi_sta_config_t *conf)
 {
     esp_err_t ret = ESP_OK;
 #if CONFIG_MESH_LITE_ENABLE
-    mesh_lite_sta_config_t config;
+    mesh_lite_sta_config_t config = {0};
     memcpy((char*)config.ssid, (char*)conf->ssid, sizeof(config.ssid));
     memcpy((char*)config.password, (char*)conf->password, sizeof(config.password));
     config.bssid_set = conf->bssid_set;
