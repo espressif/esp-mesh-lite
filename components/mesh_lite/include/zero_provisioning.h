@@ -97,4 +97,13 @@ typedef struct {
  */
 esp_err_t zero_prov_init(char *cust_data, char *device_info);
 
+/**
+ * @brief Stop the Zero Provisioning listening service.
+ *
+ * This function stops the Zero Provisioning module from listening for incoming provisioning requests.
+ * It can be called to terminate the provisioning process once it is no longer needed or after a successful
+ * provisioning has been completed.
+ */
+void zero_prov_listening_stop(void);
+
 #endif

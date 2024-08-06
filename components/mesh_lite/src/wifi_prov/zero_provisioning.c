@@ -63,7 +63,6 @@ static esp_timer_handle_t g_timer_handle = NULL, g_listen_timer = NULL;
 static zero_prov_esp_now_data_t *esp_now_data = NULL;
 static zero_prov_idle_node_data_t *idle_br_data = NULL;
 static wifi_config_t *router_cfg = NULL;
-volatile struct tm zero_prov_listening_stop_time;
 
 static void zero_prov_deinit(void);
 esp_err_t zero_prov_br_start(void);
@@ -106,7 +105,8 @@ esp_err_t zero_prov_connect_ap(wifi_config_t *wifi_cfg)
 {
     ESP_LOGI(TAG, "ssid:%s, password:%s", wifi_cfg->sta.ssid, wifi_cfg->sta.password);
 #if CONFIG_MESH_LITE_ENABLE
-    mesh_lite_sta_config_t config = {0};
+    mesh_lite_sta_config_t config;
+    memset(&config, 0x0, sizeof(config));
     memcpy((char*)config.ssid, (char*)wifi_cfg->sta.ssid, sizeof(config.ssid));
     memcpy((char*)config.password, (char*)wifi_cfg->sta.password, sizeof(config.password));
     config.bssid_set = wifi_cfg->sta.bssid_set;
@@ -209,11 +209,12 @@ esp_err_t zero_prov_br_stop(void)
 
 static void zero_prov_broadcast_cb(void *arg)
 {
-    esp_now_peer_info_t peer = {0};
+    esp_now_peer_info_t peer;
+    memset(&peer, 0x0, sizeof(peer));
     static int g_channel_time = 0;
     static uint8_t g_channel_num = 1;
 
-    if (g_channel_time > 5) {
+    if (g_channel_time > 4) {
         g_channel_time = 0;
         if (g_channel_num == 11) {
             g_channel_num = 1;
@@ -227,7 +228,7 @@ static void zero_prov_broadcast_cb(void *arg)
     }
     g_channel_time ++;
 
-    esp_timer_start_once(g_timer_handle, 100 * 1000);
+    esp_timer_start_once(g_timer_handle, 400 * 1000);
 #if ZERO_PROV_DEBUG
     ESP_LOGI(TAG, "Send br to channel[%d] free heap: %"PRIu32"", g_channel_num, esp_get_free_heap_size());
 #endif
@@ -253,7 +254,7 @@ static void resend_timer_timercb(TimerHandle_t timer)
     esp_wifi_set_channel(resend_channel, 0);
     ESP_LOGI(TAG, "set wifi channel:%d", resend_channel);
 
-    esp_err_t ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_RM_ZERO_PROV, resend_mac_addr, (const uint8_t *)pbuf, pbuf->len);
+    esp_err_t ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_ZERO_PROV, resend_mac_addr, (const uint8_t *)pbuf, pbuf->len);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Send error: %d [%s %d]", ret, __func__, __LINE__);
         if (ret == ESP_ERR_ESPNOW_NOT_FOUND) {
@@ -274,7 +275,9 @@ static void resend_timer_timercb(TimerHandle_t timer)
     uint8_t g_channel;
     wifi_second_chan_t g_channel2;
     esp_wifi_get_channel(&g_channel, &g_channel2);
+#if ZERO_PROV_DEBUG
     ESP_LOGI(TAG, "%s %d send unicast data to "MACSTR", channel:%d", __func__, __LINE__, MAC2STR(resend_mac_addr), g_channel);
+#endif
 }
 
 esp_err_t __attribute__((weak)) zero_prov_cust_data_validation(char *cust_data)
@@ -330,11 +333,13 @@ static void zero_prov_recieve_handle(void *arg)
         pbuf->type = ESPNOW_DATA_UNICAST_INFO;
         pbuf->len = length;
 
-        zero_prov_unicast_data_t unicast_data = {0};
-        mesh_lite_sta_config_t router_cfg;
-        esp_mesh_lite_get_router_config(&router_cfg);
-        snprintf((char *)unicast_data.router_ssid, strlen((char *)router_cfg.ssid) + 1, "%s", router_cfg.ssid);
-        snprintf((char *)unicast_data.router_password, strlen((char *)router_cfg.password) + 1, "%s", router_cfg.password);
+        mesh_lite_sta_config_t router_config;
+        zero_prov_unicast_data_t unicast_data;
+        memset(&router_config, 0x0, sizeof(router_config));
+        memset(&unicast_data, 0x0, sizeof(unicast_data));
+        esp_mesh_lite_get_router_config(&router_config);
+        snprintf((char *)unicast_data.router_ssid, strlen((char *)router_config.ssid) + 1, "%s", router_config.ssid);
+        snprintf((char *)unicast_data.router_password, strlen((char *)router_config.password) + 1, "%s", router_config.password);
 #if ZERO_PROV_DEBUG
         // ESP_LOGI(TAG, "unicast_data.router_ssid:%s, unicast_data.router_password:%s", unicast_data.router_ssid, unicast_data.router_password);
 #endif
@@ -360,19 +365,31 @@ static void zero_prov_recieve_handle(void *arg)
         pbuf->crc = 0;
         pbuf->crc = esp_crc16_le(UINT16_MAX, (uint8_t const *)pbuf, pbuf->len);
 
-        esp_err_t ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_RM_ZERO_PROV, recv_cb->mac_addr, (const uint8_t *)pbuf, pbuf->len);
+        esp_err_t ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_ZERO_PROV, recv_cb->mac_addr, (const uint8_t *)pbuf, pbuf->len);
         if (ret != ESP_OK) {
-            ESP_LOGE(TAG, "Send error: %d [%s %d]", ret, __func__, __LINE__);
-            if (ret == ESP_ERR_ESPNOW_NOT_FOUND) {
-                // ESP_ERR_ESPNOW_NOT_FOUND
+            switch (ret) {
+            case ESP_ERR_ESPNOW_NOT_FOUND:
                 zero_prov_del_peer();
+                break;
+
+            case ESP_ERR_ESPNOW_NO_MEM:
+                // ESP_LOGI(TAG, "free heap: %"PRIu32"", esp_get_free_heap_size());
+                break;
+
+            default:
+                ESP_LOGE(TAG, "Send error: %d [%s %d]", ret, __func__, __LINE__);
+                break;
             }
         }
         free(pbuf);
+        esp_now_del_peer(recv_cb->mac_addr);
 #if ZERO_PROV_DEBUG
         ESP_LOGW(TAG, "Receive ESPNOW_DATA_BROADCAST END**********");
 #endif
     } else if (ret == ESPNOW_DATA_UNICAST_INFO) {
+        if (!resend_timer) {
+            goto exit;
+        }
         zero_prov_br_stop();
 #if ZERO_PROV_DEBUG
         ESP_LOGW(TAG, "Receive ESPNOW_DATA_UNICAST_INFO unicast data from: "MACSTR", len: %d", MAC2STR(recv_cb->mac_addr), recv_cb->data_len);
@@ -398,7 +415,7 @@ static void zero_prov_recieve_handle(void *arg)
         esp_wifi_set_channel(date_unicast->channel, 0);
         ESP_LOGI(TAG, "set wifi channel:%d", date_unicast->channel);
 
-        esp_err_t ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_RM_ZERO_PROV, recv_cb->mac_addr, (const uint8_t *)pbuf, pbuf->len);
+        esp_err_t ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_ZERO_PROV, recv_cb->mac_addr, (const uint8_t *)pbuf, pbuf->len);
         if (ret != ESP_OK) {
             ESP_LOGE(TAG, "Send error: %d [%s %d]", ret, __func__, __LINE__);
             if (ret == ESP_ERR_ESPNOW_NOT_FOUND) {
@@ -412,8 +429,9 @@ static void zero_prov_recieve_handle(void *arg)
         uint8_t g_channel;
         wifi_second_chan_t g_channel2;
         esp_wifi_get_channel(&g_channel, &g_channel2);
+#if ZERO_PROV_DEBUG
         ESP_LOGI(TAG, "%s %d send unicast data to "MACSTR", channel:%d", __func__, __LINE__, MAC2STR(recv_cb->mac_addr), g_channel);
-
+#endif
         resend_channel = date_unicast->channel;
         memcpy(resend_mac_addr, recv_cb->mac_addr, ESP_NOW_ETH_ALEN);
         xTimerStart(resend_timer, 0);
@@ -472,17 +490,23 @@ static void zero_prov_recieve_handle(void *arg)
         pbuf->type = ESPNOW_DATA_UNICAST_ACK;
         pbuf->len = length;
 
-        memcpy(pbuf->payload, &zero_prov_listening_stop_time, sizeof(struct tm));
-
         pbuf->crc = 0;
         pbuf->crc = esp_crc16_le(UINT16_MAX, (uint8_t const *)pbuf, pbuf->len);
 
-        esp_err_t ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_RM_ZERO_PROV, recv_cb->mac_addr, (const uint8_t *)pbuf, pbuf->len);
+        esp_err_t ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_ZERO_PROV, recv_cb->mac_addr, (const uint8_t *)pbuf, pbuf->len);
         if (ret != ESP_OK) {
-            ESP_LOGE(TAG, "Send error: %d [%s %d]", ret, __func__, __LINE__);
-            if (ret == ESP_ERR_ESPNOW_NOT_FOUND) {
-                // ESP_ERR_ESPNOW_NOT_FOUND
+            switch (ret) {
+            case ESP_ERR_ESPNOW_NOT_FOUND:
                 zero_prov_del_peer();
+                break;
+
+            case ESP_ERR_ESPNOW_NO_MEM:
+                // ESP_LOGI(TAG, "free heap: %"PRIu32"", esp_get_free_heap_size());
+                break;
+
+            default:
+                ESP_LOGE(TAG, "Send error: %d [%s %d]", ret, __func__, __LINE__);
+                break;
             }
         }
         free(pbuf);
@@ -492,27 +516,31 @@ static void zero_prov_recieve_handle(void *arg)
         ESP_LOGW(TAG, "Receive ESPNOW_DATA_UNICAST_CONFIRM END**********");
 #endif
     } else if (ret == ESPNOW_DATA_UNICAST_ACK) {
-        xTimerStop(resend_timer, 10);
-        xTimerDelete(resend_timer, 10);
+        if (resend_timer != NULL) {
+            if (xTimerIsTimerActive(resend_timer) != pdFALSE) {
+                // xTimer is active, stop it
+                xTimerStop(resend_timer, 10);
+            }
+            xTimerDelete(resend_timer, 10);
+            resend_timer = NULL;
+        }
         ESP_LOGI(TAG, "Receive unicast data from: "MACSTR", len: %d", MAC2STR(recv_cb->mac_addr), recv_cb->data_len);
 #if ZERO_PROV_DEBUG
         ESP_LOG_BUFFER_HEXDUMP("recv 4", recv_cb->data, recv_cb->data_len, ESP_LOG_WARN);
 #endif
-        memcpy(&zero_prov_listening_stop_time, (struct tm*)recvbuf->payload, sizeof(struct tm));
 
-        esp_now_unregister_recv_cb();
         if (s_zero_prov_queue) {
             xQueueReset(s_zero_prov_queue);
         }
 
-        zero_prov_done = true;
-
         zero_prov_restart_softap();
 
-        esp_mesh_lite_set_disallowed_level(1);
-        zero_prov_connect_ap(router_cfg);
-        free(router_cfg);
-        router_cfg = NULL;
+        if (!zero_prov_done) {
+            esp_mesh_lite_set_disallowed_level(1);
+            zero_prov_connect_ap(router_cfg);
+        }
+
+        zero_prov_done = true;
     } else {
         ESP_LOGW(TAG, "Receive error data from: "MACSTR"", MAC2STR(recv_cb->mac_addr));
     }
@@ -528,7 +556,9 @@ static void zero_prov_unicast_handle(void *arg)
     uint8_t g_channel;
     wifi_second_chan_t g_channel2;
     esp_wifi_get_channel(&g_channel, &g_channel2);
+#if ZERO_PROV_DEBUG
     ESP_LOGI(TAG, "send unicast data to "MACSTR", channel:%d", MAC2STR(send_cb->mac_addr), g_channel);
+#endif
 }
 
 static void zero_prov_regist(zero_prov_act_t* pact, zero_prov_table_t* ptable)
@@ -574,7 +604,7 @@ static void zero_prov_send_cb(const uint8_t *mac_addr, esp_now_send_status_t sta
     send_cb->status = status;
     if (s_zero_prov_queue) {
         if (xQueueSend(s_zero_prov_queue, &evt, ESPNOW_MAXDELAY) != pdTRUE) {
-            ESP_LOGW(TAG, "Send send queue fail");
+            ESP_LOGW(TAG, "Send queue fail");
         }
     }
 }
@@ -593,7 +623,7 @@ static void zero_prov_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int 
     memcpy(recv_cb->mac_addr, mac_addr, ESP_NOW_ETH_ALEN);
     recv_cb->data = malloc(len);
     if (recv_cb->data == NULL) {
-        ESP_LOGE(TAG, "Malloc receive data fail");
+        ESP_LOGE(TAG, "Malloc receive data fail. free heap: %"PRIu32"", esp_get_free_heap_size());
         return;
     }
 
@@ -643,10 +673,8 @@ static void zero_prov_task(void *pvParameter)
     }
 }
 
-static void listen_timer_cb(void *arg)
+void zero_prov_listening_stop(void)
 {
-    ESP_LOGW(TAG,"Listening Over");
-
     esp_mesh_lite_set_allowed_level(0);
     esp_mesh_lite_set_disallowed_level(0);
 
@@ -658,6 +686,15 @@ static void listen_timer_cb(void *arg)
         esp_timer_delete(g_listen_timer);
         g_listen_timer = NULL;
     }
+
+    ESP_LOGW(TAG,"Stop Listening");
+}
+
+static void listen_timer_cb(void *arg)
+{
+    ESP_LOGW(TAG,"Listening Over");
+
+    zero_prov_listening_stop();
 }
 
 void zero_prov_listening(uint64_t timeout_s)
@@ -687,10 +724,11 @@ void zero_prov_listening(uint64_t timeout_s)
 static void zero_prov_br_timer_cb(void *arg)
 {
     zero_prov_esp_now_data_t *buf = (zero_prov_esp_now_data_t *)arg;
-    esp_err_t ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_RM_ZERO_PROV, s_broadcast_mac, (const uint8_t *)buf, buf->len);
+    esp_err_t ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_ZERO_PROV, s_broadcast_mac, (const uint8_t *)buf, buf->len);
     if (ret != ESP_OK) {
+#if ZERO_PROV_DEBUG
         ESP_LOGE(TAG, "Send error: %d [%s %d]", ret, __func__, __LINE__);
-
+#endif
         zero_prov_event_t evt;
         evt.id = ZERO_PROV_SEND_BROADCAST;
         if (s_zero_prov_queue) {
@@ -765,7 +803,7 @@ static void zero_prov_event_handler(void* arg, esp_event_base_t event_base, int3
 
 static esp_err_t zero_prov_esp_now_init(void)
 {
-    if(zero_prov_esp_now_init_done) {
+    if (zero_prov_esp_now_init_done) {
         ESP_LOGW(TAG, "fast network have been inited");
         return ESP_ERR_INVALID_STATE;
     }
@@ -779,7 +817,7 @@ static esp_err_t zero_prov_esp_now_init(void)
     }
 
     ESP_ERROR_CHECK( esp_now_register_send_cb(zero_prov_send_cb) );
-    esp_mesh_lite_espnow_recv_cb_register(ESPNOW_DATA_TYPE_RM_ZERO_PROV, zero_prov_recv_cb);
+    esp_mesh_lite_espnow_recv_cb_register(ESPNOW_DATA_TYPE_ZERO_PROV, zero_prov_recv_cb);
 
     esp_now_peer_info_t *peer = malloc(sizeof(esp_now_peer_info_t));
     if (peer == NULL) {
@@ -806,8 +844,6 @@ static esp_err_t zero_prov_esp_now_init(void)
 
 esp_err_t zero_prov_init(char *cust_data, char *device_info)
 {
-    memset(&zero_prov_listening_stop_time, 0x0, sizeof(struct tm));
-
     idle_br_data = calloc(1, sizeof(zero_prov_idle_node_data_t));
     ZERO_PROV_ERR_CHECK(idle_br_data != NULL, "calloc failed", ESP_ERR_NO_MEM);
 
@@ -837,12 +873,14 @@ exit:
 
 static void zero_prov_deinit(void)
 {
-    esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, &zero_prov_event_handler);
-
-    if (zero_prov_esp_now_init_done) {
-        esp_now_unregister_send_cb();
-        zero_prov_esp_now_init_done = false;
+    if (zero_prov_esp_now_init_done == false) {
+        ESP_LOGW(TAG, "fast network have been deinited");
+        return;
     }
+
+    esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, &zero_prov_event_handler);
+    esp_mesh_lite_espnow_recv_cb_unregister(ESPNOW_DATA_TYPE_ZERO_PROV);
+    esp_now_unregister_send_cb();
 
     if (zero_prov_handle) {
         vTaskDelete(zero_prov_handle);
@@ -853,4 +891,11 @@ static void zero_prov_deinit(void)
         vSemaphoreDelete(s_zero_prov_queue);
         s_zero_prov_queue = NULL;
     }
+
+    if (router_cfg) {
+        free(router_cfg);
+        router_cfg = NULL;
+    }
+
+    zero_prov_esp_now_init_done = false;
 }

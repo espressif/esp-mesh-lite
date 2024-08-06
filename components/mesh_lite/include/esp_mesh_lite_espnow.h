@@ -21,7 +21,7 @@ typedef void (*esp_mesh_lite_espnow_handler_failed_hook_t)(const esp_now_recv_in
 typedef enum {
     ESPNOW_DATA_TYPE_MESH_LITE_CORE,
     ESPNOW_DATA_TYPE_RM_GROUP_CONTROL,
-    ESPNOW_DATA_TYPE_RM_ZERO_PROV,
+    ESPNOW_DATA_TYPE_ZERO_PROV,
     ESPNOW_DATA_TYPE_RESERVE,
 } esp_mesh_lite_espnow_data_type_t;
 
