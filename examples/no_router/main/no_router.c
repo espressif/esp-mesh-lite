@@ -48,7 +48,7 @@ static void print_system_info_timercb(TimerHandle_t timer)
     }
 
     uint32_t size = 0;
-    node_info_list_t *node = esp_mesh_lite_get_nodes_list(&size);
+    const node_info_list_t *node = esp_mesh_lite_get_nodes_list(&size);
     printf("MeshLite nodes %ld:\r\n", size);
     for (uint32_t loop = 0; (loop < size) && (node != NULL); loop++) {
         struct in_addr ip_struct;
