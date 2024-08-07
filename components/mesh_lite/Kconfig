@@ -213,6 +213,10 @@ menu "ESP Wi-Fi Mesh Lite"
         config DEVICE_INFO_LENGTH
             int "Device information length"
             default 40
+
+        config ZERO_PROV_LISTENING_TIMEOUT
+            int "Zero Provisioning listening timeout"
+            default 360
     endmenu
 
 endmenu

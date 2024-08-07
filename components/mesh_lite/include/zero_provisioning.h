@@ -10,11 +10,20 @@
 #ifndef zero_prov_H
 #define zero_prov_H
 
-#define ZERO_PROV_QUEUE_SIZE           100
+#define ZERO_PROV_DEBUG                (0)
+#define ZERO_PROV_QUEUE_SIZE           (100)
+#define ZERO_PROV_LISTENING_TIMEOUT    CONFIG_ZERO_PROV_LISTENING_TIMEOUT
 #define ZERO_PROV_ERR_CHECK(a, str, ret) if(!(a)) { \
         ESP_LOGE(TAG,"%s:%d (%s):%s", __FILE__, __LINE__, __FUNCTION__, str); \
         return (ret); \
     }
+#define ZERO_PROV_CHECK_RETURN_VAIL(func_call) \
+    do { \
+        esp_err_t err = (func_call); \
+        if (err == ESP_FAIL) { \
+            ESP_LOGW(TAG, "%s %d %s failed with error: %d", __func__, __LINE__, #func_call, err); \
+        } \
+    } while (0)
 
 typedef enum {
     ZERO_PROV_SEND_BROADCAST,
