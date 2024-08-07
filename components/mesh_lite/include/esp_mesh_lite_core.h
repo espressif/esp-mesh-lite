@@ -81,7 +81,7 @@ extern const char* ESP_MESH_LITE_EVENT;
 /**
  * @brief Define the type for the callback function.
  */
-typedef const uint8_t*(*esp_mesh_lite_get_ssid_by_mac_cb_t)(const uint8_t *bssid);
+typedef const uint8_t*(*esp_mesh_lite_get_ssid_by_mac_cb_t)(const uint8_t *mac);
 
 /**
  * @brief Callback function pointer type for processing received messages.
@@ -713,17 +713,47 @@ esp_err_t esp_mesh_lite_wifi_scan_start(const wifi_scan_config_t *config, uint32
  *     {{0x71, 0x9b, 0xc6, 0x2e, 0x57, 0x82}, "ssid_3e52"},
  * };
  *
- * static const uint8_t* check_is_contains_bssid(const uint8_t *bssid) {
+ * static const uint8_t* check_is_contains_bssid(const uint8_t *mac) {
  *     size_t mac_table_size = sizeof(mac_table) / sizeof(mac_table[0]);
  *     for (uint8_t i = 0; i < mac_table_size; i++) {
- *         if (!memcmp(mac_table[i].bssid, bssid, sizeof(mac_table[i].bssid))) {
+ *         if (!memcmp(mac_table[i].bssid, mac, sizeof(mac_table[i].bssid))) {
  *             return mac_table[i].ssid;
  *         }
  *     }
  *     return NULL;
  * }
  *
- * esp_mesh_lite_bssid_check_cb_register(check_is_contains_bssid);
+ * esp_mesh_lite_get_ssid_by_mac_cb_register(check_is_contains_bssid, true);
+ * @endcode
+ *
+ * Usage Example: If you need to hide the SSID and cannot use ESP-NOW, you can achieve networking by registering the following callback
+ * @code{.c}
+ * static const uint8_t* check_is_contains_bssid(const uint8_t *bssid)
+ * {
+ *     // Check if the MAC address is valid, and return NULL if it is not
+ *     if (bssid == NULL) {
+ *         return NULL;
+ *     }
+ *
+ *     // Generate the SSID with BSSID suffix
+ *     static uint8_t ssid[33]; // Use static to keep the data valid after the function returns
+ *     strncpy((char *)ssid, CONFIG_BRIDGE_SOFTAP_SSID, sizeof(ssid) - 1);
+ *     ssid[sizeof(ssid) - 1] = '\0'; // Ensure null termination
+ *
+ *     char suffix[8];
+ *     snprintf(suffix, sizeof(suffix), "_%02x%02x%02x", bssid[3], bssid[4], bssid[5]);
+ *
+ *     // Ensure the combined length does not exceed 32 characters
+ *     if (strlen((char *)ssid) + strlen(suffix) > 32) {
+ *         ssid[25] = '\0'; // Truncate ssid if necessary
+ *     }
+ *
+ *     strncat((char *)ssid, suffix, sizeof(ssid) - strlen((char *)ssid) - 1);
+ *     ESP_LOGI(TAG, "Hidden ssid: %s", ssid);
+ *
+ *     return ssid;
+ * }
+ * esp_mesh_lite_get_ssid_by_mac_cb_register(check_is_contains_bssid, false);
  * @endcode
  *
  * @param[in] callback Pointer to the callback function.
@@ -731,7 +761,7 @@ esp_err_t esp_mesh_lite_wifi_scan_start(const wifi_scan_config_t *config, uint32
  * @return
  *     - ESP_OK: Registration successful.
  */
-esp_err_t esp_mesh_lite_bssid_check_cb_register(esp_mesh_lite_get_ssid_by_mac_cb_t cb);
+esp_err_t esp_mesh_lite_get_ssid_by_mac_cb_register(esp_mesh_lite_get_ssid_by_mac_cb_t cb, bool whitelist);
 
 /**
  * @brief Register callback functions for ESP-Mesh-Lite scanning events.
