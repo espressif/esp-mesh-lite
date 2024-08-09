@@ -17,12 +17,11 @@ default:
 .setup_esp_idf: &setup_esp_idf
   - image_str=${image}
   - image_str=(${image_str//:/ })
-  - idf_branch=${image_str[1]}
+  - if [ -z "${idf_branch}" ]; then idf_branch=${image_str[1]}; fi
+  - echo "idf_branch=${idf_branch}"
   - cd $IDF_PATH
   - git checkout ${idf_branch}
   - git submodule update --init --recursive
-  - ./install.sh
-  - . ./export.sh
   - cd -
 
 .before_script_preparation: &before_script_preparation
@@ -39,29 +38,29 @@ default:
 .build_default_example: &build_default_example
   - cd examples/mesh_local_control
   - rm -rf build sdkconfig
-  - idf.py set-target ${idf_target}
+  - idf.py ${compile_option} set-target ${idf_target}
   - idf.py build
   - cd -
   - cd examples/no_router
   - rm -rf build sdkconfig
-  - idf.py set-target ${idf_target}
+  - idf.py ${compile_option} set-target ${idf_target}
   - idf.py build
   - cd -
   - cd examples/mesh_wifi_provisioning
   - rm -rf build sdkconfig
-  - idf.py set-target ${idf_target}
+  - idf.py ${compile_option} set-target ${idf_target}
   - idf.py build
   - cd -
 
 .build_rainmaker_example: &build_rainmaker_example
   - cd examples/rainmaker/led_light
   - rm -rf build sdkconfig
-  - idf.py set-target ${idf_target}
+  - idf.py ${compile_option} set-target ${idf_target}
   - idf.py build
   - cd -
   - cd examples/rainmaker/provisioning_controller
   - rm -rf build sdkconfig
-  - idf.py set-target ${idf_target}
+  - idf.py ${compile_option} set-target ${idf_target}
   - idf.py build
   - cd -
 
@@ -205,6 +204,30 @@ esp32c6_build:
     - *setup_esp_idf
     - *build_default_example
     - *build_rainmaker_example
+
+esp32c5_build:
+  stage: build
+  tags:
+    - build
+  image: $IMAGE
+  parallel:
+    matrix:
+      - IMAGE: ['espressif/idf:release-v5.3']
+
+  variables:
+    <<: *global-variables
+    idf_branch: master
+    idf_target: esp32c5
+    compile_option: --preview
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *setup_esp_idf
+    - *build_default_example
+    # rainmaker does not support C5 yet
+    # - *build_rainmaker_example
 
 push_master_to_github:
   stage: deploy
