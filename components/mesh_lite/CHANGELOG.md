@@ -2,12 +2,15 @@
 
 # ChangeLog
 
-## v1.0.1 - 2024-7-31
+## v1.0.1 - 2024-8-12
 
 ### Enhancements:
 
 #### Mesh
 
+- feat: support esp32c5 ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
+- feat: optimize networking speed ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
+- Add bssid when the root node synchronizes router information to the child node ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
 - Support register ssid by mac cb for hidden ssid ([0579dfa](https://github.com/espressif/esp-mesh-lite/commit/0579dfa2b61bb4442d427122d5079397299b88d8))
 - Open enabling mesh-lite log API ([defe726](https://github.com/espressif/esp-mesh-lite/commit/defe726f1f98de17f8d1795507dab15ba0bf3917))
 - Add compatibility for older versions in the fusion mechanism ([870642f](https://github.com/espressif/esp-mesh-lite/commit/870642fb799ec23dc87966d22572dc847a371a3c))
@@ -20,6 +23,7 @@
 
 #### Bugfix
 
+- Fix the occasional failure when calling `esp_mesh_lite_transmit_file_start` multiple times to transfer different files ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
 - Fix occasional fusion failure ([0579dfa](https://github.com/espressif/esp-mesh-lite/commit/0579dfa2b61bb4442d427122d5079397299b88d8))
 - Fix occasional crash during communication ([0579dfa](https://github.com/espressif/esp-mesh-lite/commit/0579dfa2b61bb4442d427122d5079397299b88d8))
 - Fix crash caused by differences in the wifi_ap_record_t structure between IDF versions ([0579dfa](https://github.com/espressif/esp-mesh-lite/commit/0579dfa2b61bb4442d427122d5079397299b88d8))
