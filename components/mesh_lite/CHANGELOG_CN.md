@@ -1,11 +1,14 @@
 # ChangeLog
 
-## v1.0.1 - 2024-7-31
+## v1.0.1 - 2024-8-12
 
 ### 功能:
 
 #### Mesh
 
+- 支持 esp32c5 ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
+- 优化组网速度 ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
+- 根节点向子节点同步路由器信息时加入 bssid ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
 - 支持隐藏 ssid 场景注册 ssid by mac cb 来获取对端 ssid ([0579dfa](https://github.com/espressif/esp-mesh-lite/commit/0579dfa2b61bb4442d427122d5079397299b88d8))
 - 开放 mesh-lite log 控制 API ([defe726](https://github.com/espressif/esp-mesh-lite/commit/defe726f1f98de17f8d1795507dab15ba0bf3917))
 - 兼容旧版本的融合机制 ([870642f](https://github.com/espressif/esp-mesh-lite/commit/870642fb799ec23dc87966d22572dc847a371a3c))
@@ -18,6 +21,7 @@
 
 #### Bugfix
 
+- 修复多次调用 esp_mesh_lite_transmit_file_start 传输不同文件时偶现失败的问题 ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
 - 修复偶现融合失败的问题 ([0579dfa](https://github.com/espressif/esp-mesh-lite/commit/0579dfa2b61bb4442d427122d5079397299b88d8))
 - 修复通信过程中偶现崩溃的问题 ([0579dfa](https://github.com/espressif/esp-mesh-lite/commit/0579dfa2b61bb4442d427122d5079397299b88d8))
 - 修复由于 IDF 版本之间 wifi_ap_record_t 结构差异导致的崩溃 ([0579dfa](https://github.com/espressif/esp-mesh-lite/commit/0579dfa2b61bb4442d427122d5079397299b88d8))
