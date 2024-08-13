@@ -87,6 +87,22 @@ esp_err_t esp_mesh_lite_espnow_init(void);
 esp_err_t esp_mesh_lite_espnow_send(uint8_t type, uint8_t *peer_addr, const uint8_t *data, size_t len);
 
 /**
+ * @brief Send data and delete the peer using ESP-Mesh-Lite ESP-NOW.
+ *
+ * This function sends data of the specified type to a peer node with the given MAC address
+ * using the ESP-Mesh-Lite ESP-NOW protocol, and then deletes the peer from the ESP-NOW peer list.
+ *
+ * @param[in] type Type of data being sent.
+ * @param[in] peer_addr MAC address of the peer node.
+ * @param[in] data Pointer to the data to be sent.
+ * @param[in] len Length of the data.
+ * @return
+ *      - ESP_OK: Data sent and peer deleted successfully
+ *      - ESP_FAIL: Failed to send data or delete the peer
+ */
+esp_err_t esp_mesh_lite_espnow_send_and_del_peer(uint8_t type, uint8_t *peer_addr, const uint8_t *data, size_t len);
+
+/**
  * @brief Register a callback function for handling ESP-Mesh-Lite ESP-NOW data reception.
  *
  * This function registers a callback function to handle the reception of ESP-NOW data

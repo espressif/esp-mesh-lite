@@ -80,6 +80,13 @@ esp_err_t esp_mesh_lite_espnow_send(uint8_t type, uint8_t *peer_addr, const uint
 
     esp_err_t ret = esp_now_send(peer_addr, espnow_data, len + 1);
 
+    return ret;
+}
+
+esp_err_t esp_mesh_lite_espnow_send_and_del_peer(uint8_t type, uint8_t *peer_addr, const uint8_t *data, size_t len)
+{
+    esp_err_t ret = esp_mesh_lite_espnow_send(type, peer_addr, data, len);
+
     // Check if peer_addr is a broadcast address
     if (!IS_BROADCAST_ADDR(peer_addr)) {
         esp_now_del_peer(peer_addr);
