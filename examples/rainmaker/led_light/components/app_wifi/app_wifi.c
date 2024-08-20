@@ -217,7 +217,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
                 app_wifi_keystore_set(KEYSTORE_NAMESPACE, KEY_STA_PASSWORD, wifi_sta_cfg->password, strlen((const char *) wifi_sta_cfg->password));
             }
 #if CONFIG_MESH_LITE_ENABLE
-            mesh_lite_sta_config_t config;
+            mesh_lite_sta_config_t config = {0};
             memcpy((char*)config.ssid, (char*)wifi_sta_cfg->ssid, sizeof(config.ssid));
             memcpy((char*)config.password, (char*)wifi_sta_cfg->password, sizeof(config.password));
             config.bssid_set = wifi_sta_cfg->bssid_set;

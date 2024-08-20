@@ -10,12 +10,6 @@
 #include "esp_wifi.h"
 #include "esp_mesh_lite_port.h"
 
-__attribute__((weak)) const esp_app_desc_t *esp_app_get_description(void)
-{
-    const esp_app_desc_t *esp_ota_get_app_description(void);
-    return esp_ota_get_app_description();
-}
-
 wifi_ap_record_t *esp_mesh_lite_scan_get_ap_records_list(uint16_t count)
 {
     wifi_ap_record_t *ap_list = (wifi_ap_record_t *)malloc(sizeof(wifi_ap_record_t) * count);
