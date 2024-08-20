@@ -121,6 +121,22 @@ esp_err_t esp_mesh_lite_espnow_recv_cb_register(esp_mesh_lite_espnow_data_type_t
                                                 void (*recv_cb)(const uint8_t *mac_addr, const uint8_t *data, int len));
 
 /**
+ * @brief Unregister a callback function for handling ESP-Mesh-Lite ESP-NOW data reception.
+ *
+ * This function removes a previously registered callback function for the specified data type.
+ * If a callback function was registered for the given data type using `esp_mesh_lite_espnow_recv_cb_register`,
+ * this function will unregister it, and the callback will no longer be invoked when data of
+ * that type is received.
+ *
+ * @param[in] type Type of data for which the callback is unregistered.
+ *
+ * @return
+ *      - ESP_OK: Callback unregistration successful
+ *      - ESP_ERR_NOT_FOUND: No callback found for the specified type
+ */
+esp_err_t esp_mesh_lite_espnow_recv_cb_unregister(esp_mesh_lite_espnow_data_type_t type);
+
+/**
  * @brief Register ESP-Mesh-Lite ESP-NOW failed handler callback function
  *
  * @param[in] cb  The callback function to be registered.
