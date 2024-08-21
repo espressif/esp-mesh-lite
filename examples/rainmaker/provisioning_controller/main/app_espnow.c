@@ -74,14 +74,43 @@ void espnow_data_prepare(uint8_t *buf, uint8_t* payload, size_t payload_len, boo
     memcpy(temp->payload, payload, payload_len);
 }
 
+esp_err_t app_espnow_create_peer(uint8_t dst_mac[ESP_NOW_ETH_ALEN])
+{
+    esp_err_t ret = ESP_FAIL;
+    esp_now_peer_info_t *peer = malloc(sizeof(esp_now_peer_info_t));
+    if (peer == NULL) {
+        ESP_LOGE(TAG, "Malloc peer information fail");
+        return ESP_ERR_NO_MEM;
+    }
+    memset(peer, 0, sizeof(esp_now_peer_info_t));
+
+    esp_now_get_peer(dst_mac, peer);
+    peer->channel = 0;
+    peer->ifidx = ESP_IF_WIFI_STA;
+    peer->encrypt = false;
+    // memcpy(peer->lmk, CONFIG_ESPNOW_LMK, ESP_NOW_KEY_LEN);
+    memcpy(peer->peer_addr, dst_mac, ESP_NOW_ETH_ALEN);
+
+    if (esp_now_is_peer_exist(dst_mac) == false) {
+        ret = esp_now_add_peer(peer);
+    } else {
+        ret = esp_now_mod_peer(peer);
+    }
+    free(peer);
+
+    return ret;
+}
+
 static void esp_now_send_timer_cb(TimerHandle_t timer)
 {
     xSemaphoreTake(sent_msgs_mutex, portMAX_DELAY);
     if (sent_msgs->max_retry > sent_msgs->retry_times) {
         sent_msgs->retry_times++;
         if (sent_msgs->sent_msg) {
-            if (esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_RM_GROUP_CONTROL, s_broadcast_mac, sent_msgs->sent_msg, sent_msgs->msg_len) != ESP_OK) {
-                ESP_LOGE(TAG, "Send error");
+            app_espnow_create_peer(s_broadcast_mac);
+            esp_err_t ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_RM_GROUP_CONTROL, s_broadcast_mac, sent_msgs->sent_msg, sent_msgs->msg_len);
+            if (ret != ESP_OK) {
+                ESP_LOGE(TAG, "Send error: %d [%s %d]", ret, __func__, __LINE__);
             }
         }
     } else {
@@ -103,8 +132,10 @@ void esp_now_send_group_control(uint8_t *payload, bool seq_init)
     size_t payload_len = strlen((char*)payload);
     uint8_t *buf = calloc(1, payload_len + ESPNOW_PAYLOAD_HEAD_LEN);
     espnow_data_prepare(buf, payload, payload_len, seq_init);
-    if (esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_RM_GROUP_CONTROL, s_broadcast_mac, buf, payload_len + ESPNOW_PAYLOAD_HEAD_LEN) != ESP_OK) {
-        ESP_LOGE(TAG, "Send error");
+    app_espnow_create_peer(s_broadcast_mac);
+    esp_err_t ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_RM_GROUP_CONTROL, s_broadcast_mac, buf, payload_len + ESPNOW_PAYLOAD_HEAD_LEN);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Send error: %d [%s %d]", ret, __func__, __LINE__);
     }
 
     xSemaphoreTake(sent_msgs_mutex, portMAX_DELAY);
@@ -236,8 +267,10 @@ static void espnow_task(void *pvParameter)
                     ESP_LOGI(TAG, "recv_seq: %"PRIu32", current_seq: %"PRIu32"", recv_seq, current_seq);
 #endif
                     // Data Forward
-                    if (esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_RM_GROUP_CONTROL, s_broadcast_mac, recv_cb->data, recv_cb->data_len) != ESP_OK) {
-                        ESP_LOGE(TAG, "Send error");
+                    app_espnow_create_peer(s_broadcast_mac);
+                    esp_err_t ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_RM_GROUP_CONTROL, s_broadcast_mac, recv_cb->data, recv_cb->data_len);
+                    if (ret != ESP_OK) {
+                        ESP_LOGE(TAG, "Send error: %d [%s %d]", ret, __func__, __LINE__);
                     }
 
                     last_espnow_msg_mode = espnow_msg_mode;
@@ -315,22 +348,13 @@ esp_err_t app_espnow_init(void)
     esp_mesh_lite_espnow_recv_cb_register(ESPNOW_DATA_TYPE_RM_GROUP_CONTROL, espnow_recv_cb);
 
     /* Add broadcast peer information to peer list. */
-    esp_now_peer_info_t *peer = malloc(sizeof(esp_now_peer_info_t));
-    if (peer == NULL) {
+    if (app_espnow_create_peer(s_broadcast_mac) != ESP_OK) {
         ESP_LOGE(TAG, "Malloc peer information fail");
         esp_now_unregister_send_cb();
         vSemaphoreDelete(espnow_recv_queue);
         espnow_recv_queue = NULL;
         return ESP_FAIL;
     }
-    memset(peer, 0, sizeof(esp_now_peer_info_t));
-    peer->channel = CONFIG_ESPNOW_CHANNEL;
-    peer->ifidx = ESP_IF_WIFI_STA;
-    // esp_wifi_config_espnow_rate(ESP_IF_WIFI_STA, WIFI_PHY_RATE_11M_L);
-    peer->encrypt = false;
-    memcpy(peer->peer_addr, s_broadcast_mac, ESP_NOW_ETH_ALEN);
-    ESP_ERROR_CHECK( esp_now_add_peer(peer) );
-    free(peer);
 
     xTaskCreate(espnow_task, "espnow_task", 3 * 1024, NULL, 4, &group_control_handle);
 
