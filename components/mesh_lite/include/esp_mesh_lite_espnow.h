@@ -87,6 +87,22 @@ esp_err_t esp_mesh_lite_espnow_init(void);
 esp_err_t esp_mesh_lite_espnow_send(uint8_t type, uint8_t *peer_addr, const uint8_t *data, size_t len);
 
 /**
+ * @brief Send data and delete the peer using ESP-Mesh-Lite ESP-NOW.
+ *
+ * This function sends data of the specified type to a peer node with the given MAC address
+ * using the ESP-Mesh-Lite ESP-NOW protocol, and then deletes the peer from the ESP-NOW peer list.
+ *
+ * @param[in] type Type of data being sent.
+ * @param[in] peer_addr MAC address of the peer node.
+ * @param[in] data Pointer to the data to be sent.
+ * @param[in] len Length of the data.
+ * @return
+ *      - ESP_OK: Data sent and peer deleted successfully
+ *      - ESP_FAIL: Failed to send data or delete the peer
+ */
+esp_err_t esp_mesh_lite_espnow_send_and_del_peer(uint8_t type, uint8_t *peer_addr, const uint8_t *data, size_t len);
+
+/**
  * @brief Register a callback function for handling ESP-Mesh-Lite ESP-NOW data reception.
  *
  * This function registers a callback function to handle the reception of ESP-NOW data
@@ -103,6 +119,22 @@ esp_err_t esp_mesh_lite_espnow_send(uint8_t type, uint8_t *peer_addr, const uint
  */
 esp_err_t esp_mesh_lite_espnow_recv_cb_register(esp_mesh_lite_espnow_data_type_t type,
                                                 void (*recv_cb)(const uint8_t *mac_addr, const uint8_t *data, int len));
+
+/**
+ * @brief Unregister a callback function for handling ESP-Mesh-Lite ESP-NOW data reception.
+ *
+ * This function removes a previously registered callback function for the specified data type.
+ * If a callback function was registered for the given data type using `esp_mesh_lite_espnow_recv_cb_register`,
+ * this function will unregister it, and the callback will no longer be invoked when data of
+ * that type is received.
+ *
+ * @param[in] type Type of data for which the callback is unregistered.
+ *
+ * @return
+ *      - ESP_OK: Callback unregistration successful
+ *      - ESP_ERR_NOT_FOUND: No callback found for the specified type
+ */
+esp_err_t esp_mesh_lite_espnow_recv_cb_unregister(esp_mesh_lite_espnow_data_type_t type);
 
 /**
  * @brief Register ESP-Mesh-Lite ESP-NOW failed handler callback function
