@@ -373,7 +373,7 @@ ESP-MESH-LITE 网络的常见性能指标如下表所示：
 
 1. 使用 `esp_mesh_lite_espnow_recv_cb_register()` 接口注册 ESPNOW 接收回调。第一个参数是所要发送和接收的 ESPNOW 数据类型。用户可以使用 `ESPNOW_DATA_TYPE_RESERVE`，或者自行在 `ESPNOW_DATA_TYPE_RESERVE` 后添加自定义类型。
 
-   需要注意的是：`ESPNOW_DATA_TYPE_RESERVE`、`ESPNOW_DATA_TYPE_RM_GROUP_CONTROL`、`ESPNOW_DATA_TYPE_RM_ZERO_PROV` 均已被占用。以下是代码使用示例：
+   需要注意的是：`ESPNOW_DATA_TYPE_RESERVE`、`ESPNOW_DATA_TYPE_RM_GROUP_CONTROL`、`ESPNOW_DATA_TYPE_ZERO_PROV` 均已被占用。以下是代码使用示例：
 
    ```c
    static void espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len)

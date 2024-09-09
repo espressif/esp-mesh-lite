@@ -370,7 +370,7 @@ Below are some common performance metrics for the ESP-MESH-LITE network:
 ## ESPNOW Usage Guide
 To facilitate simultaneous communication using ESPNOW across multiple functional modules, the Mesh-Lite component internally encapsulates ESPNOW functionality. If you need to use ESPNOW, please follow these steps:
 
-1. Use the `esp_mesh_lite_espnow_recv_cb_register()` interface to register the ESPNOW receive callback. The first parameter is the ESPNOW data type to be sent and received. Users can use `ESPNOW_DATA_TYPE_RESERVE` or add their own custom types within `ESPNOW_DATA_TYPE_RESERVE`. Note that `ESPNOW_DATA_TYPE_RESERVE`, `ESPNOW_DATA_TYPE_RM_GROUP_CONTROL`, and `ESPNOW_DATA_TYPE_RM_ZERO_PROV` are already in use. Below is an example of how to use this in code:
+1. Use the `esp_mesh_lite_espnow_recv_cb_register()` interface to register the ESPNOW receive callback. The first parameter is the ESPNOW data type to be sent and received. Users can use `ESPNOW_DATA_TYPE_RESERVE` or add their own custom types within `ESPNOW_DATA_TYPE_RESERVE`. Note that `ESPNOW_DATA_TYPE_RESERVE`, `ESPNOW_DATA_TYPE_RM_GROUP_CONTROL`, and `ESPNOW_DATA_TYPE_ZERO_PROV` are already in use. Below is an example of how to use this in code:
 
    ```c
    static void espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len)

@@ -46,6 +46,8 @@ default:
   - idf.py ${compile_option} set-target ${idf_target}
   - idf.py build
   - cd -
+
+.build_provisioning_example: &build_provisioning_example
   - cd examples/mesh_wifi_provisioning
   - rm -rf build sdkconfig
   - idf.py ${compile_option} set-target ${idf_target}
@@ -100,6 +102,7 @@ esp32_build:
     - *setup_esp_idf
     - *build_default_example
     - *build_rainmaker_example
+    - *build_provisioning_example
 
 esp32c2_build:
   stage: build
@@ -142,6 +145,7 @@ esp32c3_build:
     - *setup_esp_idf
     - *build_default_example
     - *build_rainmaker_example
+    - *build_provisioning_example
 
 esp32s2_build:
   stage: build
@@ -183,6 +187,7 @@ esp32s3_build:
     - *setup_esp_idf
     - *build_default_example
     - *build_rainmaker_example
+    - *build_provisioning_example
 
 esp32c6_build:
   stage: build
