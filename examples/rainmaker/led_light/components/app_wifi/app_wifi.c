@@ -218,6 +218,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
             }
 #if CONFIG_MESH_LITE_ENABLE
             mesh_lite_sta_config_t config;
+            memset(&config, 0x0, sizeof(config));
             memcpy((char*)config.ssid, (char*)wifi_sta_cfg->ssid, sizeof(config.ssid));
             memcpy((char*)config.password, (char*)wifi_sta_cfg->password, sizeof(config.password));
             config.bssid_set = wifi_sta_cfg->bssid_set;

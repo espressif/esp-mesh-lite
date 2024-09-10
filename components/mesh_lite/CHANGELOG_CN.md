@@ -6,6 +6,7 @@
 
 #### Mesh
 
+- 在禁用 ESP—NOW 功能时，内部将不创建相关的 task 以节省 RAM 资源 ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
 - 支持 esp32c5 ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
 - 优化组网速度 ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
 - 根节点向子节点同步路由器信息时加入 bssid ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
@@ -21,6 +22,10 @@
 
 #### Bugfix
 
+- 修复一些融合失败的问题 ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
+- 修复LAN OTA 使能与不使能设备的兼容问题 ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
+- 修复使用 ESP-NOW 时可能对隐藏 ssid 下的组网造成的影响 ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
+- 增加 wifi failure_retry_cnt 以降低组网时连接失败的概率 ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
 - 修复多次调用 esp_mesh_lite_transmit_file_start 传输不同文件时偶现失败的问题 ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
 - 修复偶现融合失败的问题 ([0579dfa](https://github.com/espressif/esp-mesh-lite/commit/0579dfa2b61bb4442d427122d5079397299b88d8))
 - 修复通信过程中偶现崩溃的问题 ([0579dfa](https://github.com/espressif/esp-mesh-lite/commit/0579dfa2b61bb4442d427122d5079397299b88d8))

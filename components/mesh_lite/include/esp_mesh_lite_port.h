@@ -14,6 +14,8 @@ typedef struct {
     bool bssid_set;                           /**< whether set MAC address of target AP or not. Generally, station_config.bssid_set needs to be 0; and it needs to be 1 only when users need to check the MAC address of the AP.*/
     uint8_t bssid[6];                         /**< MAC address of target AP*/
     wifi_scan_threshold_t  threshold;         /**< When scan_threshold is set, only APs which have an auth mode that is more secure than the selected auth mode and a signal stronger than the minimum RSSI will be used. */
+    uint8_t failure_retry_cnt;                /**< Number of connection retries station will do before moving to next AP. scan_method should be set as WIFI_ALL_CHANNEL_SCAN to use this config.
+                                                   Note: Enabling this may cause connection time to increase incase best AP doesn't behave properly. */
 } mesh_lite_sta_config_t;
 
 typedef struct {
@@ -34,16 +36,6 @@ typedef struct {
     wifi_second_chan_t second;            /**< secondary channel of AP */
     int8_t  rssi;                         /**< signal strength of AP */
 } mesh_lite_ap_record_t;
-
-/**
- * @brief Get application description.
- *
- * This function retrieves the application description, which includes information
- * such as version, project name, and compilation date.
- *
- * @return Pointer to the application description structure (esp_app_desc_t).
- */
-const esp_app_desc_t *esp_app_get_description(void);
 
 /**
  * @brief Get access point records when scan is done.
