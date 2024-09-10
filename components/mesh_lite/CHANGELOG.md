@@ -8,6 +8,7 @@
 
 #### Mesh
 
+- When disabling the ESP-NOW function, the related tasks will not be created internally to save RAM resources ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
 - feat: support esp32c5 ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
 - feat: optimize networking speed ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
 - Add bssid when the root node synchronizes router information to the child node ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
@@ -23,6 +24,10 @@
 
 #### Bugfix
 
+- Fixed some fusion failure issues ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
+- Fixed compatibility issues between LAN OTA enabled and disabled devices ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
+- Fixed the impact that may be caused to the network under hidden ssid when using ESP-NOW ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
+- Increased wifi failure_retry_cnt to reduce the probability of connection failure during networking ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
 - Fix the occasional failure when calling `esp_mesh_lite_transmit_file_start` multiple times to transfer different files ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
 - Fix occasional fusion failure ([0579dfa](https://github.com/espressif/esp-mesh-lite/commit/0579dfa2b61bb4442d427122d5079397299b88d8))
 - Fix occasional crash during communication ([0579dfa](https://github.com/espressif/esp-mesh-lite/commit/0579dfa2b61bb4442d427122d5079397299b88d8))
