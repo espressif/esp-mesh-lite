@@ -32,8 +32,7 @@ default:
   - chmod 600 ~/.ssh/id_rsa
   - echo -e "Host gitlab.espressif.cn\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - export IDF_PATH=/opt/esp/idf
-  # - python -m pip install --upgrade idf-component-manager
-  - pip install idf-component-manager==1.4.1
+  - python -m pip install --upgrade idf-component-manager
 
 .build_default_example: &build_default_example
   - cd examples/mesh_local_control
@@ -217,7 +216,7 @@ esp32c5_build:
   image: $IMAGE
   parallel:
     matrix:
-      - IMAGE: ['espressif/idf:release-v5.3']
+      - IMAGE: ['espressif/idf:latest']
 
   variables:
     <<: *global-variables
