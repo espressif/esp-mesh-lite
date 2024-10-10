@@ -393,7 +393,7 @@ static esp_err_t rainmaker_mesh_lite_handler(uint32_t session_id, const uint8_t 
     ESP_LOGW("heap", "free heap %"PRIu32", minimum  %"PRIu32"", esp_get_free_heap_size(), esp_get_minimum_free_heap_size());
 
     if (leaf_node) {
-        esp_wifi_set_mode(WIFI_MODE_STA);
+        esp_wifi_set_mode(mode);
     }
 
     return ESP_OK;
