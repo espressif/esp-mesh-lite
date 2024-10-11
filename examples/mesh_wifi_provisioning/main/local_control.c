@@ -17,10 +17,12 @@
 #include "esp_mac.h"
 #include "esp_bridge.h"
 #include "esp_mesh_lite.h"
-#if defined(CONFIG_PROV_TRANSPORT_BLE)
+#if defined(CONFIG_MESH_LITE_PROV_TRANSPORT_BLE)
 #include "wifi_prov_mgr.h"
 #endif
+#if defined(CONFIG_MESH_LITE_PROV_ENABLE)
 #include "zero_provisioning.h"
+#endif
 #define PAYLOAD_LEN       (1456) /**< Max payload size(in bytes) */
 
 static int g_sockfd    = -1;
@@ -218,9 +220,11 @@ void app_main()
 
     esp_mesh_lite_start();
 
+#if defined(CONFIG_MESH_LITE_PROV_ENABLE)
     zero_prov_init(NULL, NULL);
+#endif
 
-#if defined(CONFIG_PROV_TRANSPORT_BLE)
+#if defined(CONFIG_MESH_LITE_PROV_TRANSPORT_BLE)
     esp_mesh_lite_wifi_prov_mgr_init();
 #endif /* CONFIG_APP_BRIDGE_USE_WIFI_PROVISIONING_OVER_BLE */
 

@@ -3,12 +3,15 @@ set(require_components "json" "esp_wifi" "app_update" "wifi_provisioning" "qrcod
 
 if (CONFIG_MESH_LITE_ENABLE)
     list(APPEND srcs "src/esp_mesh_lite.c" "src/esp_mesh_lite_port.c" "src/esp_mesh_lite_log.c" "src/mesh_lite.pb-c.c")
-    list(APPEND srcs "src/wifi_prov/wifi_prov_mgr.c" "src/wifi_prov/zero_provisioning.c")
 
     set(OLD_PROV_MGR "${IDF_PATH}/components/wifi_provisioning/src/")
     set(NEW_PROV_MGR "${CMAKE_CURRENT_LIST_DIR}/src/wifi_prov/manager.c")
 
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${NEW_PROV_MGR} ${OLD_PROV_MGR})
+endif()
+
+if (CONFIG_MESH_LITE_PROV_ENABLE)
+    list(APPEND srcs "src/wifi_prov/wifi_prov_mgr.c" "src/wifi_prov/zero_provisioning.c")
 endif()
 
 idf_component_register(SRCS "${srcs}"
