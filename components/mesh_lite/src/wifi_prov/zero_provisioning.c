@@ -551,12 +551,12 @@ exit:
 
 static void zero_prov_unicast_handle(void *arg)
 {
+#if ZERO_PROV_DEBUG
     zero_prov_event_t *evt = (zero_prov_event_t *)arg;
     zero_prov_send_cb_t *send_cb = &evt->info.send_cb;
     uint8_t g_channel;
     wifi_second_chan_t g_channel2;
     esp_wifi_get_channel(&g_channel, &g_channel2);
-#if ZERO_PROV_DEBUG
     ESP_LOGI(TAG, "send unicast data to "MACSTR", channel:%d", MAC2STR(send_cb->mac_addr), g_channel);
 #endif
 }

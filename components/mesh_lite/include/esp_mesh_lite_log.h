@@ -9,8 +9,9 @@
 #include <stdbool.h>
 #include "esp_err.h"
 #include "esp_log.h"
+#include "esp_mesh_lite_wireless_debug.h"
 
-#define ESP_MESH_LITE_LOG_LEVEL ESP_LOG_DEBUG
+#define ESP_MESH_LITE_LOG_LEVEL             ESP_LOG_DEBUG
 
 void esp_mesh_lite_log_write(esp_log_level_t level, const char *tag, const char *format, ...);
 

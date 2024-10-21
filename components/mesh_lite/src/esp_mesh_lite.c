@@ -403,4 +403,8 @@ void esp_mesh_lite_init(esp_mesh_lite_config_t* config)
     xTimerStart(report_timer, portMAX_DELAY);
     xTimerStart(root_timer, portMAX_DELAY);
 #endif /* MESH_LITE_NODE_INFO_REPORT */
+
+#if CONFIG_MESH_LITE_WIRELESS_DEBUG
+    esp_mesh_lite_wireless_debug_init();
+#endif
 }

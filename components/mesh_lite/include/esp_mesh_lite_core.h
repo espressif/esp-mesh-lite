@@ -199,6 +199,7 @@ typedef enum {
     ESP_MESH_LITE_EVENT_OTA_REJECTED,                /**< OTA update rejected by the device. */
     ESP_MESH_LITE_EVENT_OTA_WRITE_ERR,               /**< Error occurred while writing OTA data. */
     ESP_MESH_LITE_EVENT_OTA_BEGIN_FAIL,              /**< Failed to begin OTA update process. */
+    ESP_MESH_LITE_EVENT_OTA_CHECKSUM_ERR,            /**< OTA update failed due to checksum mismatch (SHA-256). */
     ESP_MESH_LITE_EVENT_OTA_PENDING_TIMEOUT,         /**< Timeout occurred while waiting for OTA update to begin. */
     ESP_MESH_LITE_EVENT_OTA_GET_PARTITION_ERR,       /**< Error occurred while obtaining OTA partition information. */
     ESP_MESH_LITE_EVENT_OTA_SET_BOOT_PARTITION_ERR,  /**< Error occurred while setting the boot partition after OTA update. */

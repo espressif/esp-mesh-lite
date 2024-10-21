@@ -1,5 +1,5 @@
 set(srcs "src/esp_mesh_lite_espnow.c")
-set(require_components "json" "esp_wifi" "app_update" "wifi_provisioning" "qrcode" "nvs_flash" "protobuf-c")
+set(require_components "json" "esp_wifi" "app_update" "wifi_provisioning" "qrcode" "nvs_flash" "protobuf-c" "console")
 
 if (CONFIG_MESH_LITE_ENABLE)
     list(APPEND srcs "src/esp_mesh_lite.c" "src/esp_mesh_lite_port.c" "src/esp_mesh_lite_log.c" "src/mesh_lite.pb-c.c")
@@ -12,6 +12,10 @@ endif()
 
 if (CONFIG_MESH_LITE_PROV_ENABLE)
     list(APPEND srcs "src/wifi_prov/wifi_prov_mgr.c" "src/wifi_prov/zero_provisioning.c")
+endif()
+
+if (CONFIG_MESH_LITE_WIRELESS_DEBUG)
+    list(APPEND srcs "src/esp_mesh_lite_wireless_debug.c")
 endif()
 
 idf_component_register(SRCS "${srcs}"
