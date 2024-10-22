@@ -306,6 +306,14 @@ static esp_err_t rainmaker_mesh_lite_handler(uint32_t session_id, const uint8_t 
     wifi_ap_config_t config;
     memset(&config, 0x0, sizeof(config));
 
+    bool leaf_node = false;
+    wifi_mode_t mode = WIFI_MODE_NULL;
+    esp_wifi_get_mode(&mode);
+    if (mode == WIFI_MODE_STA) {
+        esp_wifi_set_mode(WIFI_MODE_APSTA);
+        leaf_node = true;
+    }
+
     esp_wifi_get_mac(WIFI_IF_AP, softap_mac);
 
     item = cJSON_GetObjectItem(root, "meshId");
@@ -383,6 +391,10 @@ static esp_err_t rainmaker_mesh_lite_handler(uint32_t session_id, const uint8_t 
     ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, (wifi_config_t*)&config));
 
     ESP_LOGW("heap", "free heap %"PRIu32", minimum  %"PRIu32"", esp_get_free_heap_size(), esp_get_minimum_free_heap_size());
+
+    if (leaf_node) {
+        esp_wifi_set_mode(mode);
+    }
 
     return ESP_OK;
 }
