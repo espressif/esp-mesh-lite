@@ -18,20 +18,22 @@
 
 #include <wifi_provisioning/manager.h>
 
-#ifdef CONFIG_PROV_TRANSPORT_BLE
+#ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_BLE
 #include <wifi_provisioning/scheme_ble.h>
-#endif /* CONFIG_PROV_TRANSPORT_BLE */
+#endif /* CONFIG_MESH_LITE_PROV_TRANSPORT_BLE */
 
-#ifdef CONFIG_PROV_TRANSPORT_SOFTAP
+#ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_SOFTAP
 #include <wifi_provisioning/scheme_softap.h>
-#endif /* CONFIG_PROV_TRANSPORT_SOFTAP */
+#endif /* CONFIG_MESH_LITE_PROV_TRANSPORT_SOFTAP */
+#ifdef CONFIG_PROV_SHOW_QR
 #include "qrcode.h"
+#endif
 
 #include "esp_mesh_lite.h"
 
 #define PROV_QR_VERSION         "v1"
-#define PROV_TRANSPORT_SOFTAP   "softap"
-#define PROV_TRANSPORT_BLE      "ble"
+#define MESH_LITE_PROV_TRANSPORT_SOFTAP   "softap"
+#define MESH_LITE_PROV_TRANSPORT_BLE      "ble"
 #define QRCODE_BASE_URL         "https://espressif.github.io/esp-jumpstart/qrcode.html"
 
 typedef struct mesh_lite_config {
@@ -337,7 +339,7 @@ static void wifi_prov_print_qr(const char *name, const char *username, const cha
     ESP_LOGI(TAG, "Scan this QR code from the provisioning application for Provisioning.");
     esp_qrcode_config_t cfg = ESP_QRCODE_CONFIG_DEFAULT();
     esp_qrcode_generate(&cfg, payload);
-#endif /* CONFIG_APP_WIFI_PROV_SHOW_QR */
+#endif /* CONFIG_PROV_SHOW_QR */
     ESP_LOGI(TAG, "If QR code is not visible, copy paste the below URL in a browser.\n%s?data=%s", QRCODE_BASE_URL, payload);
 }
 
@@ -347,20 +349,20 @@ void esp_mesh_lite_wifi_prov_mgr_init(void)
 
     wifi_prov_event_register();
 
-#ifdef CONFIG_PROV_TRANSPORT_SOFTAP
+#ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_SOFTAP
     esp_netif_create_default_wifi_ap();
-#endif /* CONFIG_PROV_TRANSPORT_SOFTAP */
+#endif /* CONFIG_MESH_LITE_PROV_TRANSPORT_SOFTAP */
 
     /* Configuration for the provisioning manager */
     wifi_prov_mgr_config_t config = {
         /* What is the Provisioning Scheme that we want ?
          * wifi_prov_scheme_softap or wifi_prov_scheme_ble */
-#ifdef CONFIG_PROV_TRANSPORT_BLE
+#ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_BLE
         .scheme = wifi_prov_scheme_ble,
-#endif /* CONFIG_PROV_TRANSPORT_BLE */
-#ifdef CONFIG_PROV_TRANSPORT_SOFTAP
+#endif /* CONFIG_MESH_LITE_PROV_TRANSPORT_BLE */
+#ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_SOFTAP
         .scheme = wifi_prov_scheme_softap,
-#endif /* CONFIG_PROV_TRANSPORT_SOFTAP */
+#endif /* CONFIG_MESH_LITE_PROV_TRANSPORT_SOFTAP */
 
         /* Any default scheme specific event handler that you would
          * like to choose. Since our example application requires
@@ -370,12 +372,12 @@ void esp_mesh_lite_wifi_prov_mgr_init(void)
          * appropriate scheme specific event handler allows the manager
          * to take care of this automatically. This can be set to
          * WIFI_PROV_EVENT_HANDLER_NONE when using wifi_prov_scheme_softap*/
-#ifdef CONFIG_PROV_TRANSPORT_BLE
+#ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_BLE
         .scheme_event_handler = WIFI_PROV_SCHEME_BLE_EVENT_HANDLER_FREE_BTDM
-#endif /* CONFIG_PROV_TRANSPORT_BLE */
-#ifdef CONFIG_PROV_TRANSPORT_SOFTAP
+#endif /* CONFIG_MESH_LITE_PROV_TRANSPORT_BLE */
+#ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_SOFTAP
         .scheme_event_handler = WIFI_PROV_EVENT_HANDLER_NONE
-#endif /* CONFIG_PROV_TRANSPORT_SOFTAP */
+#endif /* CONFIG_MESH_LITE_PROV_TRANSPORT_SOFTAP */
     };
 
     /* Initialize provisioning manager with the
@@ -467,7 +469,7 @@ void esp_mesh_lite_wifi_prov_mgr_init(void)
      */
     const char *service_key = NULL;
 
-#ifdef CONFIG_PROV_TRANSPORT_BLE
+#ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_BLE
     /* This step is only useful when scheme is wifi_prov_scheme_ble. This will
      * set a custom 128 bit UUID which will be included in the BLE advertisement
      * and will correspond to the primary GATT service that provides provisioning
@@ -488,7 +490,7 @@ void esp_mesh_lite_wifi_prov_mgr_init(void)
      * forgotten to enable the BT stack or BTDM BLE settings in the SDK (e.g. see
      * the sdkconfig.defaults in the example project) */
     wifi_prov_scheme_ble_set_service_uuid(custom_service_uuid);
-#endif /* CONFIG_PROV_TRANSPORT_BLE */
+#endif /* CONFIG_MESH_LITE_PROV_TRANSPORT_BLE */
 
     /* An optional endpoint that applications can create if they expect to
      * get some additional custom data during provisioning workflow.
@@ -516,17 +518,17 @@ void esp_mesh_lite_wifi_prov_mgr_init(void)
     // wifi_prov_mgr_deinit();
     /* Print QR code for provisioning */
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
-#ifdef CONFIG_PROV_TRANSPORT_BLE
-    wifi_prov_print_qr(service_name, NULL, pop, PROV_TRANSPORT_BLE);
-#else /* CONFIG_PROV_TRANSPORT_SOFTAP */
-    wifi_prov_print_qr(service_name, NULL, pop, PROV_TRANSPORT_SOFTAP);
-#endif /* CONFIG_PROV_TRANSPORT_BLE */
+#ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_BLE
+    wifi_prov_print_qr(service_name, NULL, pop, MESH_LITE_PROV_TRANSPORT_BLE);
+#else /* CONFIG_MESH_LITE_PROV_TRANSPORT_SOFTAP */
+    wifi_prov_print_qr(service_name, NULL, pop, MESH_LITE_PROV_TRANSPORT_SOFTAP);
+#endif /* CONFIG_MESH_LITE_PROV_TRANSPORT_BLE */
 #else
-#ifdef CONFIG_PROV_TRANSPORT_BLE
-    wifi_prov_print_qr(service_name, username, pop, PROV_TRANSPORT_BLE);
-#else /* CONFIG_PROV_TRANSPORT_SOFTAP */
-    wifi_prov_print_qr(service_name, username, pop, PROV_TRANSPORT_SOFTAP);
-#endif /* CONFIG_PROV_TRANSPORT_BLE */
+#ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_BLE
+    wifi_prov_print_qr(service_name, username, pop, MESH_LITE_PROV_TRANSPORT_BLE);
+#else /* CONFIG_MESH_LITE_PROV_TRANSPORT_SOFTAP */
+    wifi_prov_print_qr(service_name, username, pop, MESH_LITE_PROV_TRANSPORT_SOFTAP);
+#endif /* CONFIG_MESH_LITE_PROV_TRANSPORT_BLE */
 #endif /* ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0) */
 
     const esp_timer_create_args_t deinit_wifi_prov_mgr_timer_args = {

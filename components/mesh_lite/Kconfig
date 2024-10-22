@@ -104,17 +104,24 @@ menu "ESP Wi-Fi Mesh Lite"
         endmenu
     endmenu
 
+    config MESH_LITE_PROV_ENABLE
+        bool "Enable Mesh-Lite Provisioning"
+        default n
+        help
+            Enable Mesh-Lite Provisioning
+
     menu "Mesh Lite Wi-Fi Provisioning Configuration"
-        choice PROV_TRANSPORT
+        depends on MESH_LITE_PROV_ENABLE
+        choice MESH_LITE_PROV_TRANSPORT
             bool "Provisioning Transport"
-            default PROV_TRANSPORT_BLE
+            default MESH_LITE_PROV_TRANSPORT_BLE
             help
                 Wi-Fi provisioning component offers both, SoftAP and BLE transports. Choose any one.
 
-            config PROV_TRANSPORT_SOFTAP
+            config MESH_LITE_PROV_TRANSPORT_SOFTAP
                 bool "SoftAP"
 
-            config PROV_TRANSPORT_BLE
+            config MESH_LITE_PROV_TRANSPORT_BLE
                 bool "BLE"
                 select BT_ENABLED
                 depends on !IDF_TARGET_ESP32S2
@@ -155,9 +162,9 @@ menu "ESP Wi-Fi Mesh Lite"
                     This enables the production mode for security version 2.
         endchoice
 
-        config PROV_TRANSPORT
+        config MESH_LITE_PROV_TRANSPORT
             int
-            default 1 if PROV_TRANSPORT_BLE
+            default 1 if MESH_LITE_PROV_TRANSPORT_BLE
 
         config PROV_RESET_PROVISIONED
             bool
