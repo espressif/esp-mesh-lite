@@ -2,12 +2,16 @@
 
 # ChangeLog
 
-## v1.0.1 - 2024-8-12
+## v1.0.1 - 2024-10-24
 
 ### Enhancements:
 
 #### Mesh
 
+- feat: Support wireless debug ([6c735a6](https://github.com/espressif/esp-mesh-lite/commit/6c735a6406e8cc9f06bee89c187e40850c120a0a))
+- feat: Support LAN OTA breakpoint resume function ([6c735a6](https://github.com/espressif/esp-mesh-lite/commit/6c735a6406e8cc9f06bee89c187e40850c120a0a))
+- feat: Verify the firmware MD5 value before LAN OTA ([6c735a6](https://github.com/espressif/esp-mesh-lite/commit/6c735a6406e8cc9f06bee89c187e40850c120a0a))
+- optimize: Add some execution logic after set_networking_mode ([6c735a6](https://github.com/espressif/esp-mesh-lite/commit/6c735a6406e8cc9f06bee89c187e40850c120a0a))
 - When disabling the ESP-NOW function, the related tasks will not be created internally to save RAM resources ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
 - feat: support esp32c5 ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
 - feat: optimize networking speed ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
