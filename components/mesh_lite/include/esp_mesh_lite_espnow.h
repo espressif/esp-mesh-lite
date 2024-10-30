@@ -22,7 +22,9 @@ typedef enum {
     ESPNOW_DATA_TYPE_MESH_LITE_CORE,
     ESPNOW_DATA_TYPE_RM_GROUP_CONTROL,
     ESPNOW_DATA_TYPE_ZERO_PROV,
-    ESPNOW_DATA_TYPE_RESERVE,
+    ESPNOW_DATA_TYPE_WIRELESS_DEBUG,
+    ESPNOW_DATA_TYPE_WIRELESS_LOG,
+    ESPNOW_DATA_TYPE_RESERVE = 200,
 } esp_mesh_lite_espnow_data_type_t;
 
 typedef struct espnow_cb_register {

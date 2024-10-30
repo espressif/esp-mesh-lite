@@ -226,4 +226,8 @@ menu "ESP Wi-Fi Mesh Lite"
             default 360
     endmenu
 
+    config MESH_LITE_WIRELESS_DEBUG
+        bool "Enabel Wireless Debug"
+        default n
+
 endmenu

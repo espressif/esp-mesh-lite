@@ -1,11 +1,15 @@
 # ChangeLog
 
-## v1.0.1 - 2024-8-12
+## v1.0.1 - 2024-10-24
 
 ### 功能:
 
 #### Mesh
 
+- 支持无线 debug 功能 ([6c735a6](https://github.com/espressif/esp-mesh-lite/commit/6c735a6406e8cc9f06bee89c187e40850c120a0a))
+- 支持 LAN OTA 时断点续传功能 ([6c735a6](https://github.com/espressif/esp-mesh-lite/commit/6c735a6406e8cc9f06bee89c187e40850c120a0a))
+- LAN OTA 之前验证固件的 MD5 值 ([6c735a6](https://github.com/espressif/esp-mesh-lite/commit/6c735a6406e8cc9f06bee89c187e40850c120a0a))
+- 优化设置组网模式后的一些执行逻辑 ([6c735a6](https://github.com/espressif/esp-mesh-lite/commit/6c735a6406e8cc9f06bee89c187e40850c120a0a))
 - 在禁用 ESP—NOW 功能时，内部将不创建相关的 task 以节省 RAM 资源 ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
 - 支持 esp32c5 ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
 - 优化组网速度 ([46d3e3e](https://github.com/espressif/esp-mesh-lite/commit/46d3e3e9a4acbeaad341bf6fef75b5605bcaf3d2))
