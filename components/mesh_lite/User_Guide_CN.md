@@ -8,6 +8,8 @@
 
 ESP-MESH-LITE 是一套建立在 Wi-Fi 协议之上的网络协议。ESP-MESH-LITE 允许分布在大范围区域内（室内和室外）的大量设备（下文称节点）在同一个 WLAN（无线局域网）中相互连接。ESP-MESH-LITE 与 [ESP-MESH](https://docs.espressif.com/projects/esp-idf/zh_CN/v5.0/esp32/api-guides/esp-wifi-mesh.html)（又称 ESP-WIFI-MESH）最大的不同是 ESP-MESH-LITE 允许组网内的子设备独立访问外部网络，传输信息对于父节点无感，大大降低了应用层开发难度，ESP-MESH-LITE 具有自组网和自修复的特性，也就是说 Mesh 网络可以自主地构建和维护。
 
+**注意**： 由于所依赖的 IoT-Bridge 组件的某些特性以及 ESP-IDF 的某些限制，组件在编译时将会给当前使用的 ESP-IDF 打上 [patch](https://github.com/espressif/esp-iot-bridge/tree/master/components/iot_bridge/patch)，为了避免对其他项目的影响，最好为 Mesh-Lite 项目单独维护 ESP-IDF。
+
 本 ESP-MESH-LITE 指南分为以下几个部分：
 
 1. [简介](#简介)
