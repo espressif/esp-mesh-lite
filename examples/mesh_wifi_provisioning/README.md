@@ -16,7 +16,7 @@ This example will demonstrate how to provision devices using the ESP Mesh-Lite P
 
 ## APP Preparation
 
-The ESP Mesh-Lite Provisioning APP requires the customer to compile it themselves from the branch https://github.com/espressif/esp-mesh-lite/tree/feature/zerp_provisioning_android.
+The ESP Mesh-Lite Provisioning APP requires the customer to compile it themselves from the branch https://github.com/espressif/esp-mesh-lite/tree/feature/zero_provisioning_android.
 
 ## Process
 

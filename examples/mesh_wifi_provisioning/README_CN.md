@@ -16,7 +16,7 @@
 
 ## APP 准备
 
-ESP Mesh-Lite Provisioning APP 需要客户根据 https://github.com/espressif/esp-mesh-lite/tree/feature/zerp_provisioning_android 分支自己编译。
+ESP Mesh-Lite Provisioning APP 需要客户根据 https://github.com/espressif/esp-mesh-lite/tree/feature/zero_provisioning_android 分支自己编译。
 
 ## 工作流程
 
