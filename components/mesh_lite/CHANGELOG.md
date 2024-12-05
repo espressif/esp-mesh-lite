@@ -2,12 +2,13 @@
 
 # ChangeLog
 
-## v1.0.1 - 2024-10-24
+## v1.0.1 - 2024-12-16
 
 ### Enhancements:
 
 #### Mesh
 
+- feat: Support setting message retransmission frequency ([888603e](https://github.com/espressif/esp-mesh-lite/commit/888603ef756e70f8fa8aa7e44b36ade11ecf4362))
 - feat: Support wireless debug ([6c735a6](https://github.com/espressif/esp-mesh-lite/commit/6c735a6406e8cc9f06bee89c187e40850c120a0a))
 - feat: Support LAN OTA breakpoint resume function ([6c735a6](https://github.com/espressif/esp-mesh-lite/commit/6c735a6406e8cc9f06bee89c187e40850c120a0a))
 - feat: Verify the firmware MD5 value before LAN OTA ([6c735a6](https://github.com/espressif/esp-mesh-lite/commit/6c735a6406e8cc9f06bee89c187e40850c120a0a))
@@ -28,6 +29,10 @@
 
 #### Bugfix
 
+- Fixed the issue where a leaf node was mistakenly selected as a parent node when softap was enabled ([888603e](https://github.com/espressif/esp-mesh-lite/commit/888603ef756e70f8fa8aa7e44b36ade11ecf4362))
+- Fixed failure to pin or disable device level when no suitable parent node is found during esp_mesh_lite_connect ([888603e](https://github.com/espressif/esp-mesh-lite/commit/888603ef756e70f8fa8aa7e44b36ade11ecf4362))
+- Fixed station number exceeds the maximum connection limit ([888603e](https://github.com/espressif/esp-mesh-lite/commit/888603ef756e70f8fa8aa7e44b36ade11ecf4362))
+- Fixed the level is changed thougth the node is fixed as root when root is disconnect from router ([888603e](https://github.com/espressif/esp-mesh-lite/commit/888603ef756e70f8fa8aa7e44b36ade11ecf4362))
 - Fixed some fusion failure issues ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
 - Fixed compatibility issues between LAN OTA enabled and disabled devices ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
 - Fixed the impact that may be caused to the network under hidden ssid when using ESP-NOW ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
