@@ -22,19 +22,9 @@ The ESP Mesh-Lite Provisioning APP requires the customer to compile it themselve
 
 ESP-Mesh-Lite is developed based on ESP-IDF functions and tools. Therefore, the ESP-IDF development environment must be set up first. You can refer to [Setting up Development Environment](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html) for detailed steps. Afterward, you can build the example directly in ESP-Mesh-Lite, similar to building the example in ESP-IDF.
 
-### Run TCP server
+### IDF configuration device
 
-1. Connect PC or the mobile phone to the router.
-2. Use a TCP testing tool (any third-party TCP testing software) to create a TCP server.
-
-### Configure the devices
-
-Enter `idf.py menuconfig`, and configure the followings under the submenu "Example Configuration".
-
- * ESP-WIFI-MESH network: The network password length should be between 8 and 64 bits (both exclusive), and the network will not be encrypted if you leave the password blank.
- * TCP server: the information of the TCP server run on the PC.
-
-<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/mesh_wifi_provisioning/device_config.png" alt="device_config" width="80%" div align=center />
+It is recommended to use v5.0.7, v5.1.5, v5.2.3, v5.3.1 and previous tag versions
 
 ### Build and Flash and Monitor
 

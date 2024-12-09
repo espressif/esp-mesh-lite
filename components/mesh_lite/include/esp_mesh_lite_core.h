@@ -670,7 +670,22 @@ esp_err_t esp_mesh_lite_get_router_config(mesh_lite_sta_config_t *router_config)
  *     if (!app_scan_stage2) {
  *         return;
  *     }
+ *
  *     // Application code
+ *     uint16_t sta_number = 0;
+ *     uint8_t i;
+ *     wifi_ap_record_t *ap_list_buffer;
+ *
+ *     esp_wifi_scan_get_ap_num(&sta_number);
+ *     ap_list_buffer = malloc(sta_number * sizeof(wifi_ap_record_t));
+ *
+ *     if (esp_wifi_scan_get_ap_records(&sta_number, (wifi_ap_record_t *)ap_list_buffer) == ESP_OK) {
+ *         for (i = 0; i < sta_number; i++) {
+ *             ESP_LOGI(TAG, "[%s][rssi=%d]", ap_list_buffer[i].ssid, ap_list_buffer[i].rssi);
+ *         }
+ *     }
+ *     free(ap_list_buffer);
+ *
  *     app_scan_end_post();
  * }
  *
@@ -692,6 +707,7 @@ esp_err_t esp_mesh_lite_get_router_config(mesh_lite_sta_config_t *router_config)
  *     .scan_end_cb = app_scan_end_post,
  * };
  * esp_mesh_lite_scan_cb_register(&app_scan_cb);
+ * ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT, WIFI_EVENT_SCAN_DONE, &app_scan_done_handler, NULL, NULL));
  * @endcode
  *
  * @return
@@ -971,6 +987,40 @@ esp_err_t esp_mesh_lite_try_sending_msg(char* send_msg,
                                         esp_err_t (*resend)(const char* payload));
 
 /**
+ * @brief Send a specific type of message with retransmission and set the retry interval.
+ *
+ * This function sends a message of a specific type and handles retransmissions. The message will
+ * be retransmitted until a message with the expected response message is received or the maximum
+ * number of retransmissions is reached. The retry interval will increment until the maximum retry
+ * interval is reached, after which the message will be retransmitted.
+ *
+ * @param[in] send_msg        The message to be sent.
+ * @param[in] expect_msg      The type of message expected to be received.
+ *                            If the corresponding message type is received, stop retransmission.
+ * @param[in] max_retry       The maximum number of retransmissions.
+ * @param[in] retry_interval  The interval (in milliseconds) between retransmissions.
+ *                            The value must be a multiple of 100 and at least 100 ms.
+ * @param[in] req_payload     The message payload. This parameter will not be freed in this API.
+ * @param[in] resend          The function pointer for sending the message.
+ *                            Possible functions include:
+ *                            - esp_mesh_lite_send_broadcast_msg_to_child()
+ *                            - esp_mesh_lite_send_broadcast_msg_to_parent()
+ *                            - esp_mesh_lite_send_msg_to_root()
+ *                            - esp_mesh_lite_send_msg_to_parent()
+ *
+ * @return
+ *      - ESP_OK: Successfully sent the message.
+ *      - ESP_FAIL: Failed to send the message.
+ *      - Other error codes: As defined in esp_err_t.
+ */
+esp_err_t esp_mesh_lite_try_sending_msg_with_retry_inerval(char* send_msg,
+                                                           char* expect_msg,
+                                                           uint8_t max_retry,
+                                                           uint16_t retry_interval,
+                                                           cJSON* req_payload,
+                                                           esp_err_t (*resend)(const char* payload));
+
+/**
  * @brief  Send broadcast raw message to child nodes.
  *
  * This function sends a raw broadcast message to all child nodes in the mesh network.
@@ -1045,6 +1095,41 @@ esp_err_t esp_mesh_lite_try_sending_raw_msg(uint32_t msg_id,
                                             const uint8_t* data,
                                             size_t size,
                                             esp_err_t (*raw_resend)(const uint8_t* data, size_t size));
+
+/**
+ * @brief Send a specific type of message and set the number of retransmissions.
+ *
+ * This function sends a raw message of a specific type and handles retransmissions.
+ * The message will be retransmitted until a message with the expected response message ID
+ * is received or the maximum number of retransmissions is reached. The interval between
+ * retransmissions is determined by the `retry_interval` parameter, which must be a multiple
+ * of 100 and cannot be smaller than 100 milliseconds.
+ *
+ * @param[in] msg_id            ID of the message to be sent.
+ * @param[in] expect_resp_msg_id ID of the expected response message.
+ * @param[in] max_retry         Maximum number of retransmissions.
+ * @param[in] retry_interval    Interval between each retransmission (in milliseconds).
+ *                              The value must be a multiple of 100 and at least 100 ms.
+ * @param[in] data              Pointer to the data to be sent.
+ * @param[in] size              Size of the data to be sent.
+ * @param[in] raw_resend        Function pointer to the send message function.
+ *                              - esp_mesh_lite_send_broadcast_raw_msg_to_child()
+ *                              - esp_mesh_lite_send_broadcast_raw_msg_to_parent()
+ *                              - esp_mesh_lite_send_raw_msg_to_root()
+ *                              - esp_mesh_lite_send_raw_msg_to_parent()
+ *
+ * @return
+ *      - ESP_OK: Successfully sent the message.
+ *      - ESP_FAIL: Failed to send the message.
+ *      - Other error codes: As defined in esp_err_t.
+ */
+esp_err_t esp_mesh_lite_try_sending_raw_msg_with_retry_inerval(uint32_t msg_id,
+                                                               uint32_t expect_resp_msg_id,
+                                                               uint8_t max_retry,
+                                                               uint16_t retry_interval,
+                                                               const uint8_t* data,
+                                                               size_t size,
+                                                               esp_err_t (*raw_resend)(const uint8_t* data, size_t size));
 
 /**
  * @brief Register a raw message action with the Mesh-Lite message action list.
