@@ -216,7 +216,7 @@ static void zero_prov_broadcast_cb(void *arg)
 
     if (g_channel_time > 4) {
         g_channel_time = 0;
-        if (g_channel_num == 11) {
+        if (g_channel_num == 14) {
             g_channel_num = 1;
         } else {
             g_channel_num ++;

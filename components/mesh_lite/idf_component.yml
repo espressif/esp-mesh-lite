@@ -1,4 +1,4 @@
-version: "1.0.0"
+version: "1.0.1"
 description: A lite version Wi-Fi Mesh, each node can access the network over the IP layer.
 url: https://github.com/espressif/esp-mesh-lite/tree/master/components/mesh_lite
 repository: https://github.com/espressif/esp-mesh-lite.git

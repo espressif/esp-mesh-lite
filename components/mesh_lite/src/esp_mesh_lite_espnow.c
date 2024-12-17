@@ -107,8 +107,8 @@ esp_err_t esp_mesh_lite_espnow_send(uint8_t type, uint8_t *peer_addr, const uint
         return ESP_ERR_INVALID_STATE;
     }
 
-    if (len == ESPNOW_PAYLOAD_MAX_LEN) {
-        len--;
+    if (len >= ESPNOW_PAYLOAD_MAX_LEN) {
+        len = ESPNOW_PAYLOAD_MAX_LEN - 1;
     }
     espnow_data[0] = type;
     memcpy(&espnow_data[1], data, len);

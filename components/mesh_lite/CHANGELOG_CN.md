@@ -1,11 +1,12 @@
 # ChangeLog
 
-## v1.0.1 - 2024-10-24
+## v1.0.1 - 2024-12-16
 
 ### 功能:
 
 #### Mesh
 
+- 支持设置消息重传频率 ([888603e](https://github.com/espressif/esp-mesh-lite/commit/888603ef756e70f8fa8aa7e44b36ade11ecf4362))
 - 支持无线 debug 功能 ([6c735a6](https://github.com/espressif/esp-mesh-lite/commit/6c735a6406e8cc9f06bee89c187e40850c120a0a))
 - 支持 LAN OTA 时断点续传功能 ([6c735a6](https://github.com/espressif/esp-mesh-lite/commit/6c735a6406e8cc9f06bee89c187e40850c120a0a))
 - LAN OTA 之前验证固件的 MD5 值 ([6c735a6](https://github.com/espressif/esp-mesh-lite/commit/6c735a6406e8cc9f06bee89c187e40850c120a0a))
@@ -26,6 +27,10 @@
 
 #### Bugfix
 
+- 修复固定叶节点开启 softap 时，被误选为父节点的问题 ([888603e](https://github.com/espressif/esp-mesh-lite/commit/888603ef756e70f8fa8aa7e44b36ade11ecf4362))
+- 修复当在 esp_mesh_lite_connect 期间找不到合适的父节点时，固定或禁用设备层级失败 ([888603e](https://github.com/espressif/esp-mesh-lite/commit/888603ef756e70f8fa8aa7e44b36ade11ecf4362))
+- 修复节点下 station 数量超过设置的最大连接数量 ([888603e](https://github.com/espressif/esp-mesh-lite/commit/888603ef756e70f8fa8aa7e44b36ade11ecf4362))
+- 修复固定根节点的设备与路由器断开时层级发生变化 ([888603e](https://github.com/espressif/esp-mesh-lite/commit/888603ef756e70f8fa8aa7e44b36ade11ecf4362))
 - 修复一些融合失败的问题 ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
 - 修复LAN OTA 使能与不使能设备的兼容问题 ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))
 - 修复使用 ESP-NOW 时可能对隐藏 ssid 下的组网造成的影响 ([7aec4a6](https://github.com/espressif/esp-mesh-lite/commit/7aec4a6555a933459181be4ea8ac0a27409585ea))

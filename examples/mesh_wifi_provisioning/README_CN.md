@@ -22,19 +22,9 @@ ESP Mesh-Lite Provisioning APP 需要客户根据 https://github.com/espressif/e
 
 ESP-Mesh-Lite 是基于 ESP-IDF 的功能和工具开发的。因此，首先必须设置 ESP-IDF 开发环境。您可以参考[设置开发环境](https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/get-started/index.html)获取详细的步骤。之后，您可以直接在 ESP-Mesh-Lite 中构建示例，类似于在 ESP-IDF 中构建示例。
 
-### 运行 TCP 服务器
+### IDF 配置设备
 
-1. 将主机（PC 或手机）连接到路由器。
-2. 使用 TCP 测试工具（此工具为任意一个第三方的 TCP 测试软件）来创建 TCP 服务器。
-
-### 配置设备
-
-输入 `idf.py menuconfig`，在 “Example Configuration” 子菜单下，进行配置：
-
- * ESP-WIFI-MESH 网络：密码长度要大于 8 位并小于 64 位，设置为空则不加密
- * TCP 服务器：主机上运行的 TCP 服务器信息, 包含：IP 地址、端口
-
-<img src="https://raw.githubusercontent.com/espressif/esp-mesh-lite/master/examples/mesh_wifi_provisioning/device_config.png" alt="device_config" width="80%" div align=center />
+建议使用 v5.0.7、v5.1.5、v5.2.3、v5.3.1 及其之前的 tag 版本
 
 ### 编译&烧录&运行
 
