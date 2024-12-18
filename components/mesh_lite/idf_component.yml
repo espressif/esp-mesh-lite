@@ -9,9 +9,6 @@ dependencies:
   espressif/qrcode: "^0.1.0"
   espressif/iot_bridge: "0.11.9"
   espressif/cmake_utilities: 0.*
-  wifi_provisioning:
-    path: components/wifi_provisioning
-    git: https://github.com/espressif/esp-mesh-lite.git
 examples:
   - path: ../../examples/mesh_local_control
   - path: ../../examples/no_router
