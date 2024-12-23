@@ -56,19 +56,10 @@ esp_err_t esp_mesh_lite_wireless_debug_send_command(uint8_t *dst_mac, char *comm
  * @brief Register wireless debug callbacks for handling various debug events.
  *
  * @param cb Pointer to the structure that contains the callback functions.
- */
-void esp_mesh_lite_wireless_debug_cb_register(esp_mesh_lite_wireless_debug_cb_list_t *cb);
-
-/**
- * @brief Initialize the wireless debug feature for ESP-Mesh-Lite.
- *
- * This function sets up necessary configurations for wireless debugging,
- * including setting up the communication channels and enabling mDNS for device discovery.
- * Call this function before using any wireless debugging functionalities.
  *
  * Usage Example: If you need to hide the SSID and cannot use ESP-NOW, you can achieve networking by registering the following callback
  * @code{.c}
-#include "esp_mesh_lite_wireless_debug.h"
+ * #include "esp_mesh_lite_wireless_debug.h"
  * static char wifi_error_payload[ESPNOW_PAYLOAD_MAX_LEN];
  * static uint8_t s_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
  *
@@ -167,6 +158,16 @@ void esp_mesh_lite_wireless_debug_cb_register(esp_mesh_lite_wireless_debug_cb_li
  * };
  * esp_mesh_lite_wireless_debug_cb_register(&cb);
  * @endcode
+ *
+ */
+void esp_mesh_lite_wireless_debug_cb_register(esp_mesh_lite_wireless_debug_cb_list_t *cb);
+
+/**
+ * @brief Initialize the wireless debug feature for ESP-Mesh-Lite.
+ *
+ * This function sets up necessary configurations for wireless debugging,
+ * including setting up the communication channels and enabling mDNS for device discovery.
+ * Call this function before using any wireless debugging functionalities.
  *
  */
 void esp_mesh_lite_wireless_debug_init(void);

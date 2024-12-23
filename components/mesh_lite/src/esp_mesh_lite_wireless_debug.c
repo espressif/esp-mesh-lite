@@ -191,15 +191,15 @@ static int wireless_debug_cmd_discover(int argc, char **argv)
         uint8_t channel = base_args.channel->ival[0];
         if ((channel > 0) && (channel <= 14)) {
             last_response_channel = base_args.channel->ival[0];
-            ESP_LOGI(TAG, "channel: %d\n", channel);
+            ESP_LOGI(TAG, "channel: %d", channel);
         }
     }
 
     if (base_args.mac->count > 0) {
         str_2_mac((uint8_t*)base_args.mac->sval[0], last_dst_mac);
-        ESP_LOGI(TAG, "mac:" MACSTR "\r\n",  MAC2STR(last_dst_mac));
+        ESP_LOGI(TAG, "mac:" MACSTR "",  MAC2STR(last_dst_mac));
     } else {
-        ESP_LOGW(TAG, "Not provided mac, use last mac "MACSTR"\n", MAC2STR(last_dst_mac));
+        ESP_LOGW(TAG, "Not provided mac, use last mac "MACSTR"", MAC2STR(last_dst_mac));
     }
 
     uint8_t sta_mac[6];
@@ -215,7 +215,7 @@ static int wireless_debug_cmd_discover(int argc, char **argv)
             vTaskDelay(delay_time_ms / portTICK_PERIOD_MS);
         }
     } else {
-        ESP_LOGW(TAG, "STA MAC does not match with last_dst_mac\n");
+        ESP_LOGW(TAG, "STA MAC does not match with last_dst_mac");
     }
 
     return 0;
@@ -233,15 +233,15 @@ static int wireless_debug_cmd_wifi_error(int argc, char **argv)
         uint8_t channel = base_args.channel->ival[0];
         if ((channel > 0) && (channel <= 14)) {
             last_response_channel = base_args.channel->ival[0];
-            ESP_LOGI(TAG, "channel: %d\n", channel);
+            ESP_LOGI(TAG, "channel: %d", channel);
         }
     }
 
     if (base_args.mac->count > 0) {
         str_2_mac((uint8_t*)base_args.mac->sval[0], last_dst_mac);
-        ESP_LOGI(TAG, "mac:" MACSTR "\r\n",  MAC2STR(last_dst_mac));
+        ESP_LOGI(TAG, "mac:" MACSTR "",  MAC2STR(last_dst_mac));
     } else {
-        ESP_LOGW(TAG, "Not provided mac, use last mac "MACSTR"\n", MAC2STR(last_dst_mac));
+        ESP_LOGW(TAG, "Not provided mac, use last mac "MACSTR"", MAC2STR(last_dst_mac));
     }
 
     uint8_t sta_mac[6];
@@ -258,7 +258,7 @@ static int wireless_debug_cmd_wifi_error(int argc, char **argv)
             snprintf(output_buffer, ESPNOW_PAYLOAD_MAX_LEN, "wifi_error:%s", error_info);
         }
     } else {
-        ESP_LOGW(TAG, "STA MAC does not match with last_dst_mac\n");
+        ESP_LOGW(TAG, "STA MAC does not match with last_dst_mac");
     }
 
     return 0;
@@ -276,15 +276,15 @@ static int wireless_debug_cmd_cloud_error(int argc, char **argv)
         uint8_t channel = base_args.channel->ival[0];
         if ((channel > 0) && (channel <= 14)) {
             last_response_channel = base_args.channel->ival[0];
-            ESP_LOGI(TAG, "channel: %d\n", channel);
+            ESP_LOGI(TAG, "channel: %d", channel);
         }
     }
 
     if (base_args.mac->count > 0) {
         str_2_mac((uint8_t*)base_args.mac->sval[0], last_dst_mac);
-        ESP_LOGI(TAG, "mac:" MACSTR "\r\n",  MAC2STR(last_dst_mac));
+        ESP_LOGI(TAG, "mac:" MACSTR "",  MAC2STR(last_dst_mac));
     } else {
-        ESP_LOGW(TAG, "Not provided mac, use last mac "MACSTR"\n", MAC2STR(last_dst_mac));
+        ESP_LOGW(TAG, "Not provided mac, use last mac "MACSTR"", MAC2STR(last_dst_mac));
     }
 
     uint8_t sta_mac[6];
@@ -301,7 +301,7 @@ static int wireless_debug_cmd_cloud_error(int argc, char **argv)
             snprintf(output_buffer, ESPNOW_PAYLOAD_MAX_LEN, "cloud_error:%s", error_info);
         }
     } else {
-        ESP_LOGW(TAG, "STA MAC does not match with last_dst_mac\n");
+        ESP_LOGW(TAG, "STA MAC does not match with last_dst_mac");
     }
 
     return 0;
@@ -322,25 +322,25 @@ static int wireless_debug_cmd_core_log(int argc, char **argv)
         uint8_t channel = core_log_args.base_args.channel->ival[0];
         if ((channel > 0) && (channel <= 14)) {
             last_response_channel = core_log_args.base_args.channel->ival[0];
-            ESP_LOGI(TAG, "channel: %d\n", channel);
+            ESP_LOGI(TAG, "channel: %d", channel);
         }
     }
 
     if (core_log_args.base_args.mac->count > 0) {
         str_2_mac((uint8_t*)core_log_args.base_args.mac->sval[0], last_dst_mac);
-        ESP_LOGI(TAG, "mac: "MACSTR"\n", MAC2STR(last_dst_mac));
+        ESP_LOGI(TAG, "mac: "MACSTR"", MAC2STR(last_dst_mac));
     } else {
-        ESP_LOGW(TAG, "Not provided mac, use last mac "MACSTR"\n", MAC2STR(last_dst_mac));
+        ESP_LOGW(TAG, "Not provided mac, use last mac "MACSTR"", MAC2STR(last_dst_mac));
     }
 
     if (core_log_args.onoff->count > 0) {
         onoff = core_log_args.onoff->ival[0];
-        ESP_LOGI(TAG, "onoff: %d\n", onoff);
+        ESP_LOGI(TAG, "onoff: %d", onoff);
     }
 
     if (core_log_args.level->count > 0) {
         level = core_log_args.level->ival[0];
-        ESP_LOGI(TAG, "level: %d\n", level);
+        ESP_LOGI(TAG, "level: %d", level);
     }
 
     if ((onoff != 0) && (onoff != 1)) {
@@ -472,7 +472,7 @@ static void esp_mesh_lite_wireless_debug_task(void *pvParameter)
                 int ret;
                 memset(output_buffer, 0x0, ESPNOW_PAYLOAD_MAX_LEN);
                 memcpy(command_payload, data->payload, recv_cb->data_len - sizeof(wireless_debug_data_t));
-                ESP_LOGI(TAG, "recv cmd:%s\r\n", command_payload);
+                ESP_LOGI(TAG, "recv cmd:%s", command_payload);
                 esp_err_t err = esp_console_run(command_payload, &ret);
 
                 if (err == ESP_OK) {
@@ -481,7 +481,7 @@ static void esp_mesh_lite_wireless_debug_task(void *pvParameter)
                         if (rsp_data) {
                             memcpy(rsp_data->payload, output_buffer, strlen(output_buffer));
                             rsp_data->payload[strlen(output_buffer)] = '\0';
-                            ESP_LOGI(TAG, "response data:%s\r\n", rsp_data->payload);
+                            ESP_LOGI(TAG, "response data:%s", rsp_data->payload);
                             if (last_response_channel) {
                                 rsp_data->channel = last_response_channel;
                             }
@@ -492,13 +492,13 @@ static void esp_mesh_lite_wireless_debug_task(void *pvParameter)
                             if (ret == ESP_OK) {
                                 ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_WIRELESS_DEBUG, recv_cb->mac_addr, (const uint8_t*)rsp_data, sizeof(wireless_debug_data_t) + strlen(output_buffer));
                                 if (ret != ESP_OK) {
-                                    ESP_LOGE(TAG, "Send error: %d [%s %d]\r\n", ret, __func__, __LINE__);
+                                    ESP_LOGE(TAG, "Send error: %d [%s %d]", ret, __func__, __LINE__);
                                 }
                             }
                             free(rsp_data);
                         }
                     }
-                    ESP_LOGI(TAG, "Run command\n\n");
+                    ESP_LOGI(TAG, "Run command\n");
                 } else if (err == ESP_ERR_NOT_FOUND) {
                     ESP_LOGI(TAG, "Unrecognized command\n");
                 } else if (err == ESP_ERR_INVALID_ARG) {
@@ -547,7 +547,7 @@ esp_err_t esp_mesh_lite_wireless_debug_send_command(uint8_t *dst_mac, char *comm
     pbuf->is_rsp_payload = false;
     pbuf->mesh_id = esp_mesh_lite_get_mesh_id();
     strcpy((char*)pbuf->payload, command);
-    ESP_LOGI(TAG, "send command: %s\r\n", pbuf->payload);
+    ESP_LOGI(TAG, "send command: %s", pbuf->payload);
 
     ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_WIRELESS_DEBUG, dst_mac, (const uint8_t *)pbuf, length);
     if (ret != ESP_OK) {
