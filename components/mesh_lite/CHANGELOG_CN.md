@@ -20,6 +20,12 @@
 - 修复了以下问题：设备被子节点连满后，子节点即使断开，该设备也不会再被当作父节点来进行选择，此问题由 888603ef 引入 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - 修复了以下问题：设备成功执行了父节点发现动作，但是没有执行连接 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 
+### 功能:
+
+#### Mesh
+
+- 扩展 esp_mesh_lite_espnow_recv_cb 的参数以适应更多场景
+
 ## v1.0.1 - 2024-12-16
 
 ### 功能:

@@ -557,23 +557,23 @@ esp_err_t esp_mesh_lite_wireless_debug_send_command(uint8_t *dst_mac, char *comm
     return ret;
 }
 
-static void wireless_log_process_cb(const uint8_t *mac_addr, const uint8_t *data, int len)
+static void wireless_log_process_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)
 {
     if (mesh_lite_wireless_debug_task_handle == NULL) {
         return;
     }
 
-    if (mac_addr == NULL || data == NULL || len <= 0) {
+    if (recv_info == NULL || data == NULL || len <= 0) {
         ESP_LOGD(TAG, "Receive cb arg error");
         return;
     }
 
     if (cb_list.recv_debug_log_cb) {
-        cb_list.recv_debug_log_cb(mac_addr, data, len);
+        cb_list.recv_debug_log_cb(recv_info, data, len);
     }
 }
 
-static void wireless_debug_process_cb(const uint8_t *mac_addr, const uint8_t *data, int len)
+static void wireless_debug_process_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)
 {
     if (mesh_lite_wireless_debug_task_handle == NULL) {
         return;
@@ -581,6 +581,7 @@ static void wireless_debug_process_cb(const uint8_t *mac_addr, const uint8_t *da
 
     esp_mesh_lite_espnow_event_t evt;
     espnow_recv_cb_t *recv_cb = &evt.info.recv_cb;
+    uint8_t *mac_addr = (uint8_t *)recv_info->src_addr;
 
     if (mac_addr == NULL || data == NULL || len <= 0) {
         ESP_LOGD(TAG, "Receive cb arg error");

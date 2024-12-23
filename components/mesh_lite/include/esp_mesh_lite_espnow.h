@@ -29,7 +29,7 @@ typedef enum {
 
 typedef struct espnow_cb_register {
     esp_mesh_lite_espnow_data_type_t type;
-    void (*esp_mesh_lite_espnow_recv_cb)(const uint8_t *mac_addr, const uint8_t *data, int len);
+    void (*esp_mesh_lite_espnow_recv_cb)(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len);
     struct espnow_cb_register *next;
 } espnow_cb_register_t;
 
@@ -114,13 +114,13 @@ esp_err_t esp_mesh_lite_espnow_send_and_del_peer(uint8_t type, uint8_t *peer_add
  * @param[in] type Type of data for which the callback is registered.
  * @param[in] recv_cb Pointer to the callback function for data reception.
  *                    The callback function must have the signature:
- *                    `void recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len)`.
+ *                    `void recv_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)`.
  * @return
  *      - ESP_OK: Callback registration successful
  *      - ESP_FAIL: Failed to register the callback
  */
 esp_err_t esp_mesh_lite_espnow_recv_cb_register(esp_mesh_lite_espnow_data_type_t type,
-                                                void (*recv_cb)(const uint8_t *mac_addr, const uint8_t *data, int len));
+                                                void (*recv_cb)(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len));
 
 /**
  * @brief Unregister a callback function for handling ESP-Mesh-Lite ESP-NOW data reception.

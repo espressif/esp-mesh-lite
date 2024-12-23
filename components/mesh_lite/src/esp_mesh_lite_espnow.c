@@ -22,13 +22,13 @@ esp_err_t esp_mesh_lite_espnow_register_handler_failed_callback(esp_mesh_lite_es
     return ESP_OK;
 }
 
-static inline esp_err_t esp_mesh_lite_espnow_recv_callback(uint8_t type, const uint8_t *mac_addr, const uint8_t *data, int len)
+static inline esp_err_t esp_mesh_lite_espnow_recv_callback(uint8_t type, const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)
 {
     esp_err_t ret = ESP_FAIL;
     espnow_cb_register_t *current = esp_mesh_lite_espnow_cb_list;
     while (current != NULL) {
         if (current->type == type) {
-            current->esp_mesh_lite_espnow_recv_cb(mac_addr, data, len);
+            current->esp_mesh_lite_espnow_recv_cb(recv_info, data, len);
             ret = ESP_OK;
             break;
         }
@@ -39,8 +39,7 @@ static inline esp_err_t esp_mesh_lite_espnow_recv_callback(uint8_t type, const u
 
 static void espnow_recv_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)
 {
-    uint8_t *mac_addr = recv_info->src_addr;
-    esp_err_t ret = esp_mesh_lite_espnow_recv_callback(data[0], mac_addr, data + 1, len - 1);
+    esp_err_t ret = esp_mesh_lite_espnow_recv_callback(data[0], recv_info, data + 1, len - 1);
 
     if (ret != ESP_OK) {
         if (espnow_recv_failed_hook) {
@@ -50,7 +49,7 @@ static void espnow_recv_cb(const esp_now_recv_info_t *recv_info, const uint8_t *
 }
 
 esp_err_t esp_mesh_lite_espnow_recv_cb_register(esp_mesh_lite_espnow_data_type_t type,
-                                                void (*recv_cb)(const uint8_t *mac_addr, const uint8_t *data, int len))
+                                                void (*recv_cb)(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len))
 {
     if (espnow_init == false) {
         return ESP_ERR_INVALID_STATE;

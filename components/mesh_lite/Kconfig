@@ -71,37 +71,37 @@ menu "ESP Wi-Fi Mesh Lite"
                 default "ESP32"
                 help
                     The device category, such as Light, Fun.
+    endmenu
 
-        config ESP_MESH_LITE_OTA_ENABLE
-            bool "Enable Mesh-Lite OTA"
-            default n
+    config ESP_MESH_LITE_OTA_ENABLE
+        bool "Enable Mesh-Lite OTA"
+        default n
+        help
+            Enable Mesh-Lite OTA,
+            When the device receives an OTA instruction, it will first request new firmware from the parent node,
+            if the parent node does not have one, it will continue to request from a higher-level node, and so on up to the root node,
+            if the root node also does not have the corresponding version firmware, then the upgrade will begin from the external URL.
+
+    menu "Mesh-Lite OTA"
+        depends on ESP_MESH_LITE_OTA_ENABLE
+        config OTA_DATA_LEN
+            int "Transmission data length of each packet"
+            default 1388
+            range 512 1388
             help
-                Enable Mesh-Lite OTA,
-                When the device receives an OTA instruction, it will first request new firmware from the parent node,
-                if the parent node does not have one, it will continue to request from a higher-level node, and so on up to the root node,
-                if the root node also does not have the corresponding version firmware, then the upgrade will begin from the external URL.
+                Setting a smaller default OTA_DATA_LEN size can save some RAM,
+                but the time spent by OTA will increase.
 
-        menu "Mesh-Lite OTA"
-            depends on ESP_MESH_LITE_OTA_ENABLE
-            config OTA_DATA_LEN
-                int "Transmission data length of each packet"
-                default 1388
-                range 512 1388
-                help
-                    Setting a smaller default OTA_DATA_LEN size can save some RAM,
-                    but the time spent by OTA will increase.
+        config OTA_WND_DEFAULT
+            int "Default receive window size"
+            default 8328
+            range OTA_DATA_LEN 8328
+            help
+                Must be a multiple of OTA_data_Len
 
-            config OTA_WND_DEFAULT
-                int "Default receive window size"
-                default 8328
-                range OTA_DATA_LEN 8328
-                help
-                    Must be a multiple of OTA_data_Len
-
-            config OTA_AUTO_RESTART
-                bool "After OTA successfully, chip restarts automatically"
-                default y
-        endmenu
+        config OTA_AUTO_RESTART
+            bool "After OTA successfully, chip restarts automatically"
+            default y
     endmenu
 
     config MESH_LITE_PROV_ENABLE

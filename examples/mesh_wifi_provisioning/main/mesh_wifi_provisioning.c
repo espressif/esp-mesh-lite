@@ -23,7 +23,6 @@
 #if defined(CONFIG_MESH_LITE_PROV_ENABLE)
 #include "zero_provisioning.h"
 #endif
-#define PAYLOAD_LEN       (1456) /**< Max payload size(in bytes) */
 
 static int g_sockfd    = -1;
 static const char *TAG = "local_control";
@@ -52,14 +51,13 @@ static int socket_tcp_client_create(const char *ip, uint16_t port)
     }
 
     esp_netif_get_netif_impl_name(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), iface.ifr_name);
-    if (setsockopt(sockfd, SOL_SOCKET, SO_BINDTODEVICE,  &iface, sizeof(struct ifreq)) != 0) {
+    if (setsockopt(sockfd, SOL_SOCKET, SO_BINDTODEVICE, &iface, sizeof(struct ifreq)) != 0) {
         ESP_LOGE(TAG, "Bind [sock=%d] to interface %s fail", sockfd, iface.ifr_name);
     }
 
     ret = connect(sockfd, (struct sockaddr *)&server_addr, sizeof(struct sockaddr_in));
     if (ret < 0) {
-        ESP_LOGD(TAG, "socket connect, ret: %d, ip: %s, port: %d",
-                 ret, ip, port);
+        ESP_LOGD(TAG, "socket connect, ret: %d, ip: %s, port: %d", ret, ip, port);
         goto ERR_EXIT;
     }
     return sockfd;

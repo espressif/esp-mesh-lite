@@ -375,12 +375,12 @@ To facilitate simultaneous communication using ESPNOW across multiple functional
 1. Use the `esp_mesh_lite_espnow_recv_cb_register()` interface to register the ESPNOW receive callback. The first parameter is the ESPNOW data type to be sent and received. Users can use `ESPNOW_DATA_TYPE_RESERVE` or add their own custom types within `ESPNOW_DATA_TYPE_RESERVE`. Note that `ESPNOW_DATA_TYPE_RESERVE`, `ESPNOW_DATA_TYPE_RM_GROUP_CONTROL`, and `ESPNOW_DATA_TYPE_ZERO_PROV` are already in use. Below is an example of how to use this in code:
 
    ```c
-   static void espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len)
+   static void espnow_recv_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)
    {
        esp_mesh_lite_espnow_event_t evt;
        espnow_recv_cb_t *recv_cb = &evt.info.recv_cb;
    
-       if (mac_addr == NULL || data == NULL || len <= 0) {
+       if (recv_info->src_addr == NULL || data == NULL || len <= 0) {
            ESP_LOGE(TAG, "Receive cb arg error");
            return;
        }
