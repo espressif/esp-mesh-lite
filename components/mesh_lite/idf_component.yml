@@ -12,4 +12,6 @@ dependencies:
 examples:
   - path: ../../examples/mesh_local_control
   - path: ../../examples/no_router
+  - path: ../../examples/wireless_debug
+  - path: ../../examples/mesh_wifi_provisioning
   - path: ../../examples/rainmaker/led_light

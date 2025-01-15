@@ -1,0 +1,23 @@
+menu "Example Configuration"
+
+config ROUTER_SSID
+    string "Router SSID"
+        default "ROUTER_SSID"
+        help
+            Router SSID.
+
+config ROUTER_PASSWORD
+    string "Router password"
+        default "ROUTER_PASSWORD"
+        help
+            Router password.
+
+config APP_GPIO_BUTTON_SW1
+    default 16 if IDF_TARGET_ESP32   || IDF_TARGET_ESP32H2
+    default 38 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+    default 9
+    int "GPIO button of switch"
+    help
+        Set the GPIO button of switch.
+
+endmenu
