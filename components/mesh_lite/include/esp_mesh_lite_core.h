@@ -697,7 +697,7 @@ esp_err_t esp_mesh_lite_get_router_config(mesh_lite_sta_config_t *router_config)
  *     }
  *
  *     app_scan_stage1 = true;
- *     if (esp_mesh_lite_wifi_scan_start(NULL, 1000 / portTICK_PERIOD_MS) != ESP_OK) {
+ *     if (esp_mesh_lite_wifi_scan_start(NULL, 3000 / portTICK_PERIOD_MS) != ESP_OK) {
  *         app_scan_stage1 = false;
  *     }
  * }

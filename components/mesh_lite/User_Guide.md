@@ -6,7 +6,7 @@ This document provides an introduction to the Mesh-Lite protocol.
 
 ## Overview
 
-ESP-MESH-LITE is a Wi-Fi networking application of [IoT-Bridge](https://github.com/espressif/esp-iot-bridge), based on the **SoftAP + Station** mode, a set of Mesh solutions built on top of the Wi-Fi protocol. ESP-MESH-LITE allows numerous devices (henceforth referred to as nodes) spread over a large physical area (both indoors and outdoors) to be interconnected under a single WLAN (Wireless Local-Area Network). The biggest difference between ESP-MESH-LITE and [ESP-MESH](https://docs.espressif.com/projects/esp-idf/en/v5.0/esp32/api-guides/esp-wifi-mesh.html) (also known as ESP-WIFI-MESH) is that ESP-MESH-LITE allows sub-devices in the network to independently access the external network, and the transmission information is insensitive to the parent node, which greatly reduces the difficulty to develop the application layer. ESP-MESH-LITE is self-organizing and self-healing, which means the network can be built and maintained autonomously.
+ESP-MESH-LITE is a Wi-Fi networking application of [IoT-Bridge](https://github.com/espressif/esp-iot-bridge), based on the **SoftAP + Station** mode, a set of Mesh solutions built on top of the Wi-Fi protocol. ESP-MESH-LITE allows numerous devices (henceforth referred to as nodes) spread over a large physical area (both indoors and outdoors) to be interconnected under a single WLAN (Wireless Local-Area Network). The biggest difference between ESP-MESH-LITE and [ESP-MESH](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/esp-wifi-mesh.html) (also known as ESP-WIFI-MESH) is that ESP-MESH-LITE allows sub-devices in the network to independently access the external network, and the transmission information is insensitive to the parent node, which greatly reduces the difficulty to develop the application layer. ESP-MESH-LITE is self-organizing and self-healing, which means the network can be built and maintained autonomously.
 
 **Note**: Due to certain characteristics of the IoT-Bridge component and some limitations of ESP-IDF, the component will apply a [patch](https://github.com/espressif/esp-iot-bridge/tree/master/components/iot_bridge/patch) during compilation for the currently used ESP-IDF. To avoid impacting other projects, it is best to maintain a separate ESP-IDF for the Mesh-Lite project.
 
@@ -357,7 +357,7 @@ Below are some common performance metrics for the ESP-MESH-LITE network:
 
 
 
-## Difference Between ESP-MESH-LITE and [ESP-MESH](https://docs.espressif.com/projects/esp-idf/en/v4.4.2/esp32/api-guides/esp-wifi-mesh.html)
+## Difference Between ESP-MESH-LITE and [ESP-MESH](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/esp-wifi-mesh.html)
 
 - ESP-MESH-LITE saves more memory space compared to ESP-MESH, but ESP-MESH's self-provisioning and self-healing features are relatively better.
 
