@@ -2,6 +2,12 @@
 
 # ChangeLog
 
+## v1.0.2 - 2025-1-22
+
+### Breaking Change:
+
+- Deprecate `esp_mesh_lite_get_child_node_number` and replace it with `esp_mesh_lite_get_mesh_node_number`.
+
 ## v1.0.1 - 2024-12-16
 
 ### Enhancements:

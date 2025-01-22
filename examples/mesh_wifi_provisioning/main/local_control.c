@@ -139,8 +139,8 @@ static void print_system_info_timercb(TimerHandle_t timer)
              ", parent rssi: %d, free heap: %"PRIu32"", primary,
              esp_mesh_lite_get_level(), MAC2STR(sta_mac), MAC2STR(ap_info.bssid),
              (ap_info.rssi != 0 ? ap_info.rssi : -120), esp_get_free_heap_size());
-#if CONFIG_MESH_LITE_MAXIMUM_NODE_NUMBER
-    ESP_LOGI(TAG, "child node number: %d", esp_mesh_lite_get_child_node_number());
+#if CONFIG_MESH_LITE_NODE_INFO_REPORT
+    ESP_LOGI(TAG, "All node number: %"PRIu32"", esp_mesh_lite_get_mesh_node_number());
 #endif /* MESH_LITE_NODE_INFO_REPORT */
     for (int i = 0; i < wifi_sta_list.num; i++) {
         ESP_LOGI(TAG, "Child mac: " MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));

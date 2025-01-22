@@ -40,6 +40,18 @@ default:
   - idf.py ${compile_option} set-target ${idf_target}
   - idf.py build
   - cd -
+
+  - cd examples/mesh_local_control
+  - git checkout -- .
+  - git clean -xdff
+  - echo -e "\nCONFIG_MESH_LITE_NODE_INFO_REPORT=y" >> sdkconfig.defaults.${idf_target}
+  - echo -e "\nCONFIG_ESP_MESH_LITE_OTA_ENABLE=y" >> sdkconfig.defaults.${idf_target}
+  - echo -e "\nCONFIG_MESH_LITE_PROV_ENABLE=y" >> sdkconfig.defaults.${idf_target}
+  - echo -e "\nCONFIG_MESH_LITE_WIRELESS_DEBUG=y" >> sdkconfig.defaults.${idf_target}
+  - idf.py ${compile_option} set-target ${idf_target}
+  - idf.py build
+  - cd -
+
   - cd examples/no_router
   - rm -rf build sdkconfig
   - idf.py ${compile_option} set-target ${idf_target}
