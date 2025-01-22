@@ -1,5 +1,11 @@
 # ChangeLog
 
+## v1.0.2 - 2025-1-22
+
+### Breaking Change:
+
+- 弃用 esp_mesh_lite_get_child_node_number，改用 esp_mesh_lite_get_mesh_node_number
+
 ## v1.0.1 - 2024-12-16
 
 ### 功能:

@@ -95,13 +95,25 @@ const node_info_list_t *esp_mesh_lite_get_nodes_list(uint32_t *size);
 #endif /* CONFIG_MESH_LITE_NODE_INFO_REPORT */
 
 /**
- * @brief Get the child node number of Mesh-Lite
+ * @brief Get all node number of Mesh-Lite
  *
- * @attention The valid number of child nodes can only be obtained when CONFIG_MESH_LITE_NODE_INFO_REPORT is configured, otherwise 0 is returned.
+ * @attention The valid number of all nodes can only be obtained when CONFIG_MESH_LITE_NODE_INFO_REPORT is configured, otherwise 0 is returned.
  *
- * @return the child node number of Mesh-Lite
+ * @return the all node number of Mesh-Lite
  */
-uint32_t esp_mesh_lite_get_child_node_number(void);
+uint32_t esp_mesh_lite_get_mesh_node_number(void);
+
+/**
+ * @brief Get all node number of Mesh-Lite
+ *
+ * @attention The valid number of all nodes can only be obtained when CONFIG_MESH_LITE_NODE_INFO_REPORT is configured, otherwise 0 is returned.
+ *
+ * @note This API is present for backward compatibility reasons. Alternative function
+ * with the same functionality is `esp_mesh_lite_get_mesh_node_number`
+ *
+ * @return the all node number of Mesh-Lite
+ */
+uint32_t esp_mesh_lite_get_child_node_number(void) __attribute__((deprecated("Please use esp_mesh_lite_get_mesh_node_number instead")));
 
 /**
  * @brief Get the softap ssid from NVS

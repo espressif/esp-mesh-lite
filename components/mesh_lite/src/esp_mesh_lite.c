@@ -27,7 +27,6 @@ static uint32_t nodes_num = 0;
 static node_info_list_t *node_info_list = NULL;
 static SemaphoreHandle_t node_info_mutex;
 
-static esp_err_t esp_mesh_lite_node_info_add(uint8_t level, char* mac);
 static esp_err_t esp_mesh_lite_node_info_update(uint8_t level, uint8_t* mac, uint32_t ip_addr);
 static esp_err_t esp_mesh_lite_update_nodes_info_to_children(void);
 
@@ -325,6 +324,15 @@ static void esp_mesh_lite_event_ap_sta_ip_assigned_handler(void *arg, esp_event_
     esp_mesh_lite_report_info();
 }
 #endif // CONFIG_MESH_LITE_NODE_INFO_REPORT
+
+uint32_t esp_mesh_lite_get_mesh_node_number(void)
+{
+#ifdef CONFIG_MESH_LITE_NODE_INFO_REPORT
+    return nodes_num;
+#else
+    return 0;
+#endif
+}
 
 uint32_t esp_mesh_lite_get_child_node_number(void)
 {
