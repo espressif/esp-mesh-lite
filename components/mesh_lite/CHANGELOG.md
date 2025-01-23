@@ -2,11 +2,25 @@
 
 # ChangeLog
 
-## v1.0.2 - 2025-1-22
+## v1.0.2 - 2025-1-23
 
 ### Breaking Change:
 
-- Deprecate `esp_mesh_lite_get_child_node_number` and replace it with `esp_mesh_lite_get_mesh_node_number`.
+- Deprecate `esp_mesh_lite_get_child_node_number` and replace it with `esp_mesh_lite_get_mesh_node_number` ([a38ba0e](https://github.com/espressif/esp-mesh-lite/commit/a38ba0e68d48a93aa0c536f5a43bf657a5cccaf3))
+
+### Enhancements:
+
+#### Mesh
+
+- optimize wifi reconnect logic ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
+- feat: Redefine the interface for obtaining the total number of nodes ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
+
+#### Bugfix
+
+- Fixed seq exception for raw data communication ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
+- Fixed a situation where the new device verification logic was accidentally not executed ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
+- Fixed an issue where after a device is fully connected by children it will no longer be selected as a parent even if some children are disconnected, This issue was introduced by 888603ef  ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
+- Fix an issue that the parent node discovery operation is successfully performed, but the connection is not established ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 
 ## v1.0.1 - 2024-12-16
 

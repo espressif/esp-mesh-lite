@@ -1,10 +1,24 @@
 # ChangeLog
 
-## v1.0.2 - 2025-1-22
+## v1.0.2 - 2025-1-23
 
 ### Breaking Change:
 
-- 弃用 esp_mesh_lite_get_child_node_number，改用 esp_mesh_lite_get_mesh_node_number
+- 弃用 esp_mesh_lite_get_child_node_number，改用 esp_mesh_lite_get_mesh_node_number ([a38ba0e](https://github.com/espressif/esp-mesh-lite/commit/a38ba0e68d48a93aa0c536f5a43bf657a5cccaf3))
+
+### Enhancements:
+
+#### Mesh
+
+- 优化 wifi 重连逻辑 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
+- 重新定义获取节点总数接口 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
+
+#### Bugfix
+
+- 修复 raw data 通信时的 seq 异常问题 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
+- 修复了新设备验证逻辑意外未执行的情况 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
+- 修复了以下问题：设备被子节点连满后，子节点即使断开，该设备也不会再被当作父节点来进行选择，此问题由 888603ef 引入 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
+- 修复了以下问题：设备成功执行了父节点发现动作，但是没有执行连接 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 
 ## v1.0.1 - 2024-12-16
 
