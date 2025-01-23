@@ -6,12 +6,13 @@
 
 - 弃用 esp_mesh_lite_get_child_node_number，改用 esp_mesh_lite_get_mesh_node_number ([a38ba0e](https://github.com/espressif/esp-mesh-lite/commit/a38ba0e68d48a93aa0c536f5a43bf657a5cccaf3))
 
-### Enhancements:
+### 功能:
 
 #### Mesh
 
 - 优化 wifi 重连逻辑 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - 重新定义获取节点总数接口 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
+- 扩展 esp_mesh_lite_espnow_recv_cb 的参数以适应更多场景 ([eaf4e0a](https://github.com/espressif/esp-mesh-lite/commit/eaf4e0aa47da2a4d93c4d058395f67575d33161b))
 
 #### Bugfix
 
@@ -19,12 +20,6 @@
 - 修复了新设备验证逻辑意外未执行的情况 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - 修复了以下问题：设备被子节点连满后，子节点即使断开，该设备也不会再被当作父节点来进行选择，此问题由 888603ef 引入 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - 修复了以下问题：设备成功执行了父节点发现动作，但是没有执行连接 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
-
-### 功能:
-
-#### Mesh
-
-- 扩展 esp_mesh_lite_espnow_recv_cb 的参数以适应更多场景
 
 ## v1.0.1 - 2024-12-16
 

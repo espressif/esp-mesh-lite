@@ -14,6 +14,7 @@
 
 - optimize wifi reconnect logic ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - feat: Redefine the interface for obtaining the total number of nodes ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
+- In the `mesh_lite_espnow` receive callback, more Wi-Fi packet information can be obtained, such as CSI ([eaf4e0a](https://github.com/espressif/esp-mesh-lite/commit/eaf4e0aa47da2a4d93c4d058395f67575d33161b))
 
 #### Bugfix
 
@@ -21,12 +22,6 @@
 - Fixed a situation where the new device verification logic was accidentally not executed ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - Fixed an issue where after a device is fully connected by children it will no longer be selected as a parent even if some children are disconnected, This issue was introduced by 888603ef  ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - Fix an issue that the parent node discovery operation is successfully performed, but the connection is not established ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
-
-### Enhancements:
-
-#### Mesh
-
-- feat: Extend parameters of esp_mesh_lite_espnow_recv_cb for more scenario
 
 ## v1.0.1 - 2024-12-16
 
