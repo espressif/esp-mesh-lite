@@ -6,12 +6,13 @@
 
 - 弃用 esp_mesh_lite_get_child_node_number，改用 esp_mesh_lite_get_mesh_node_number ([a38ba0e](https://github.com/espressif/esp-mesh-lite/commit/a38ba0e68d48a93aa0c536f5a43bf657a5cccaf3))
 
-### Enhancements:
+### 功能:
 
 #### Mesh
 
 - 优化 wifi 重连逻辑 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - 重新定义获取节点总数接口 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
+- 扩展 esp_mesh_lite_espnow_recv_cb 的参数以适应更多场景 ([eaf4e0a](https://github.com/espressif/esp-mesh-lite/commit/eaf4e0aa47da2a4d93c4d058395f67575d33161b))
 
 #### Bugfix
 

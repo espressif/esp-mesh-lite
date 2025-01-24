@@ -185,10 +185,11 @@ static void espnow_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status
 #endif
 }
 
-static void espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len)
+static void espnow_recv_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)
 {
     esp_mesh_lite_espnow_event_t evt;
     espnow_recv_cb_t *recv_cb = &evt.info.recv_cb;
+    uint8_t *mac_addr = (uint8_t *)recv_info->src_addr;
 
     if (mac_addr == NULL || data == NULL || len <= 0) {
         ESP_LOGE(TAG, "Receive cb arg error");

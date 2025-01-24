@@ -378,12 +378,12 @@ ESP-MESH-LITE 网络的常见性能指标如下表所示：
    需要注意的是：`ESPNOW_DATA_TYPE_RESERVE`、`ESPNOW_DATA_TYPE_RM_GROUP_CONTROL`、`ESPNOW_DATA_TYPE_ZERO_PROV` 均已被占用。以下是代码使用示例：
 
    ```c
-   static void espnow_recv_cb(const uint8_t *mac_addr, const uint8_t *data, int len)
+   static void espnow_recv_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)
    {
        esp_mesh_lite_espnow_event_t evt;
        espnow_recv_cb_t *recv_cb = &evt.info.recv_cb;
    
-       if (mac_addr == NULL || data == NULL || len <= 0) {
+       if (recv_info->src_addr == NULL || data == NULL || len <= 0) {
            ESP_LOGE(TAG, "Receive cb arg error");
            return;
        }

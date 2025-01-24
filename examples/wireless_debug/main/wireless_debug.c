@@ -194,9 +194,9 @@ static void app_recv_resp_data_cb(char *response_data, size_t len)
     }
 }
 
-static void app_recv_debug_log_cb(const uint8_t *mac_addr, const uint8_t *data, int len)
+static void app_recv_debug_log_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)
 {
-    printf(""MACSTR": %s", MAC2STR(mac_addr), (char*)data);
+    printf(""MACSTR": %s", MAC2STR((uint8_t *)recv_info->src_addr), (char*)data);
 }
 
 esp_mesh_lite_wireless_debug_cb_list_t cb = {
