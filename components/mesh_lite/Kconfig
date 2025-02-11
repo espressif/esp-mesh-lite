@@ -102,6 +102,10 @@ menu "ESP Wi-Fi Mesh Lite"
         config OTA_AUTO_RESTART
             bool "After OTA successfully, chip restarts automatically"
             default y
+
+        config OTA_AUTO_CANCEL_ROLLBACK
+            bool "After OTA successfully, cancel the rollback automatically"
+            default y
     endmenu
 
     config MESH_LITE_PROV_ENABLE
