@@ -31,10 +31,10 @@
 
 #include "esp_mesh_lite.h"
 
-#define PROV_QR_VERSION         "v1"
+#define MESH_LITE_PROV_QR_VERSION         "v1"
 #define MESH_LITE_PROV_TRANSPORT_SOFTAP   "softap"
 #define MESH_LITE_PROV_TRANSPORT_BLE      "ble"
-#define QRCODE_BASE_URL         "https://espressif.github.io/esp-jumpstart/qrcode.html"
+#define MESH_LITE_QRCODE_BASE_URL         "https://espressif.github.io/esp-jumpstart/qrcode.html"
 
 typedef struct mesh_lite_config {
     uint8_t ssid[32];                         /**< SSID of target AP. */
@@ -46,13 +46,9 @@ static const char *TAG = "esp_mesh_lite_wifi_prov_mgr";
 
 static bool wifi_prov_status = false;
 const int WIFI_CONNECTED_EVENT = BIT0;
+static TimerHandle_t prov_timeout_timer = NULL;
 static mesh_lite_config_t wifi_prov_mgr_mesh_lite_cfg;
-static esp_timer_handle_t deinit_wifi_prov_mgr_timer = NULL;
 
-/* Register Wi-Fi Provisioning events */
-static void wifi_prov_event_register(void);
-
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 #if CONFIG_PROV_SECURITY_VERSION_2
 #if CONFIG_PROV_SEC2_DEV_MODE
 #define MESH_LITE_PROV_SEC2_USERNAME          "wifiprov"
@@ -120,7 +116,6 @@ static esp_err_t esp_mesh_lite_get_sec2_verifier(const char **verifier, uint16_t
 #endif
 }
 #endif
-#endif /* ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0) */
 
 bool wifi_provision_in_progress(void)
 {
@@ -150,11 +145,12 @@ esp_err_t __attribute__((weak)) wifi_prov_wifi_connect(wifi_sta_config_t *conf)
     return ret;
 }
 
-static void deinit_wifi_prov_mgr_timer_callback(void *arg)
+static void prov_timeout_timer_callback(TimerHandle_t timer)
 {
     ESP_LOGW(TAG, "Provisioning timed out. Please reboot device to restart provisioning.");
-    wifi_prov_mgr_stop_provisioning();
-    esp_event_post(WIFI_PROV_EVENT, WIFI_PROV_END, NULL, 0, portMAX_DELAY);
+    xTimerStop(timer, 10);
+    wifi_prov_status = false;
+    wifi_prov_mgr_deinit();
 }
 
 void wifi_provision_stop(void)
@@ -180,7 +176,7 @@ static void event_handler(void *arg, esp_event_base_t event_base,
             ESP_LOGI(TAG, "Provisioning started");
             break;
 
-        case WIFI_PROV_CUST_DATA_RECV:
+        case WIFI_PROV_CUST_DATA_RECV: {
             mesh_lite_config_t* mesh_lite_cfg = (mesh_lite_config_t*)event_data;
             char softap_ssid[40];
             uint8_t softap_mac[6];
@@ -207,6 +203,8 @@ static void event_handler(void *arg, esp_event_base_t event_base,
                 wifi_prov_mgr_mesh_lite_cfg.mesh_id = CONFIG_MESH_LITE_ID;
             }
             break;
+        }
+
         case WIFI_PROV_CRED_RECV: {
             wifi_sta_config_t *wifi_sta_cfg = (wifi_sta_config_t *)event_data;
             ESP_LOGI(TAG, "Received Wi-Fi credentials"
@@ -225,13 +223,11 @@ static void event_handler(void *arg, esp_event_base_t event_base,
                      "Wi-Fi station authentication failed" : "Wi-Fi access-point not found");
 #ifdef CONFIG_PROV_RESET_PROV_MGR_ON_FAILURE
             retries++;
-
             if (retries >= CONFIG_PROV_MGR_MAX_RETRY_CNT) {
                 ESP_LOGI(TAG, "Failed to connect with provisioned AP, reseting provisioned credentials");
                 wifi_prov_mgr_reset_sm_state_on_failure();
                 retries = 0;
             }
-
 #endif
             break;
         }
@@ -244,11 +240,12 @@ static void event_handler(void *arg, esp_event_base_t event_base,
             break;
 
         case WIFI_PROV_END:
-            esp_timer_stop(deinit_wifi_prov_mgr_timer);
-            esp_timer_delete(deinit_wifi_prov_mgr_timer);
-            /* De-initialize manager once provisioning is finished */
-            wifi_prov_mgr_deinit();
-            wifi_prov_status = false;
+            xTimerDelete(prov_timeout_timer, 10);
+            if (wifi_prov_status) {
+                /* De-initialize manager once provisioning is finished */
+                wifi_prov_mgr_deinit();
+                wifi_prov_status = false;
+            }
             break;
 
         default:
@@ -259,6 +256,35 @@ static void event_handler(void *arg, esp_event_base_t event_base,
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
         ESP_LOGI(TAG, "Connected with IP Address:" IPSTR, IP2STR(&event->ip_info.ip));
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 0)
+#ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_BLE
+    } else if (event_base == PROTOCOMM_TRANSPORT_BLE_EVENT) {
+        switch (event_id) {
+        case PROTOCOMM_TRANSPORT_BLE_CONNECTED:
+            ESP_LOGI(TAG, "BLE transport: Connected!");
+            break;
+        case PROTOCOMM_TRANSPORT_BLE_DISCONNECTED:
+            ESP_LOGI(TAG, "BLE transport: Disconnected!");
+            break;
+        default:
+            break;
+        }
+#endif
+    } else if (event_base == PROTOCOMM_SECURITY_SESSION_EVENT) {
+        switch (event_id) {
+        case PROTOCOMM_SECURITY_SESSION_SETUP_OK:
+            ESP_LOGI(TAG, "Secured session established!");
+            break;
+        case PROTOCOMM_SECURITY_SESSION_INVALID_SECURITY_PARAMS:
+            ESP_LOGE(TAG, "Received invalid security parameters for establishing secure session!");
+            break;
+        case PROTOCOMM_SECURITY_SESSION_CREDENTIALS_MISMATCH:
+            ESP_LOGE(TAG, "Received incorrect username and/or PoP for establishing secure session!");
+            break;
+        default:
+            break;
+        }
+#endif
     }
 }
 
@@ -267,6 +293,12 @@ static void wifi_prov_event_register(void)
 {
     /* Register our event handler for Wi-Fi, IP and Provisioning related events */
     ESP_ERROR_CHECK(esp_event_handler_register(WIFI_PROV_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL));
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 1, 0)
+#ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_BLE
+    ESP_ERROR_CHECK(esp_event_handler_register(PROTOCOMM_TRANSPORT_BLE_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL));
+#endif
+    ESP_ERROR_CHECK(esp_event_handler_register(PROTOCOMM_SECURITY_SESSION_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL));
+#endif
     ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL));
     ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler, NULL));
 }
@@ -290,15 +322,12 @@ esp_err_t custom_prov_data_handler(uint32_t session_id, const uint8_t *inbuf, ss
     if (inbuf) {
         ESP_LOGI(TAG, "Received data: %.*s", inlen, (char *)inbuf);
     }
-
     char response[] = "SUCCESS";
     *outbuf = (uint8_t *)strdup(response);
-
     if (*outbuf == NULL) {
         ESP_LOGE(TAG, "System out of memory");
         return ESP_ERR_NO_MEM;
     }
-
     *outlen = strlen(response) + 1; /* +1 for NULL terminating byte */
 
     return ESP_OK;
@@ -310,41 +339,48 @@ static void wifi_prov_print_qr(const char *name, const char *username, const cha
         ESP_LOGW(TAG, "Cannot generate QR code payload. Data missing.");
         return;
     }
-
     char payload[150] = { 0 };
-
     if (pop) {
-#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
-        snprintf(payload, sizeof(payload), "{\"ver\":\"%s\",\"name\":\"%s\"" \
-                 ",\"pop\":\"%s\",\"transport\":\"%s\"}",
-                 PROV_QR_VERSION, name, pop, transport);
-#else
 #if CONFIG_PROV_SECURITY_VERSION_1
         snprintf(payload, sizeof(payload), "{\"ver\":\"%s\",\"name\":\"%s\"" \
                  ",\"pop\":\"%s\",\"transport\":\"%s\"}",
-                 PROV_QR_VERSION, name, pop, transport);
+                 MESH_LITE_PROV_QR_VERSION, name, pop, transport);
 #elif CONFIG_PROV_SECURITY_VERSION_2
         snprintf(payload, sizeof(payload), "{\"ver\":\"%s\",\"name\":\"%s\"" \
                  ",\"username\":\"%s\",\"pop\":\"%s\",\"transport\":\"%s\"}",
-                 PROV_QR_VERSION, name, username, pop, transport);
+                 MESH_LITE_PROV_QR_VERSION, name, username, pop, transport);
 #endif
-#endif /* ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0) */
     } else {
         snprintf(payload, sizeof(payload), "{\"ver\":\"%s\",\"name\":\"%s\"" \
                  ",\"transport\":\"%s\"}",
-                 PROV_QR_VERSION, name, transport);
+                 MESH_LITE_PROV_QR_VERSION, name, transport);
     }
-
 #ifdef CONFIG_PROV_SHOW_QR
     ESP_LOGI(TAG, "Scan this QR code from the provisioning application for Provisioning.");
     esp_qrcode_config_t cfg = ESP_QRCODE_CONFIG_DEFAULT();
     esp_qrcode_generate(&cfg, payload);
 #endif /* CONFIG_PROV_SHOW_QR */
-    ESP_LOGI(TAG, "If QR code is not visible, copy paste the below URL in a browser.\n%s?data=%s", QRCODE_BASE_URL, payload);
+    ESP_LOGI(TAG, "If QR code is not visible, copy paste the below URL in a browser.\n%s?data=%s", MESH_LITE_QRCODE_BASE_URL, payload);
 }
 
-void esp_mesh_lite_wifi_prov_mgr_init(void)
+esp_err_t esp_mesh_lite_wifi_prov_mgr_deinit(void)
 {
+    if (wifi_prov_status) {
+        wifi_prov_mgr_deinit();
+        wifi_prov_status = false;
+        return ESP_OK;
+    } else {
+        ESP_LOGW(TAG, "Provisioning not in progress");
+        return ESP_FAIL;
+    }
+}
+
+esp_err_t esp_mesh_lite_wifi_prov_mgr_init(void)
+{
+    if (wifi_prov_status) {
+        ESP_LOGW(TAG, "Provisioning already in progress");
+        return ESP_ERR_INVALID_STATE;
+    }
     wifi_prov_status = true;
 
     wifi_prov_event_register();
@@ -373,7 +409,11 @@ void esp_mesh_lite_wifi_prov_mgr_init(void)
          * to take care of this automatically. This can be set to
          * WIFI_PROV_EVENT_HANDLER_NONE when using wifi_prov_scheme_softap*/
 #ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_BLE
+#ifdef CONFIG_PROV_RELEASE_BLE_MEMORY_AFTER_PROVISIONED
         .scheme_event_handler = WIFI_PROV_SCHEME_BLE_EVENT_HANDLER_FREE_BTDM
+#else
+        .scheme_event_handler = WIFI_PROV_SCHEME_BLE_EVENT_HANDLER_FREE_BT
+#endif /* CONFIG_PROV_RELEASE_BLE_MEMORY_AFTER_PROVISIONED */
 #endif /* CONFIG_MESH_LITE_PROV_TRANSPORT_BLE */
 #ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_SOFTAP
         .scheme_event_handler = WIFI_PROV_EVENT_HANDLER_NONE
@@ -384,158 +424,146 @@ void esp_mesh_lite_wifi_prov_mgr_init(void)
      * configuration parameters set above */
     ESP_ERROR_CHECK(wifi_prov_mgr_init(config));
 
+    bool provisioned = false;
 #ifdef CONFIG_PROV_RESET_PROVISIONED
     wifi_prov_mgr_reset_provisioning();
-#endif
-
-    bool provisioned = false;
+#else
     /* Let's find out if the device is provisioned */
     ESP_ERROR_CHECK(wifi_prov_mgr_is_provisioned(&provisioned));
+#endif
     /* If device is not yet provisioned start provisioning service */
-    if (provisioned) {
-        return;
-    }
+    if (!provisioned) {
+        ESP_LOGI(TAG, "Starting provisioning");
 
-    ESP_LOGI(TAG, "Starting provisioning");
+        /* What is the Device Service Name that we want
+         * This translates to :
+         *     - Wi-Fi SSID when scheme is wifi_prov_scheme_softap
+         *     - device name when scheme is wifi_prov_scheme_ble
+         */
+        char service_name[12];
+        get_device_service_name(service_name, sizeof(service_name));
 
-    /* What is the Device Service Name that we want
-     * This translates to :
-     *     - Wi-Fi SSID when scheme is wifi_prov_scheme_softap
-     *     - device name when scheme is wifi_prov_scheme_ble
-     */
-    char service_name[12];
-    get_device_service_name(service_name, sizeof(service_name));
-
-    /* What is the security level that we want (0, 1, 2):
-     *      - WIFI_PROV_SECURITY_0 is simply plain text communication.
-     *      - WIFI_PROV_SECURITY_1 is secure communication which consists of secure handshake
-     *          using X25519 key exchange and proof of possession (pop) and AES-CTR
-     *          for encryption/decryption of messages.
-     *      - WIFI_PROV_SECURITY_2 SRP6a based authentication and key exchange
-     *        + AES-GCM encryption/decryption of messages
-     */
-    wifi_prov_security_t security = WIFI_PROV_SECURITY_1;
-
-    /* Do we want a proof-of-possession (ignored if Security 0 is selected):
-     *      - this should be a string with length > 0
-     *      - NULL if not used
-     */
-    const char *pop = "abcd1234";
-
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 #ifdef CONFIG_PROV_SECURITY_VERSION_1
-    /* This is the structure for passing security parameters
-     * for the protocomm security 1.
-     */
-    wifi_prov_security1_params_t *sec_params = pop;
+        /* What is the security level that we want (0, 1, 2):
+         *      - WIFI_PROV_SECURITY_0 is simply plain text communication.
+         *      - WIFI_PROV_SECURITY_1 is secure communication which consists of secure handshake
+         *          using X25519 key exchange and proof of possession (pop) and AES-CTR
+         *          for encryption/decryption of messages.
+         *      - WIFI_PROV_SECURITY_2 SRP6a based authentication and key exchange
+         *        + AES-GCM encryption/decryption of messages
+         */
+        wifi_prov_security_t security = WIFI_PROV_SECURITY_1;
 
-    const char *username = NULL;
+        /* Do we want a proof-of-possession (ignored if Security 0 is selected):
+         *      - this should be a string with length > 0
+         *      - NULL if not used
+         */
+        const char *pop = "abcd1234";
+
+        /* This is the structure for passing security parameters
+         * for the protocomm security 1.
+         */
+        wifi_prov_security1_params_t *sec_params = pop;
+
+        const char *username  = NULL;
 
 #elif CONFIG_PROV_SECURITY_VERSION_2
-    security = WIFI_PROV_SECURITY_2;
-    /* The username must be the same one, which has been used in the generation of salt and verifier */
+        wifi_prov_security_t security = WIFI_PROV_SECURITY_2;
+        /* The username must be the same one, which has been used in the generation of salt and verifier */
 
 #if CONFIG_PROV_SEC2_DEV_MODE
-    /* This pop field represents the password that will be used to generate salt and verifier.
-     * The field is present here in order to generate the QR code containing password.
-     * In production this password field shall not be stored on the device */
-    const char *username = MESH_LITE_PROV_SEC2_USERNAME;
-    pop = MESH_LITE_PROV_SEC2_PWD;
+        /* This pop field represents the password that will be used to generate salt and verifier.
+         * The field is present here in order to generate the QR code containing password.
+         * In production this password field shall not be stored on the device */
+        const char *username  = MESH_LITE_PROV_SEC2_USERNAME;
+        const char *pop = MESH_LITE_PROV_SEC2_PWD;
 #elif CONFIG_PROV_SEC2_PROD_MODE
-    /* The username and password shall not be embedded in the firmware,
-     * they should be provided to the user by other means.
-     * e.g. QR code sticker */
-    const char *username = NULL;
-    pop = NULL;
+        /* The username and password shall not be embedded in the firmware,
+         * they should be provided to the user by other means.
+         * e.g. QR code sticker */
+        const char *username  = NULL;
+        const char *pop = NULL;
 #endif
-    /* This is the structure for passing security parameters
-     * for the protocomm security 2.
-     * This does not need not be static i.e. could be dynamically allocated
-     */
-    wifi_prov_security2_params_t sec2_params = {};
+        /* This is the structure for passing security parameters
+         * for the protocomm security 2.
+         * If dynamically allocated, sec2_params pointer and its content
+         * must be valid till WIFI_PROV_END event is triggered.
+         */
+        wifi_prov_security2_params_t sec2_params = {};
 
-    ESP_ERROR_CHECK(esp_mesh_lite_get_sec2_salt(&sec2_params.salt, &sec2_params.salt_len));
-    ESP_ERROR_CHECK(esp_mesh_lite_get_sec2_verifier(&sec2_params.verifier, &sec2_params.verifier_len));
+        ESP_ERROR_CHECK(esp_mesh_lite_get_sec2_salt(&sec2_params.salt, &sec2_params.salt_len));
+        ESP_ERROR_CHECK(esp_mesh_lite_get_sec2_verifier(&sec2_params.verifier, &sec2_params.verifier_len));
 
-    wifi_prov_security2_params_t *sec_params = &sec2_params;
+        wifi_prov_security2_params_t *sec_params = &sec2_params;
 #endif
-#endif /* ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0) */
-
-    /* What is the service key (could be NULL)
-     * This translates to :
-     *     - Wi-Fi password when scheme is wifi_prov_scheme_softap
-     *          (Minimum expected length: 8, maximum 64 for WPA2-PSK)
-     *     - simply ignored when scheme is wifi_prov_scheme_ble
-     */
-    const char *service_key = NULL;
+        /* What is the service key (could be NULL)
+         * This translates to :
+         *     - Wi-Fi password when scheme is wifi_prov_scheme_softap
+         *          (Minimum expected length: 8, maximum 64 for WPA2-PSK)
+         *     - simply ignored when scheme is wifi_prov_scheme_ble
+         */
+        const char *service_key = NULL;
 
 #ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_BLE
-    /* This step is only useful when scheme is wifi_prov_scheme_ble. This will
-     * set a custom 128 bit UUID which will be included in the BLE advertisement
-     * and will correspond to the primary GATT service that provides provisioning
-     * endpoints as GATT characteristics. Each GATT characteristic will be
-     * formed using the primary service UUID as base, with different auto assigned
-     * 12th and 13th bytes (assume counting starts from 0th byte). The client side
-     * applications must identify the endpoints by reading the User Characteristic
-     * Description descriptor (0x2901) for each characteristic, which contains the
-     * endpoint name of the characteristic */
-    uint8_t custom_service_uuid[] = {
-        /* LSB <---------------------------------------
-            * ---------------------------------------> MSB */
-        0xb4, 0xdf, 0x5a, 0x1c, 0x3f, 0x6b, 0xf4, 0xbf,
-        0xea, 0x4a, 0x82, 0x03, 0x04, 0x90, 0x1a, 0x02,
-    };
+        /* This step is only useful when scheme is wifi_prov_scheme_ble. This will
+         * set a custom 128 bit UUID which will be included in the BLE advertisement
+         * and will correspond to the primary GATT service that provides provisioning
+         * endpoints as GATT characteristics. Each GATT characteristic will be
+         * formed using the primary service UUID as base, with different auto assigned
+         * 12th and 13th bytes (assume counting starts from 0th byte). The client side
+         * applications must identify the endpoints by reading the User Characteristic
+         * Description descriptor (0x2901) for each characteristic, which contains the
+         * endpoint name of the characteristic */
+        uint8_t custom_service_uuid[] = {
+            /* LSB <---------------------------------------
+             * ---------------------------------------> MSB */
+            0xb4, 0xdf, 0x5a, 0x1c, 0x3f, 0x6b, 0xf4, 0xbf,
+            0xea, 0x4a, 0x82, 0x03, 0x04, 0x90, 0x1a, 0x02,
+        };
 
-    /* If your build fails with linker errors at this point, then you may have
-     * forgotten to enable the BT stack or BTDM BLE settings in the SDK (e.g. see
-     * the sdkconfig.defaults in the example project) */
-    wifi_prov_scheme_ble_set_service_uuid(custom_service_uuid);
+        /* If your build fails with linker errors at this point, then you may have
+         * forgotten to enable the BT stack or BTDM BLE settings in the SDK (e.g. see
+         * the sdkconfig.defaults in the example project) */
+        wifi_prov_scheme_ble_set_service_uuid(custom_service_uuid);
 #endif /* CONFIG_MESH_LITE_PROV_TRANSPORT_BLE */
 
-    /* An optional endpoint that applications can create if they expect to
-     * get some additional custom data during provisioning workflow.
-     * The endpoint name can be anything of your choice.
-     * This call must be made before starting the provisioning.
-     */
-    wifi_prov_mgr_endpoint_create("custom-data");
-    /* Start provisioning service */
-#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
-    ESP_ERROR_CHECK(wifi_prov_mgr_start_provisioning(security, pop, service_name, service_key));
-#else
-    ESP_ERROR_CHECK(wifi_prov_mgr_start_provisioning(security, (const void *)sec_params, service_name, service_key));
-#endif
+        /* An optional endpoint that applications can create if they expect to
+         * get some additional custom data during provisioning workflow.
+         * The endpoint name can be anything of your choice.
+         * This call must be made before starting the provisioning.
+         */
+        wifi_prov_mgr_endpoint_create("custom-data");
 
-    /* The handler for the optional endpoint created above.
-     * This call must be made after starting the provisioning, and only if the endpoint
-     * has already been created above.
-     */
-    wifi_prov_mgr_endpoint_register("custom-data", custom_prov_data_handler, NULL);
+        /* Start provisioning service */
+        ESP_ERROR_CHECK(wifi_prov_mgr_start_provisioning(security, (const void *) sec_params, service_name, service_key));
 
-    /* Uncomment the following to wait for the provisioning to finish and then release
-     * the resources of the manager. Since in this case de-initialization is triggered
-     * by the default event loop handler, we don't need to call the following */
-    // wifi_prov_mgr_wait();
-    // wifi_prov_mgr_deinit();
-    /* Print QR code for provisioning */
-#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
+        /* The handler for the optional endpoint created above.
+         * This call must be made after starting the provisioning, and only if the endpoint
+         * has already been created above.
+         */
+        wifi_prov_mgr_endpoint_register("custom-data", custom_prov_data_handler, NULL);
+
+        /* Uncomment the following to wait for the provisioning to finish and then release
+         * the resources of the manager. Since in this case de-initialization is triggered
+         * by the default event loop handler, we don't need to call the following */
+        // wifi_prov_mgr_wait();
+        // wifi_prov_mgr_deinit();
+        /* Print QR code for provisioning */
 #ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_BLE
-    wifi_prov_print_qr(service_name, NULL, pop, MESH_LITE_PROV_TRANSPORT_BLE);
+        wifi_prov_print_qr(service_name, username, pop, MESH_LITE_PROV_TRANSPORT_BLE);
 #else /* CONFIG_MESH_LITE_PROV_TRANSPORT_SOFTAP */
-    wifi_prov_print_qr(service_name, NULL, pop, MESH_LITE_PROV_TRANSPORT_SOFTAP);
+        wifi_prov_print_qr(service_name, username, pop, MESH_LITE_PROV_TRANSPORT_SOFTAP);
 #endif /* CONFIG_MESH_LITE_PROV_TRANSPORT_BLE */
-#else
-#ifdef CONFIG_MESH_LITE_PROV_TRANSPORT_BLE
-    wifi_prov_print_qr(service_name, username, pop, MESH_LITE_PROV_TRANSPORT_BLE);
-#else /* CONFIG_MESH_LITE_PROV_TRANSPORT_SOFTAP */
-    wifi_prov_print_qr(service_name, username, pop, MESH_LITE_PROV_TRANSPORT_SOFTAP);
-#endif /* CONFIG_MESH_LITE_PROV_TRANSPORT_BLE */
-#endif /* ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0) */
 
-    const esp_timer_create_args_t deinit_wifi_prov_mgr_timer_args = {
-        .callback = &deinit_wifi_prov_mgr_timer_callback,
-        .name = "deinit_wifi_prov_mgr"
-    };
+        prov_timeout_timer = xTimerCreate("prov_timeout_timer", CONFIG_PROV_TIMEOUT_SECONDS * 1000 / portTICK_PERIOD_MS, pdTRUE,
+                                          NULL, prov_timeout_timer_callback);
+        xTimerStart(prov_timeout_timer, portMAX_DELAY);
+    } else {
+        ESP_LOGI(TAG, "Already provisioned, starting Wi-Fi STA");
 
-    ESP_ERROR_CHECK(esp_timer_create(&deinit_wifi_prov_mgr_timer_args, &deinit_wifi_prov_mgr_timer));
-    ESP_ERROR_CHECK(esp_timer_start_once(deinit_wifi_prov_mgr_timer, 300 * 1000000));
+        /* We don't need the manager as device is already provisioned,
+         * so let's release it's resources */
+        wifi_prov_mgr_deinit();
+    }
+    return ESP_OK;
 }

@@ -10,7 +10,13 @@
  * @brief   Enable Wi-Fi Provisioning
  *
  */
-void esp_mesh_lite_wifi_prov_mgr_init(void);
+esp_err_t esp_mesh_lite_wifi_prov_mgr_init(void);
+
+/**
+ * @brief   Disable Wi-Fi Provisioning
+ *
+ */
+esp_err_t esp_mesh_lite_wifi_prov_mgr_deinit(void);
 
 /**
  * @brief   Get Wi-Fi Provisioning Status
