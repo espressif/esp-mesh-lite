@@ -2,7 +2,7 @@
 
 # ChangeLog
 
-## v1.0.2 - 2025-1-23
+## v1.0.2 - 2025-2-17
 
 ### Breaking Change:
 
@@ -12,6 +12,7 @@
 
 #### Mesh
 
+- Remove 'mark current partition is workable' inside the mesh lib ([56d5ad2](https://github.com/espressif/esp-mesh-lite/commit/56d5ad2778d9dec1217434247fe0122fe7f960e6))
 - optimize wifi reconnect logic ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - feat: Redefine the interface for obtaining the total number of nodes ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - In the `mesh_lite_espnow` receive callback, more Wi-Fi packet information can be obtained, such as CSI ([eaf4e0a](https://github.com/espressif/esp-mesh-lite/commit/eaf4e0aa47da2a4d93c4d058395f67575d33161b))

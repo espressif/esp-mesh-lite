@@ -1,6 +1,6 @@
 # ChangeLog
 
-## v1.0.2 - 2025-1-23
+## v1.0.2 - 2025-2-17
 
 ### Breaking Change:
 
@@ -10,6 +10,7 @@
 
 #### Mesh
 
+- 将 `esp_ota_mark_app_valid_cancel_rollback` 从 mesh lite lib 中移除 ([56d5ad2](https://github.com/espressif/esp-mesh-lite/commit/56d5ad2778d9dec1217434247fe0122fe7f960e6))
 - 优化 wifi 重连逻辑 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - 重新定义获取节点总数接口 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - 扩展 esp_mesh_lite_espnow_recv_cb 的参数以适应更多场景 ([eaf4e0a](https://github.com/espressif/esp-mesh-lite/commit/eaf4e0aa47da2a4d93c4d058395f67575d33161b))
