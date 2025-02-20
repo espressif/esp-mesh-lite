@@ -1,6 +1,6 @@
 # ChangeLog
 
-## v1.0.2 - 2025-2-17
+## v1.0.2 - 2025-2-25
 
 ### Breaking Change:
 
@@ -14,6 +14,10 @@
 - 优化 wifi 重连逻辑 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - 重新定义获取节点总数接口 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - 扩展 esp_mesh_lite_espnow_recv_cb 的参数以适应更多场景 ([eaf4e0a](https://github.com/espressif/esp-mesh-lite/commit/eaf4e0aa47da2a4d93c4d058395f67575d33161b))
+
+#### Wi-Fi Provisioning
+
+- 支持设备不重启条件下重复配网 ([402f438](https://github.com/espressif/esp-mesh-lite/commit/402f4385d6117da84e0aace6d365847eb13ca12c))
 
 #### Bugfix
 
