@@ -196,6 +196,14 @@ menu "ESP Wi-Fi Mesh Lite"
                 are misconfigured. Provisioned credentials are erased and internal state machine
                 is reset after this threshold is reached.
 
+        config PROV_RELEASE_BLE_MEMORY_AFTER_PROVISIONED
+            bool "Release BLE memory after provisioned"
+            default y
+            help
+                If this option is enabled, it will release the BLE memory for other usage,
+                but you can not perform Wi-Fi provision again until the device restarts.
+                If you need to perform Wi-Fi provision multiple times without restarting the device, please disable this configuration.
+
         config PROV_SHOW_QR
             bool "Show provisioning QR code"
             default y
@@ -216,6 +224,13 @@ menu "ESP Wi-Fi Mesh Lite"
             help
                 The default SSID prefix used for the device.
                 This will be used to form the SoftAP SSID with the device's MAC address.
+
+        config PROV_TIMEOUT_SECONDS
+            int "Provisioning timeout in seconds"
+            default 300
+            help
+                The time in seconds for which the device will wait for provisioning to complete.
+                If the device is not provisioned within this time, the device will exit provisioning mode.
 
         config CUSTOMER_DATA_LENGTH
             int "Customer data length"
