@@ -998,7 +998,7 @@ esp_err_t esp_mesh_lite_send_msg_to_root(const char* payload);
 esp_err_t esp_mesh_lite_send_msg_to_parent(const char* payload);
 
 /**
- * @brief Send a message over ESP-Mesh-Lite network.
+ * @brief Send the message within the mesh network.
  *
  * This function allows sending a message of a specified type with a given configuration.
  *
