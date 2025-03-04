@@ -12,6 +12,8 @@
 
 #### Mesh
 
+- Support registering callback function for failure to send message ([0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6))
+- Optimize the execution logic of the fixed root node device esp_mesh_lite_connect to shorten the connection time ([0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6))
 - Remove 'mark current partition is workable' inside the mesh lib ([56d5ad2](https://github.com/espressif/esp-mesh-lite/commit/56d5ad2778d9dec1217434247fe0122fe7f960e6))
 - optimize wifi reconnect logic ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - feat: Redefine the interface for obtaining the total number of nodes ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
@@ -27,6 +29,10 @@
 - Fixed a situation where the new device verification logic was accidentally not executed ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - Fixed an issue where after a device is fully connected by children it will no longer be selected as a parent even if some children are disconnected, This issue was introduced by 888603ef  ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - Fix an issue that the parent node discovery operation is successfully performed, but the connection is not established ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
+
+#### Chore
+
+- Update the output level of some logs ([0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6))
 
 ## v1.0.1 - 2024-12-16
 

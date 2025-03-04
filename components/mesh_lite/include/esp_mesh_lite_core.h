@@ -233,6 +233,38 @@ typedef struct {
     const char* device_category;            /**< Device Category */
 } esp_mesh_lite_config_t;
 
+typedef struct {
+    const char* send_msg;
+    const char* expect_msg;
+    uint32_t max_retry;
+    uint16_t retry_interval;
+    cJSON* req_payload;
+    esp_err_t (*resend)(const char* payload);
+    void (*send_fail)(const char *msg_type);
+} esp_mesh_lite_json_msg_config_t;
+
+typedef struct {
+    uint32_t msg_id;
+    uint32_t expect_resp_msg_id;
+    uint32_t max_retry;
+    uint16_t retry_interval;
+    const uint8_t* data;
+    size_t size;
+    esp_err_t (*raw_resend)(const uint8_t* data, size_t size);
+    void (*raw_send_fail)(uint32_t msg_id);
+} esp_mesh_lite_raw_msg_config_t;
+
+typedef union {
+    esp_mesh_lite_json_msg_config_t json_msg;
+    esp_mesh_lite_raw_msg_config_t  raw_msg;
+} esp_mesh_lite_msg_config_t;
+
+typedef enum {
+    ESP_MESH_LITE_JSON_MSG,
+    ESP_MESH_LITE_RAW_MSG,
+    ESP_MESH_LITE_OTHER_MSG,
+} esp_mesh_lite_msg_data_t;
+
 // Define a structure for mesh lite fusion configuration settings.
 typedef struct {
     int8_t fusion_rssi_threshold;   // During fusion, the device to be fused will scan the primary fusion device. If the signal strength of the primary fusion device is lower than this threshold, the fusion process will be aborted. By default, this value is set to -85.
@@ -966,6 +998,40 @@ esp_err_t esp_mesh_lite_send_msg_to_root(const char* payload);
 esp_err_t esp_mesh_lite_send_msg_to_parent(const char* payload);
 
 /**
+ * @brief Send the message within the mesh network.
+ *
+ * This function allows sending a message of a specified type with a given configuration.
+ *
+ * @param[in] type  Message type, defined in `esp_mesh_lite_msg_data_t`
+ * @param[in] conf  Pointer to the message configuration structure
+ *
+ * @return
+ *      - ESP_OK on success
+ *      - ESP_ERR_INVALID_ARG if parameters are invalid
+ *      - ESP_ERR_NO_MEM if memory allocation fails
+ *      - ESP_FAIL if message sending fails
+ *
+ * @note Ensure that the message payload and configuration are valid before calling this function.
+ *
+ * @code
+ * esp_mesh_lite_msg_config_t config = {
+ *      .json_msg = {
+ *          .send_msg = send_msg,
+ *          .expect_msg = expect_msg,
+ *          .max_retry = max_retry,
+ *          .retry_interval = 1000,
+ *          .req_payload = req_payload,
+ *          .resend = resend,
+ *          .send_fail = NULL,
+ *      }
+ * };
+ * // Try sending the message with the configured parameters
+ * esp_mesh_lite_send_msg(ESP_MESH_LITE_JSON_MSG, &config);
+ * @endcode
+ */
+esp_err_t esp_mesh_lite_send_msg(esp_mesh_lite_msg_data_t type, esp_mesh_lite_msg_config_t *conf);
+
+/**
  * @brief Send a specific type of message and set the number of retransmissions.
  *
  * @param[in] send_msg:    Send message type.
@@ -984,7 +1050,7 @@ esp_err_t esp_mesh_lite_try_sending_msg(char* send_msg,
                                         char* expect_msg,
                                         uint32_t max_retry,
                                         cJSON* req_payload,
-                                        esp_err_t (*resend)(const char* payload));
+                                        esp_err_t (*resend)(const char* payload)) __attribute__((deprecated("Please use esp_mesh_lite_send_msg instead")));
 
 /**
  * @brief Send a specific type of message with retransmission and set the retry interval.
@@ -1018,7 +1084,7 @@ esp_err_t esp_mesh_lite_try_sending_msg_with_retry_inerval(char* send_msg,
                                                            uint8_t max_retry,
                                                            uint16_t retry_interval,
                                                            cJSON* req_payload,
-                                                           esp_err_t (*resend)(const char* payload));
+                                                           esp_err_t (*resend)(const char* payload)) __attribute__((deprecated("Please use esp_mesh_lite_send_msg instead")));
 
 /**
  * @brief  Send broadcast raw message to child nodes.
@@ -1094,7 +1160,7 @@ esp_err_t esp_mesh_lite_try_sending_raw_msg(uint32_t msg_id,
                                             uint32_t max_retry,
                                             const uint8_t* data,
                                             size_t size,
-                                            esp_err_t (*raw_resend)(const uint8_t* data, size_t size));
+                                            esp_err_t (*raw_resend)(const uint8_t* data, size_t size)) __attribute__((deprecated("Please use esp_mesh_lite_send_msg instead")));
 
 /**
  * @brief Send a specific type of message and set the number of retransmissions.
@@ -1129,7 +1195,7 @@ esp_err_t esp_mesh_lite_try_sending_raw_msg_with_retry_inerval(uint32_t msg_id,
                                                                uint16_t retry_interval,
                                                                const uint8_t* data,
                                                                size_t size,
-                                                               esp_err_t (*raw_resend)(const uint8_t* data, size_t size));
+                                                               esp_err_t (*raw_resend)(const uint8_t* data, size_t size)) __attribute__((deprecated("Please use esp_mesh_lite_send_msg instead")));
 
 /**
  * @brief Register a raw message action with the Mesh-Lite message action list.
