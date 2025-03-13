@@ -2,7 +2,7 @@
 
 # ChangeLog
 
-## v1.0.2 - 2025-2-25
+## v1.0.2 - 2025-3-13
 
 ### Breaking Change:
 
@@ -12,6 +12,7 @@
 
 #### Mesh
 
+- When the current node exceeds the maximum limit, deauthenticate its child node ([9c33dcf](https://github.com/espressif/esp-mesh-lite/commit/9c33dcf1c484ef91abc5227565100c67fb6d6f3d))
 - Support registering callback function for failure to send message ([0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6))
 - Optimize the execution logic of the fixed root node device esp_mesh_lite_connect to shorten the connection time ([0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6))
 - Remove 'mark current partition is workable' inside the mesh lib ([56d5ad2](https://github.com/espressif/esp-mesh-lite/commit/56d5ad2778d9dec1217434247fe0122fe7f960e6))

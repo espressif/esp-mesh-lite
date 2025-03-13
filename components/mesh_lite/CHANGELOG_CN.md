@@ -1,6 +1,6 @@
 # ChangeLog
 
-## v1.0.2 - 2025-2-25
+## v1.0.2 - 2025-3-13
 
 ### Breaking Change:
 
@@ -10,6 +10,7 @@
 
 #### Mesh
 
+- 当前设备的层级超过最大限制时，断开其子节点的 sta 连接 ([9c33dcf](https://github.com/espressif/esp-mesh-lite/commit/9c33dcf1c484ef91abc5227565100c67fb6d6f3d))
 - 支持注册发送消息失败的回调函数 ([0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6))
 - 优化固定根节点设备 esp_mesh_lite_connect 的执行逻辑，缩短连接时间 ([0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6))
 - 将 `esp_ota_mark_app_valid_cancel_rollback` 从 mesh lite lib 中移除 ([56d5ad2](https://github.com/espressif/esp-mesh-lite/commit/56d5ad2778d9dec1217434247fe0122fe7f960e6))
