@@ -182,7 +182,9 @@ static esp_err_t set_config_service(void *config, const char *service_name, cons
         ble_config->manufacturer_data_len = 0;
     }
 
-#if ESP_IDF_VERSION > ESP_IDF_VERSION_VAL(5, 1, 4)
+#if (ESP_IDF_VERSION > ESP_IDF_VERSION_VAL(5, 1, 4) && ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 2, 0)) || \
+    (ESP_IDF_VERSION > ESP_IDF_VERSION_VAL(5, 2, 2) && ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 3, 0)) || \
+    (ESP_IDF_VERSION > ESP_IDF_VERSION_VAL(5, 3, 0))
     if (custom_ble_addr) {
         ble_config->ble_addr = custom_ble_addr;
     } else {
