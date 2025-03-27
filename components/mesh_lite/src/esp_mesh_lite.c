@@ -211,7 +211,7 @@ static esp_err_t mesh_lite_update_nodes_list(uint8_t *data, uint32_t len, uint8_
         mesh_lite__data__free_unpacked(req, NULL);
     }
 
-    esp_mesh_lite_try_sending_raw_msg(MESH_LITE_MSG_ID_UPDATE_NODES_LIST, 0, 3, data, len, esp_mesh_lite_send_broadcast_raw_msg_to_child);
+    esp_mesh_lite_try_sending_raw_msg(MESH_LITE_MSG_ID_UPDATE_NODES_LIST, 0, 0, data, len, esp_mesh_lite_send_broadcast_raw_msg_to_child);
     return ret;
 }
 
@@ -326,15 +326,6 @@ static void esp_mesh_lite_event_ap_sta_ip_assigned_handler(void *arg, esp_event_
 #endif // CONFIG_MESH_LITE_NODE_INFO_REPORT
 
 uint32_t esp_mesh_lite_get_mesh_node_number(void)
-{
-#ifdef CONFIG_MESH_LITE_NODE_INFO_REPORT
-    return nodes_num;
-#else
-    return 0;
-#endif
-}
-
-uint32_t esp_mesh_lite_get_child_node_number(void)
 {
 #ifdef CONFIG_MESH_LITE_NODE_INFO_REPORT
     return nodes_num;
