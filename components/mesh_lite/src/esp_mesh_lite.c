@@ -363,7 +363,7 @@ static void esp_mesh_lite_event_ip_changed_handler(void *arg, esp_event_base_t e
     case ESP_MESH_LITE_EVENT_CORE_ROUTER_INFO_CHANGED:
         break;
     case ESP_MESH_LITE_EVENT_OTA_START:
-        ESP_LOGI(TAG, "OTA Start\r\n");
+        ESP_LOGI(TAG, "OTA Start");
         break;
     case ESP_MESH_LITE_EVENT_OTA_FINISH: {
         esp_mesh_lite_event_ota_finish_t *event = (esp_mesh_lite_event_ota_finish_t*)event_data;
