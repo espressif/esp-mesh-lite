@@ -1060,42 +1060,42 @@ static void wifi_prov_mgr_event_handler_internal(
         /* Execute user registered callback handler */
         execute_event_cb(WIFI_PROV_CRED_SUCCESS, NULL, 0);
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
-        // ESP_LOGE(TAG, "STA Disconnected");
-        // /* Station couldn't connect to configured host SSID */
-        // prov_ctx->wifi_state = WIFI_PROV_STA_DISCONNECTED;
+        ESP_LOGE(TAG, "STA Disconnected");
+        /* Station couldn't connect to configured host SSID */
+        prov_ctx->wifi_state = WIFI_PROV_STA_DISCONNECTED;
 
-        // wifi_event_sta_disconnected_t* disconnected = (wifi_event_sta_disconnected_t*) event_data;
-        // ESP_LOGE(TAG, "Disconnect reason : %d", disconnected->reason);
+        wifi_event_sta_disconnected_t* disconnected = (wifi_event_sta_disconnected_t*) event_data;
+        ESP_LOGE(TAG, "Disconnect reason : %d", disconnected->reason);
 
-        // /* Set code corresponding to the reason for disconnection */
-        // switch (disconnected->reason) {
-        // case WIFI_REASON_AUTH_EXPIRE:
-        // case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT:
-        // case WIFI_REASON_AUTH_FAIL:
-        // case WIFI_REASON_HANDSHAKE_TIMEOUT:
-        // case WIFI_REASON_MIC_FAILURE:
-        //     ESP_LOGE(TAG, "STA Auth Error");
-        //     prov_ctx->wifi_disconnect_reason = WIFI_PROV_STA_AUTH_ERROR;
-        //     break;
-        // case WIFI_REASON_NO_AP_FOUND:
-        //     ESP_LOGE(TAG, "STA AP Not found");
-        //     prov_ctx->wifi_disconnect_reason = WIFI_PROV_STA_AP_NOT_FOUND;
-        //     break;
-        // default:
-        //     /* If none of the expected reasons,
-        //      * retry connecting to host SSID */
-        //     prov_ctx->wifi_state = WIFI_PROV_STA_CONNECTING;
-        //     esp_wifi_connect();
-        // }
+        /* Set code corresponding to the reason for disconnection */
+        switch (disconnected->reason) {
+        case WIFI_REASON_AUTH_EXPIRE:
+        case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT:
+        case WIFI_REASON_AUTH_FAIL:
+        case WIFI_REASON_HANDSHAKE_TIMEOUT:
+        case WIFI_REASON_MIC_FAILURE:
+            ESP_LOGE(TAG, "STA Auth Error");
+            prov_ctx->wifi_disconnect_reason = WIFI_PROV_STA_AUTH_ERROR;
+            break;
+        case WIFI_REASON_NO_AP_FOUND:
+            ESP_LOGE(TAG, "STA AP Not found");
+            prov_ctx->wifi_disconnect_reason = WIFI_PROV_STA_AP_NOT_FOUND;
+            break;
+        default:
+            /* If none of the expected reasons,
+             * retry connecting to host SSID */
+            prov_ctx->wifi_state = WIFI_PROV_STA_CONNECTING;
+            // esp_wifi_connect();
+        }
 
-        // /* In case of disconnection, update state of service and
-        //  * run the event handler with disconnection reason as data */
-        // if (prov_ctx->wifi_state == WIFI_PROV_STA_DISCONNECTED) {
-        //     prov_ctx->prov_state = WIFI_PROV_STATE_FAIL;
-        //     wifi_prov_sta_fail_reason_t reason = prov_ctx->wifi_disconnect_reason;
-        //     /* Execute user registered callback handler */
-        //     execute_event_cb(WIFI_PROV_CRED_FAIL, (void *)&reason, sizeof(reason));
-        // }
+        /* In case of disconnection, update state of service and
+         * run the event handler with disconnection reason as data */
+        if (prov_ctx->wifi_state == WIFI_PROV_STA_DISCONNECTED) {
+            prov_ctx->prov_state = WIFI_PROV_STATE_FAIL;
+            wifi_prov_sta_fail_reason_t reason = prov_ctx->wifi_disconnect_reason;
+            /* Execute user registered callback handler */
+            execute_event_cb(WIFI_PROV_CRED_FAIL, (void *)&reason, sizeof(reason));
+        }
     }
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
     else if (event_base == WIFI_PROV_MGR_PVT_EVENT && event_id == WIFI_PROV_MGR_STOP) {
