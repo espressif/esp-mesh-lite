@@ -390,6 +390,15 @@ bool esp_mesh_lite_network_segment_is_used(uint32_t ip);
 esp_err_t esp_mesh_lite_core_init(esp_mesh_lite_config_t* config);
 
 /**
+ * @brief Get the Git commit ID of the Mesh-Lite firmware.
+ *
+ * @return Pointer to the null-terminated commit ID string
+ *     - Valid string: Current firmware commit ID
+ *     - NULL: Not available
+ */
+const char *esp_mesh_lite_get_core_commit_id(void);
+
+/**
  * @brief Scan to find a matched node and connect.
  *
  */
