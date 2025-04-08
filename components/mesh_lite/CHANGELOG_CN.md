@@ -1,15 +1,18 @@
 # ChangeLog
 
-## v1.0.2 - 2025-3-13
+## v1.0.2 - 2025-4-9
 
 ### Breaking Change:
 
+- lan_ota_file_transfer： 为 get_file_cb 增加更多参数 ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
 - 弃用 esp_mesh_lite_get_child_node_number，改用 esp_mesh_lite_get_mesh_node_number ([a38ba0e](https://github.com/espressif/esp-mesh-lite/commit/a38ba0e68d48a93aa0c536f5a43bf657a5cccaf3))
 
 ### 功能:
 
 #### Mesh
 
+- 新增 API 以获取当前 mesh-lite 库的 commit id ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
+- 当设备被禁止成为根节点时将不会被加入到 “遗嘱” 列表中 ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
 - 当前设备的层级超过最大限制时，断开其子节点的 sta 连接 ([9c33dcf](https://github.com/espressif/esp-mesh-lite/commit/9c33dcf1c484ef91abc5227565100c67fb6d6f3d))
 - 支持注册发送消息失败的回调函数 ([0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6))
 - 优化固定根节点设备 esp_mesh_lite_connect 的执行逻辑，缩短连接时间 ([0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6))
@@ -24,6 +27,12 @@
 
 #### Bugfix
 
+- 修复在 send_fail cb 中调用 esp_mesh_lite_send_msg 会造成系统卡死问题 ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
+- 修复当不禁用设备层级时，无法设置设备 level 为 0 的问题 ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
+- 修复在子节点数量没有超过最大限制的情况下，最后一个接入的子节点被 deauth 的问题 ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
+- 修复在 mesh lite 内部两个扫描动作连续执行时互相影响导致 Wi-Fi 连接异常的问题 ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
+- 修复当发送 json 数据进行通信时，payload 为 NULL 会 send fail 的问题 ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
+- 修复 lan ota 时，固件下载完成后，Wi-Fi 变更导致重新 OTA 的问题 ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
 - 修复 raw data 通信时的 seq 异常问题 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - 修复了新设备验证逻辑意外未执行的情况 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - 修复了以下问题：设备被子节点连满后，子节点即使断开，该设备也不会再被当作父节点来进行选择，此问题由 888603ef 引入 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
