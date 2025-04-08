@@ -343,6 +343,13 @@ uint32_t esp_mesh_lite_get_child_node_number(void)
 #endif
 }
 
+static void esp_mesh_lite_event_sta_lost_ip_handler(void *arg, esp_event_base_t event_base,
+                                                    int32_t event_id, void *event_data)
+{
+    ESP_LOGW(TAG, "STA lost IP, reconnecting");
+    esp_mesh_lite_connect();
+}
+
 static void esp_mesh_lite_event_ip_changed_handler(void *arg, esp_event_base_t event_base,
                                                    int32_t event_id, void *event_data)
 {
@@ -393,6 +400,7 @@ void esp_mesh_lite_init(esp_mesh_lite_config_t* config)
 
     esp_bridge_network_segment_check_register(esp_mesh_lite_network_segment_is_used);
     esp_event_handler_instance_register(ESP_MESH_LITE_EVENT, ESP_EVENT_ANY_ID, &esp_mesh_lite_event_ip_changed_handler, NULL, NULL);
+    esp_event_handler_instance_register(IP_EVENT, IP_EVENT_STA_LOST_IP, &esp_mesh_lite_event_sta_lost_ip_handler, NULL, NULL);
 
     esp_mesh_lite_espnow_init();
 
