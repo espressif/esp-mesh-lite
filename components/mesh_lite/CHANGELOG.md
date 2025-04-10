@@ -2,16 +2,19 @@
 
 # ChangeLog
 
-## v1.0.2 - 2025-3-13
+## v1.0.2 - 2025-4-9
 
 ### Breaking Change:
 
+- lan_ota_file_transfer: Add more parameters to get_file_cb ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
 - Deprecate `esp_mesh_lite_get_child_node_number` and replace it with `esp_mesh_lite_get_mesh_node_number` ([a38ba0e](https://github.com/espressif/esp-mesh-lite/commit/a38ba0e68d48a93aa0c536f5a43bf657a5cccaf3))
 
 ### Enhancements:
 
 #### Mesh
 
+- Support getting mesh-lite core commit ID through API ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
+- Optimize: The device disallowed as root node will not request to be included in the will list ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
 - When the current node exceeds the maximum limit, deauthenticate its child node ([9c33dcf](https://github.com/espressif/esp-mesh-lite/commit/9c33dcf1c484ef91abc5227565100c67fb6d6f3d))
 - Support registering callback function for failure to send message ([0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6))
 - Optimize the execution logic of the fixed root node device esp_mesh_lite_connect to shorten the connection time ([0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6))
@@ -26,6 +29,12 @@
 
 #### Bugfix
 
+- Fixed: It blocked the system when calling esp_mesh_lite_send_msg in the send_fail callback ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
+- Fixed: It failed to set the level to 0 when disallowed_level had been set 0 ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
+- Fixed: The last connected child node will be de-authenticated though the number of child nodes does not exceed the maximum limit ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
+- Fixed: Consecutive scan operations in mesh lite interfere with each other, causing Wi-Fi connection abnormalities ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
+- Fixed: The json msg send fails when payload is NULL ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
+- Fixed: OTA would restart when Wi-Fi changed after lan ota was completed ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
 - Fixed seq exception for raw data communication ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - Fixed a situation where the new device verification logic was accidentally not executed ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - Fixed an issue where after a device is fully connected by children it will no longer be selected as a parent even if some children are disconnected, This issue was introduced by 888603ef  ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))

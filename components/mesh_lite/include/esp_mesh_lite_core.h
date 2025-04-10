@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2022-2024 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2022-2025 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -109,6 +109,20 @@ typedef cJSON* (*msg_process_cb_t)(cJSON *payload, uint32_t seq);
 typedef esp_err_t (*raw_msg_process_cb_t)(uint8_t *data, uint32_t len, uint8_t **out_data, uint32_t* out_len, uint32_t seq);
 
 /**
+ * @brief Structure defining parameters for LAN OTA (Over-The-Air) file transfer operations in ESP-Mesh-Lite.
+ *        This structure encapsulates all necessary parameters for file transfer callbacks.
+ */
+typedef struct {
+    char *fw_version;        /**< Pointer to firmware version string. */
+    int filesize;            /**< Total size of the file being transferred in bytes.
+                              *   Note: this data size may be larger than the `size` parameter passed to `esp_mesh_lite_transmit_file_start`,
+                              *   as this value is calculated by aligning the `size` parameter to 64KB boundaries. */
+    size_t offset;           /**< Current offset position within the file for this transfer operation. */
+    char *data;              /**< Pointer to the data buffer for file transfer. */
+    size_t data_size;        /**< Size of the data buffer in bytes for this transfer operation. */
+} esp_mesh_lite_lan_ota_file_transfer_param_t;
+
+/**
  * @brief Callback function pointer type for providing LAN OTA file data.
  *        This function should provide file data for LAN OTA.
  *
@@ -120,7 +134,7 @@ typedef esp_err_t (*raw_msg_process_cb_t)(uint8_t *data, uint32_t len, uint8_t *
  *
  * @return esp_err_t The result of the operation.
  */
-typedef esp_err_t (*lan_ota_provide_file_cb_t)(int filesize, char *fw_version, size_t offset, size_t data_size, char *data);
+typedef esp_err_t (*lan_ota_provide_file_cb_t)(esp_mesh_lite_lan_ota_file_transfer_param_t *param);
 
 /**
  * @brief Callback function pointer type for getting LAN OTA file data.
@@ -131,7 +145,7 @@ typedef esp_err_t (*lan_ota_provide_file_cb_t)(int filesize, char *fw_version, s
  *
  * @return esp_err_t The result of the operation.
  */
-typedef esp_err_t (*lan_ota_get_file_cb_t)(char *data, size_t data_size);
+typedef esp_err_t (*lan_ota_get_file_cb_t)(esp_mesh_lite_lan_ota_file_transfer_param_t *param);
 
 /**
  * @brief Callback function pointer type for indicating LAN OTA file reception completion.
@@ -376,6 +390,15 @@ bool esp_mesh_lite_network_segment_is_used(uint32_t ip);
 esp_err_t esp_mesh_lite_core_init(esp_mesh_lite_config_t* config);
 
 /**
+ * @brief Get the Git commit ID of the Mesh-Lite firmware.
+ *
+ * @return Pointer to the null-terminated commit ID string
+ *     - Valid string: Current firmware commit ID
+ *     - NULL: Not available
+ */
+const char *esp_mesh_lite_get_core_commit_id(void);
+
+/**
  * @brief Scan to find a matched node and connect.
  *
  */
@@ -440,8 +463,11 @@ esp_err_t esp_mesh_lite_set_router_config(mesh_lite_sta_config_t *conf);
 /**
  * @brief  Whether to allow other nodes to join the mesh network.
  *
- * @attention  1. Please call this API after  `esp_mesh_lite_init`
+ * @attention  1. Please call this API after `esp_mesh_lite_init`
  * @attention  2. Please call this API before `esp_mesh_lite_start`
+ * @attention  3. When disallowing new devices to join, it's recommended to set
+ *              the same argot value via `esp_mesh_lite_set_argot` for all devices
+ *              in the same Mesh network to ensure proper network maintenance.
  *
  * @param[in]  enable: true -> allow; false -> disallow
  *
@@ -884,20 +910,23 @@ esp_err_t esp_mesh_lite_lan_ota_set_file_name(char *file_name);
  * static esp_ota_handle_t update_handle = 0;
  * static const esp_partition_t *next_app_partition = NULL;
  *
- * static esp_err_t provide_file_cb(int filesize, char *fw_version, size_t offset, size_t data_size, char *data)
+ * static esp_err_t provide_file_cb(esp_mesh_lite_lan_ota_file_transfer_param_t *param)
  * {
+ *     printf("Provide File: fw_version: %s, file size: %d, offset: %d, data_size: %d\n", param->fw_version, param->filesize, param->offset, param->data_size);
  *     // check filesize and fw_version
  *     const esp_partition_t* running_partition = esp_ota_get_running_partition();
- *     return esp_partition_read(running_partition, offset, data, data_size);
+ *     return esp_partition_read(running_partition, param->offset, param->data, param->data_size);
  * }
  *
- * static esp_err_t get_file_cb(char *data, size_t data_size)
+ * static esp_err_t get_file_cb(esp_mesh_lite_lan_ota_file_transfer_param_t *param)
  * {
- *     return esp_ota_write(update_handle, (const void *)data, data_size);
+ *     printf("Get File: fw_version: %s, file size: %d, offset: %d, data_size: %d\n", param->fw_version, param->filesize, param->offset, param->data_size);
+ *     return esp_ota_write(update_handle, (const void *)param->data, param->data_size);
  * }
  *
  * static esp_err_t get_file_done(void)
  * {
+ *     printf("Get File Done\n");
  *     esp_ota_end(update_handle);
  *     return esp_ota_set_boot_partition(next_app_partition);
  * }
