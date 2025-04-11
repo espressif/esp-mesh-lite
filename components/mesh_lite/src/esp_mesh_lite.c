@@ -65,7 +65,18 @@ esp_err_t esp_mesh_lite_report_info(void)
     uint32_t outlen = mesh_lite__node_data__get_packed_size(&req);
     uint8_t *outdata = malloc(outlen);
     mesh_lite__node_data__pack(&req, outdata);
-    esp_mesh_lite_try_sending_raw_msg(MESH_LITE_MSG_ID_REPORT_NODE_INFO, MESH_LITE_MSG_ID_REPORT_NODE_INFO_RESP, 3, outdata, outlen, esp_mesh_lite_send_raw_msg_to_root);
+
+    esp_mesh_lite_msg_config_t config = {
+        .raw_msg = {
+            .msg_id = MESH_LITE_MSG_ID_REPORT_NODE_INFO,
+            .expect_resp_msg_id = MESH_LITE_MSG_ID_REPORT_NODE_INFO_RESP,
+            .max_retry = 3,
+            .data = outdata,
+            .size = outlen,
+            .raw_resend = esp_mesh_lite_send_raw_msg_to_root,
+        },
+    };
+    esp_mesh_lite_send_msg(ESP_MESH_LITE_RAW_MSG, &config);
     free(outdata);
 
     return ESP_OK;
@@ -211,7 +222,17 @@ static esp_err_t mesh_lite_update_nodes_list(uint8_t *data, uint32_t len, uint8_
         mesh_lite__data__free_unpacked(req, NULL);
     }
 
-    esp_mesh_lite_try_sending_raw_msg(MESH_LITE_MSG_ID_UPDATE_NODES_LIST, 0, 0, data, len, esp_mesh_lite_send_broadcast_raw_msg_to_child);
+    esp_mesh_lite_msg_config_t config = {
+        .raw_msg = {
+            .msg_id = MESH_LITE_MSG_ID_UPDATE_NODES_LIST,
+            .expect_resp_msg_id = 0,
+            .max_retry = 0,
+            .data = data,
+            .size = len,
+            .raw_resend = esp_mesh_lite_send_broadcast_raw_msg_to_child,
+        },
+    };
+    esp_mesh_lite_send_msg(ESP_MESH_LITE_RAW_MSG, &config);
     return ret;
 }
 
@@ -297,7 +318,17 @@ static esp_err_t esp_mesh_lite_update_nodes_info_to_children(void)
         }
         free(req.nodes);
 
-        esp_mesh_lite_try_sending_raw_msg(MESH_LITE_MSG_ID_UPDATE_NODES_LIST, 0, 3, outdata, outlen, esp_mesh_lite_send_broadcast_raw_msg_to_child);
+        esp_mesh_lite_msg_config_t config = {
+            .raw_msg = {
+                .msg_id = MESH_LITE_MSG_ID_UPDATE_NODES_LIST,
+                .expect_resp_msg_id = 0,
+                .max_retry = 3,
+                .data = outdata,
+                .size = outlen,
+                .raw_resend = esp_mesh_lite_send_broadcast_raw_msg_to_child,
+            },
+        };
+        esp_mesh_lite_send_msg(ESP_MESH_LITE_RAW_MSG, &config);
         free(outdata);
     }
     return ESP_OK;

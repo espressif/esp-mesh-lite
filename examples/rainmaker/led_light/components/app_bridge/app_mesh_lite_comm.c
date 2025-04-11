@@ -49,7 +49,16 @@ esp_err_t app_rmaker_mesh_lite_report_child_info(void)
         cJSON_AddNumberToObject(item, "level", esp_mesh_lite_get_level());
         cJSON_AddStringToObject(item, "mac", mac_str);
         cJSON_AddStringToObject(item, "ip", ip_str);
-        esp_mesh_lite_try_sending_msg("report_child_info", "report_child_info_ack", MAX_RETRY, item, &esp_mesh_lite_send_msg_to_parent);
+        esp_mesh_lite_msg_config_t config = {
+            .json_msg = {
+                .send_msg = "report_child_info",
+                .expect_msg = "report_child_info_ack",
+                .max_retry = MAX_RETRY,
+                .req_payload = item,
+                .resend = esp_mesh_lite_send_msg_to_parent,
+            }
+        };
+        esp_mesh_lite_send_msg(ESP_MESH_LITE_JSON_MSG, &config);
         cJSON_Delete(item);
     }
 
