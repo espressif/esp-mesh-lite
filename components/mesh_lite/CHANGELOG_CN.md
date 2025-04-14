@@ -1,6 +1,6 @@
 # ChangeLog
 
-## v1.0.2 - 2025-4-9
+## v1.0.2 - 2025-4-14
 
 ### Breaking Change:
 
@@ -11,6 +11,7 @@
 
 #### Mesh
 
+- 支持 espnow 发送更长的数据 ([29185cc](https://github.com/espressif/esp-mesh-lite/commit/29185cc323d199e609d1ff75fe21e5dab95c4e34))
 - 新增 API 以获取当前 mesh-lite 库的 commit id ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
 - 当设备被禁止成为根节点时将不会被加入到 “遗嘱” 列表中 ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
 - 当前设备的层级超过最大限制时，断开其子节点的 sta 连接 ([9c33dcf](https://github.com/espressif/esp-mesh-lite/commit/9c33dcf1c484ef91abc5227565100c67fb6d6f3d))

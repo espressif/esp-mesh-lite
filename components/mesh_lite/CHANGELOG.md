@@ -2,7 +2,7 @@
 
 # ChangeLog
 
-## v1.0.2 - 2025-4-9
+## v1.0.2 - 2025-4-14
 
 ### Breaking Change:
 
@@ -13,6 +13,7 @@
 
 #### Mesh
 
+- Support longer data length in espnow ([29185cc](https://github.com/espressif/esp-mesh-lite/commit/29185cc323d199e609d1ff75fe21e5dab95c4e34))
 - Support getting mesh-lite core commit ID through API ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
 - Optimize: The device disallowed as root node will not request to be included in the will list ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
 - When the current node exceeds the maximum limit, deauthenticate its child node ([9c33dcf](https://github.com/espressif/esp-mesh-lite/commit/9c33dcf1c484ef91abc5227565100c67fb6d6f3d))
