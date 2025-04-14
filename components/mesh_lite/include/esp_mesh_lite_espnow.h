@@ -11,7 +11,11 @@
 #include "esp_now.h"
 
 #define ESPNOW_MAXDELAY                  (512)
+#if defined(ESP_NOW_MAX_DATA_LEN_V2)
+#define ESPNOW_PAYLOAD_MAX_LEN           (1470)
+#else
 #define ESPNOW_PAYLOAD_MAX_LEN           (250)
+#endif
 
 #define IS_BROADCAST_ADDR(addr) ((((uint8_t*)addr)[0] == 0xFF) && (((uint8_t*)addr)[1] == 0xFF) && (((uint8_t*)addr)[2] == 0xFF) \
                                     && (((uint8_t*)addr)[3] == 0xFF) && (((uint8_t*)addr)[4] == 0xFF) && (((uint8_t*)addr)[5] == 0xFF))
