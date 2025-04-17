@@ -2,7 +2,7 @@
 
 # ChangeLog
 
-## v1.0.2 - 2025-4-14
+## v1.0.2 - 2025-4-17
 
 ### Breaking Change:
 
@@ -13,6 +13,8 @@
 
 #### Mesh
 
+- Optimized: speed up fusion process for specific scenarios​ ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
+- Optimized: in Mesh Lite connections, skip disconnection/reconnection if the target device matches the currently connected one ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
 - Support longer data length in espnow ([29185cc](https://github.com/espressif/esp-mesh-lite/commit/29185cc323d199e609d1ff75fe21e5dab95c4e34))
 - Support getting mesh-lite core commit ID through API ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
 - Optimize: The device disallowed as root node will not request to be included in the will list ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
@@ -30,6 +32,14 @@
 
 #### Bugfix
 
+- Fixed the issue that the Vendor IE information was accidentally updated when esp_wifi_connect() returned ESP_FAIL ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
+- Fixed: The new device may disrupt the old network topology when joining a full capacity network ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
+- Fixed the issue where the reconnection mechanism could not be enabled when the fixed root node called `esp_mesh_lite_connect()`, this regression was introduced in commit [0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6) ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
+- Fixed: replace deprecated `esp_mesh_lite_try_sending_msg()` with `esp_mesh_lite_send_msg()` ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
+- Fix abnormal fusion behavior in special situations ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
+    - Devices fixed as root nodes and acting only as leaf nodes mistakenly triggered fusion, causing them to repeatedly disconnect from the router
+    - Devices fixed as root nodes and acting only as leaf nodes mistakenly triggered fusion in other devices, causing other root nodes to repeatedly disconnect from the router
+    - Root nodes with the maximum layer set to 1 mistakenly triggered fusion in other devices, causing other root nodes to repeatedly disconnect from the router
 - Fixed: It blocked the system when calling esp_mesh_lite_send_msg in the send_fail callback ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
 - Fixed: It failed to set the level to 0 when disallowed_level had been set 0 ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
 - Fixed: The last connected child node will be de-authenticated though the number of child nodes does not exceed the maximum limit ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
