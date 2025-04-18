@@ -1,6 +1,6 @@
 # ChangeLog
 
-## v1.0.2 - 2025-4-14
+## v1.0.2 - 2025-4-17
 
 ### Breaking Change:
 
@@ -11,6 +11,8 @@
 
 #### Mesh
 
+- 优化部分场景下的融合过程，缩短融合时间 ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
+- Mesh Lite 连接中，若待连接设备与当前连接设备相同，无需断开重连 ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
 - 支持 espnow 发送更长的数据 ([29185cc](https://github.com/espressif/esp-mesh-lite/commit/29185cc323d199e609d1ff75fe21e5dab95c4e34))
 - 新增 API 以获取当前 mesh-lite 库的 commit id ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
 - 当设备被禁止成为根节点时将不会被加入到 “遗嘱” 列表中 ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
@@ -28,6 +30,14 @@
 
 #### Bugfix
 
+- 修复调用 `esp_wifi_connect()` 失败时错误地更新 Vendor IE 信息 ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
+- 修复新设备加入满载网络时可能会破坏原有拓扑结构的问题 ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
+- 修复设备作为固定根节点时，调用 `esp_mesh_lite_connect()` 未触发重连机制的问题，该问题由提交 [0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6) 引入 ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
+- 将废弃的 `esp_mesh_lite_try_sending_msg()` 替换为 `esp_mesh_lite_send_msg()` ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
+- 修复特殊情况下的异常融合行为 ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
+    - 固定为根节点且仅作为叶节点的设备，误触发了融合导致其反复断开路由器
+    - 固定为根节点且仅作为叶节点的设备，误触发其它设备融合，导致其他根节点反复断开路由器
+    - 最高层级设置为 1 的根节点，误触发其它设备融合，导致其他根节点反复断开路由器
 - 修复在 send_fail cb 中调用 esp_mesh_lite_send_msg 会造成系统卡死问题 ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
 - 修复当不禁用设备层级时，无法设置设备 level 为 0 的问题 ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))
 - 修复在子节点数量没有超过最大限制的情况下，最后一个接入的子节点被 deauth 的问题 ([6265503](https://github.com/espressif/esp-mesh-lite/commit/62655031e5dc527d35ebb2c51389f100208991cd))

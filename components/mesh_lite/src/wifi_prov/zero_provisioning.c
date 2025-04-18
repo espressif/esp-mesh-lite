@@ -583,18 +583,25 @@ static void zero_prov_event_handle(zero_prov_act_t* pact, zero_prov_event_id_t e
     }
 }
 
+#if ESP_IDF_VERSION > ESP_IDF_VERSION_VAL(5, 4, 1)
+static void zero_prov_send_cb(const esp_now_send_info_t *tx_info, esp_now_send_status_t status)
+#else
 static void zero_prov_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status)
+#endif
 {
     zero_prov_event_t evt;
     zero_prov_send_cb_t *send_cb = &evt.info.send_cb;
-    bool is_broadcast =  IS_BROADCAST_ADDR(mac_addr);
-
+#if ESP_IDF_VERSION > ESP_IDF_VERSION_VAL(5, 4, 1)
+    const uint8_t *mac_addr = tx_info->des_addr;
+    if (tx_info == NULL) {
+#else
     if (mac_addr == NULL) {
+#endif
         ESP_LOGE(TAG, "Send cb arg error");
         return;
     }
 
-    if (is_broadcast) {
+    if (IS_BROADCAST_ADDR(mac_addr)) {
         evt.id = ZERO_PROV_SEND_BROADCAST;
     } else {
         evt.id = ZERO_PROV_SEND_UNICAST_DATA;
