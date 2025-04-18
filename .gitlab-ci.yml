@@ -35,33 +35,24 @@ default:
   - python -m pip install --upgrade idf-component-manager
 
 .build_default_example: &build_default_example
-  - cd examples/mesh_local_control
-  - rm -rf build sdkconfig
-  - idf.py ${compile_option} set-target ${idf_target}
-  - idf.py build
-  - cd -
+  - >
+    for example in mesh_local_control no_router wireless_debug; do
+      cd examples/${example}
+      rm -rf build sdkconfig
 
-  - cd examples/mesh_local_control
-  - git checkout -- .
-  - git clean -xdff
-  - echo -e "\nCONFIG_MESH_LITE_NODE_INFO_REPORT=y" >> sdkconfig.defaults.${idf_target}
-  - echo -e "\nCONFIG_ESP_MESH_LITE_OTA_ENABLE=y" >> sdkconfig.defaults.${idf_target}
-  - echo -e "\nCONFIG_MESH_LITE_PROV_ENABLE=y" >> sdkconfig.defaults.${idf_target}
-  - echo -e "\nCONFIG_MESH_LITE_WIRELESS_DEBUG=y" >> sdkconfig.defaults.${idf_target}
-  - idf.py ${compile_option} set-target ${idf_target}
-  - idf.py build
-  - cd -
+      if [ "$example" == "mesh_local_control" ]; then
+        git checkout -- .
+        git clean -xdff
+        echo -e "\nCONFIG_MESH_LITE_NODE_INFO_REPORT=y" >> sdkconfig.defaults.${idf_target}
+        echo -e "\nCONFIG_ESP_MESH_LITE_OTA_ENABLE=y" >> sdkconfig.defaults.${idf_target}
+        echo -e "\nCONFIG_MESH_LITE_PROV_ENABLE=y" >> sdkconfig.defaults.${idf_target}
+        echo -e "\nCONFIG_MESH_LITE_WIRELESS_DEBUG=y" >> sdkconfig.defaults.${idf_target}
+      fi
 
-  - cd examples/no_router
-  - rm -rf build sdkconfig
-  - idf.py ${compile_option} set-target ${idf_target}
-  - idf.py build
-  - cd -
-  - cd examples/wireless_debug
-  - rm -rf build sdkconfig
-  - idf.py ${compile_option} set-target ${idf_target}
-  - idf.py build
-  - cd -
+      idf.py ${compile_option} set-target ${idf_target}
+      idf.py build
+      cd -
+    done
 
 .build_provisioning_example: &build_provisioning_example
   - cd examples/mesh_wifi_provisioning
@@ -71,16 +62,16 @@ default:
   - cd -
 
 .build_rainmaker_example: &build_rainmaker_example
-  - cd examples/rainmaker/led_light
-  - rm -rf build sdkconfig
-  - idf.py ${compile_option} set-target ${idf_target}
-  - idf.py build
-  - cd -
-  - cd examples/rainmaker/provisioning_controller
-  - rm -rf build sdkconfig
-  - idf.py ${compile_option} set-target ${idf_target}
-  - idf.py build
-  - cd -
+  - >
+    if [ "$IMAGE" != "espressif/idf:release-v5.4" ]; then
+      for example in led_light provisioning_controller; do
+        cd examples/rainmaker/${example}
+        rm -rf build sdkconfig
+        idf.py ${compile_option} set-target ${idf_target}
+        idf.py build
+        cd -
+      done
+    fi
 
 .pre_check_template:
   stage: pre_check
@@ -105,7 +96,7 @@ esp32_build:
   image: $IMAGE
   parallel:
     matrix:
-      - IMAGE: ['espressif/idf:release-v5.0', 'espressif/idf:release-v5.1', 'espressif/idf:release-v5.2', 'espressif/idf:release-v5.3']
+      - IMAGE: ['espressif/idf:release-v5.0', 'espressif/idf:release-v5.1', 'espressif/idf:release-v5.2', 'espressif/idf:release-v5.3', 'espressif/idf:release-v5.4']
 
   variables:
     <<: *global-variables
@@ -127,7 +118,7 @@ esp32c2_build:
   image: $IMAGE
   parallel:
     matrix:
-      - IMAGE: ['espressif/idf:release-v5.0', 'espressif/idf:release-v5.1', 'espressif/idf:release-v5.2', 'espressif/idf:release-v5.3']
+      - IMAGE: ['espressif/idf:release-v5.0', 'espressif/idf:release-v5.1', 'espressif/idf:release-v5.2', 'espressif/idf:release-v5.3', 'espressif/idf:release-v5.4']
 
   variables:
     <<: *global-variables
@@ -140,6 +131,7 @@ esp32c2_build:
     - *setup_esp_idf
     - *build_default_example
     - *build_rainmaker_example
+    - *build_provisioning_example
 
 esp32c3_build:
   stage: build
@@ -148,7 +140,7 @@ esp32c3_build:
   image: $IMAGE
   parallel:
     matrix:
-      - IMAGE: ['espressif/idf:release-v5.0', 'espressif/idf:release-v5.1', 'espressif/idf:release-v5.2', 'espressif/idf:release-v5.3']
+      - IMAGE: ['espressif/idf:release-v5.0', 'espressif/idf:release-v5.1', 'espressif/idf:release-v5.2', 'espressif/idf:release-v5.3', 'espressif/idf:release-v5.4']
 
   variables:
     <<: *global-variables
@@ -170,7 +162,7 @@ esp32s2_build:
   image: $IMAGE
   parallel:
     matrix:
-      - IMAGE: ['espressif/idf:release-v5.0', 'espressif/idf:release-v5.1', 'espressif/idf:release-v5.2', 'espressif/idf:release-v5.3']
+      - IMAGE: ['espressif/idf:release-v5.0', 'espressif/idf:release-v5.1', 'espressif/idf:release-v5.2', 'espressif/idf:release-v5.3', 'espressif/idf:release-v5.4']
 
   variables:
     <<: *global-variables
@@ -190,7 +182,7 @@ esp32s3_build:
   image: $IMAGE
   parallel:
     matrix:
-      - IMAGE: ['espressif/idf:release-v5.0', 'espressif/idf:release-v5.1', 'espressif/idf:release-v5.2', 'espressif/idf:release-v5.3']
+      - IMAGE: ['espressif/idf:release-v5.0', 'espressif/idf:release-v5.1', 'espressif/idf:release-v5.2', 'espressif/idf:release-v5.3', 'espressif/idf:release-v5.4']
 
   variables:
     <<: *global-variables
@@ -212,7 +204,7 @@ esp32c6_build:
   image: $IMAGE
   parallel:
     matrix:
-      - IMAGE: ['espressif/idf:release-v5.1', 'espressif/idf:release-v5.2', 'espressif/idf:release-v5.3']
+      - IMAGE: ['espressif/idf:release-v5.1', 'espressif/idf:release-v5.2', 'espressif/idf:release-v5.3', 'espressif/idf:release-v5.4']
 
   variables:
     <<: *global-variables
@@ -225,6 +217,7 @@ esp32c6_build:
     - *setup_esp_idf
     - *build_default_example
     - *build_rainmaker_example
+    - *build_provisioning_example
 
 esp32c5_build:
   stage: build
@@ -233,11 +226,10 @@ esp32c5_build:
   image: $IMAGE
   parallel:
     matrix:
-      - IMAGE: ['espressif/idf:latest']
+      - IMAGE: ['espressif/idf:release-v5.4']
 
   variables:
     <<: *global-variables
-    idf_branch: master
     idf_target: esp32c5
     compile_option: --preview
 
@@ -248,6 +240,30 @@ esp32c5_build:
     - *setup_esp_idf
     - *build_default_example
     # rainmaker does not support C5 yet
+    # - *build_rainmaker_example
+
+esp32c61_build:
+  stage: build
+  tags:
+    - build
+  image: $IMAGE
+  parallel:
+    matrix:
+      - IMAGE: ['espressif/idf:release-v5.4']
+
+  variables:
+    <<: *global-variables
+    idf_target: esp32c61
+    compile_option: --preview
+
+  before_script:
+    - *before_script_preparation
+
+  script:
+    - *setup_esp_idf
+    - *build_default_example
+    - *build_provisioning_example
+    # rainmaker does not support C61 yet
     # - *build_rainmaker_example
 
 push_master_to_github:
