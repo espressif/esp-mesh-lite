@@ -5,12 +5,3 @@ dependencies:
     version: "*"
     # Please comment the following line, if this example is installed by idf.py create-project-from-example.
     override_path: "../../../components/mesh_lite"
-  # Wait until the `usb_device` component is listed in the package manager
-  # before adding the dependency to the `yml` file of the `iot_bridge` component.
-  #
-  usb_device:
-    path: components/usb/usb_device
-    git: https://github.com/espressif/esp-iot-bridge.git
-    rules:
-      - if: "target in [esp32s2, esp32s3]"
-      - if: "idf_version < 5.1.4"
