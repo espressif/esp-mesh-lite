@@ -368,8 +368,11 @@ uint32_t esp_mesh_lite_get_mesh_node_number(void)
 static void esp_mesh_lite_event_sta_lost_ip_handler(void *arg, esp_event_base_t event_base,
                                                     int32_t event_id, void *event_data)
 {
-    ESP_LOGW(TAG, "STA lost IP, reconnecting");
-    esp_mesh_lite_connect();
+    wifi_ap_record_t ap_info;
+    if (esp_wifi_sta_get_ap_info(&ap_info) == ESP_OK) {
+        ESP_LOGW(TAG, "STA lost IP, reconnecting");
+        esp_mesh_lite_connect();
+    }
 }
 
 static void esp_mesh_lite_event_ip_changed_handler(void *arg, esp_event_base_t event_base,
