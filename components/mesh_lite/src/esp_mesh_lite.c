@@ -444,6 +444,10 @@ void esp_mesh_lite_init(esp_mesh_lite_config_t* config)
                                             pdTRUE, NULL, root_timer_cb);
     xTimerStart(report_timer, portMAX_DELAY);
     xTimerStart(root_timer, portMAX_DELAY);
+
+    uint8_t mac[6];
+    esp_wifi_get_mac(WIFI_IF_STA, mac);
+    esp_mesh_lite_node_info_update(0, mac, 0);
 #endif /* MESH_LITE_NODE_INFO_REPORT */
 
 #if CONFIG_MESH_LITE_WIRELESS_DEBUG
