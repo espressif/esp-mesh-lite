@@ -3,30 +3,67 @@
 | Supported Targets | ESP32 | ESP32-C3 | ESP32-S2 | ESP32-S3 | ESP32-C2 | ESP32-C6 |
 | ----------------- | ----- | -------- | -------- | -------- | -------- | -------- |
 
-# Mesh-Lite 无线调试示例
+# **ESP-Mesh-Lite 无线调试示例**
 
-## 介绍
+## **1. 功能概述**
+**Wireless Debug** 是一种创新的无线调试解决方案。该方案使开发者无需通过物理连接 UART 或 JTAG 接口，即可通过无线方式控制目标设备，并实时获取 Mesh-Lite 网络中其他设备的运行状态信息(包括 Wi-Fi 连接状态、应用层连接状态、调试日志等)。此外，开发者还可以通过云端或在线设备转发的方式获取离线设备的运行日志和连接状态，大大提升了分布式设备的调试效率。
 
-本示例介绍了如何基于 Mesh-Lite Wireless Debug 方案来进行调试，通过 espnow 来获取其他设备的一些信息。
+---
 
-## 硬件准备
+## **2. 应用场景**
+### **(1) 多设备协同调试**
+当多个 ESP32 设备组成 Mesh-Lite 网络时，可通过 **Wireless Debug** 实现对所有设备运行状态的集中监控，无需逐一连接串口进行调试。
 
-1. 至少两块 ESP32 开发板
-2. 一台支持 2.4G 路由器
+### **(2) 现场故障诊断**
+对于部署在难以直接接触的位置的设备（如嵌入式传感器、工业控制器等），可通过无线方式快速获取故障日志，提高问题诊断效率。
 
-## 工作流程
+---
 
-ESP-Mesh-Lite 是基于 ESP-IDF 的功能和工具开发的。因此，首先必须设置 ESP-IDF 开发环境。您可以参考[设置开发环境](https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32/get-started/index.html)获取详细的步骤。之后，您可以直接在 ESP-Mesh-Lite 中构建示例，类似于在 ESP-IDF 中构建示例。
+## **3. 硬件要求**
+| 设备 | 数量 | 说明 |
+|------|------|------|
+| ESP32/ESP32-C3/ESP32-S3 等 | ≥2 | 至少需要 1 个作为 **调试主机**，1 个作为 **被调试设备** |
+| 2.4GHz 路由器 | 1 | 所有设备需连接至同一路由器，确保工作在相同信道 |
 
-### 配置设备
+---
 
-输入 `idf.py menuconfig`，在 “Example Configuration” 子菜单下，进行配置：
+## **4. 配置说明**
+运行 `idf.py menuconfig`，在 **Example Configuration** 中配置以下参数：
 
- * 路由器信息
+| 配置项 | 说明 |
+|--------|------|
+| `Router SSID` | 路由器 SSID |
+| `Router Password` | 路由器密码 |
+| `APP_GPIO_BUTTON_SW1` | 按键引脚编号 |
 
-### 编译和烧录
+---
 
-CMake:
-```shell
-idf.py erase_flash flash monitor -p /dev/ttyUSBx
+## **5. 编译与烧录**  
+```bash
+# 清除旧固件并烧录新固件
+idf.py erase_flash flash monitor -p /dev/ttyUSB0
 ```
+> 将 `/dev/ttyUSB0` 替换为实际串口设备。  
+
+---
+
+## **6. 示例输出**  
+成功运行后，调试主机可通过按键模拟发送对应无线调试指令，串口会显示：  
+```
+Command Type: discover
+MAC Address: 58:cf:79:1e:b1:14
+Channel: 11
+I (329519) wireless_debug: BTN: BUTTON_PRESS_UP
+I (329519) Mesh-Lite-Wireless-Debug: send command: discover --delay 1000 --channel 11 --mac 58:cf:79:1e:b1:14
+I (330094) wireless_debug: BTN: BUTTON_PRESS_UP
+I (330094) Mesh-Lite-Wireless-Debug: send command: wifi_error
+Command Type: discover
+MAC Address: 58:cf:79:1e:b1:14
+Channel: 11
+I (330694) wireless_debug: BTN: BUTTON_PRESS_UP
+I (330694) Mesh-Lite-Wireless-Debug: send command: wifi_error --mac 58:cf:79:1e:b1:14
+Command Type: wifi_error
+Command Value: This message from app_wifi_error_cb
+```
+
+---
