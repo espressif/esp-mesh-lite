@@ -33,6 +33,13 @@
 
 #### Bugfix
 
+- Fixed: When multiple root nodes have the same RSSI value during fusion, it may cause the node number to exceed the max node number limit ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
+- Fixed: Disconnect all mesh nodes when setting device as leaf node ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
+- Fixed: Parent node change not triggered when current RSSI falls below newly set parent node RSSI threshold ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
+- Fixed: When parent node's mesh id changes, disconnect station connection and reconnect it ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
+- Fixed: When parent node's level changes, devices with allowed/disallowed level need to disconnect and search for new parent nodes ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
+- Fixed incorrect node number before device connects to Wi-Fi ([5094532](https://github.com/espressif/esp-mesh-lite/commit/50945329140209bdf3f0f01625a6a7bb798ee683))
+- Fixed the issue where Wi-Fi reconnection is still triggered after executing esp_mesh_lite_disconnect ([fc251d9](https://github.com/espressif/esp-mesh-lite/commit/fc251d967f066421d505aa25befc09c5da2a1be3))
 - Fixed the issue that the Vendor IE information was accidentally updated when esp_wifi_connect() returned ESP_FAIL ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
 - Fixed: The new device may disrupt the old network topology when joining a full capacity network ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
 - Fixed the issue where the reconnection mechanism could not be enabled when the fixed root node called `esp_mesh_lite_connect()`, this regression was introduced in commit [0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6) ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
@@ -54,6 +61,8 @@
 
 #### Chore
 
+- Modify the default retransmission interval of raw messages to 1000ms ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
+- Optimize the return value of esp_mesh_lite_aes_set_key ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
 - Update the output level of some logs ([0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6))
 
 ## v1.0.1 - 2024-12-16

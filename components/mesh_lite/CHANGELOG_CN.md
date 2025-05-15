@@ -31,6 +31,13 @@
 
 #### Bugfix
 
+- 修复当前 RSSI 低于重新设置的父节点 RSSI 阈值时，未触发父节点变更的问题 ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
+- 修复设备设置为叶子节点后，其子节点未断开连接的问题 ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
+- 修复多个根节点 RSSI 值相同时进行融合，可能导致节点总数超过最大限制的问题 ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
+- 修复父节点 mesh id 变更后，其子节点未断开连接的问题 ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
+- 修复父节点层级变更后，不符合固定/禁用层级要求的设备未断开连接的问题 ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
+- 修复设备连接 Wi-Fi 之前 node number 错误的问题 ([5094532](https://github.com/espressif/esp-mesh-lite/commit/50945329140209bdf3f0f01625a6a7bb798ee683))
+- 修复执行 esp_mesh_lite_disconnect 之后仍会触发 Wi-Fi 重连的问题 ([fc251d9](https://github.com/espressif/esp-mesh-lite/commit/fc251d967f066421d505aa25befc09c5da2a1be3))
 - 修复调用 `esp_wifi_connect()` 失败时错误地更新 Vendor IE 信息 ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
 - 修复新设备加入满载网络时可能会破坏原有拓扑结构的问题 ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
 - 修复设备作为固定根节点时，调用 `esp_mesh_lite_connect()` 未触发重连机制的问题，该问题由提交 [0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6) 引入 ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
@@ -52,6 +59,8 @@
 
 #### Chore
 
+- 将 raw msg 通信的默认重传间隔修改为 1000ms ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
+- 优化 esp_mesh_lite_aes_set_key 的返回值 ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
 - 更新部分日志的输出级别 ([0b8918b](https://github.com/espressif/esp-mesh-lite/commit/0b8918b28f9bb6a8ccf2f676c2005e5b0d30cdf6))
 
 ## v1.0.1 - 2024-12-16
