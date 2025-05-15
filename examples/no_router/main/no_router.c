@@ -93,18 +93,33 @@ static void wifi_init(void)
 void app_wifi_set_softap_info(void)
 {
     char softap_ssid[33];
+    char softap_psw[64];
     uint8_t softap_mac[6];
+    size_t ssid_size = sizeof(softap_ssid);
+    size_t psw_size = sizeof(softap_psw);
     esp_wifi_get_mac(WIFI_IF_AP, softap_mac);
     memset(softap_ssid, 0x0, sizeof(softap_ssid));
+    memset(softap_psw, 0x0, sizeof(softap_psw));
 
+    if (esp_mesh_lite_get_softap_ssid_from_nvs(softap_ssid, &ssid_size) == ESP_OK) {
+        ESP_LOGI(TAG, "Get ssid from nvs: %s", softap_ssid);
+    } else {
 #ifdef CONFIG_BRIDGE_SOFTAP_SSID_END_WITH_THE_MAC
-    snprintf(softap_ssid, sizeof(softap_ssid), "%.25s_%02x%02x%02x", CONFIG_BRIDGE_SOFTAP_SSID, softap_mac[3], softap_mac[4], softap_mac[5]);
+        snprintf(softap_ssid, sizeof(softap_ssid), "%.25s_%02x%02x%02x", CONFIG_BRIDGE_SOFTAP_SSID, softap_mac[3], softap_mac[4], softap_mac[5]);
 #else
-    snprintf(softap_ssid, sizeof(softap_ssid), "%.32s", CONFIG_BRIDGE_SOFTAP_SSID);
+        snprintf(softap_ssid, sizeof(softap_ssid), "%.32s", CONFIG_BRIDGE_SOFTAP_SSID);
 #endif
-    esp_mesh_lite_set_softap_ssid_to_nvs(softap_ssid);
-    esp_mesh_lite_set_softap_psw_to_nvs(CONFIG_BRIDGE_SOFTAP_PASSWORD);
-    esp_mesh_lite_set_softap_info(softap_ssid, CONFIG_BRIDGE_SOFTAP_PASSWORD);
+        ESP_LOGI(TAG, "Get ssid from nvs failed, set ssid: %s", softap_ssid);
+    }
+
+    if (esp_mesh_lite_get_softap_psw_from_nvs(softap_psw, &psw_size) == ESP_OK) {
+        ESP_LOGI(TAG, "Get psw from nvs: [HIDDEN]");
+    } else {
+        strlcpy(softap_psw, CONFIG_BRIDGE_SOFTAP_PASSWORD, sizeof(softap_psw));
+        ESP_LOGI(TAG, "Get psw from nvs failed, set psw: [HIDDEN]");
+    }
+
+    esp_mesh_lite_set_softap_info(softap_ssid, softap_psw);
 }
 
 void app_main()
