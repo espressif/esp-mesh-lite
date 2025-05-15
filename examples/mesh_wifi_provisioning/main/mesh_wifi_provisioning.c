@@ -172,15 +172,18 @@ static esp_err_t esp_storage_init(void)
 
 static void wifi_init(void)
 {
-    wifi_config_t wifi_config = {0};
-    snprintf((char *)wifi_config.ap.ssid, sizeof(wifi_config.ap.ssid), "%s", CONFIG_BRIDGE_SOFTAP_SSID);
-    strlcpy((char *)wifi_config.ap.password, CONFIG_BRIDGE_SOFTAP_PASSWORD, sizeof(wifi_config.ap.password));
-    esp_bridge_wifi_set_config(WIFI_IF_AP, &wifi_config);
+    wifi_config_t wifi_softap_config = {
+        .ap = {
+            .ssid = CONFIG_BRIDGE_SOFTAP_SSID,
+            .password = CONFIG_BRIDGE_SOFTAP_PASSWORD,
+        },
+    };
+    esp_bridge_wifi_set_config(WIFI_IF_AP, &wifi_softap_config);
 }
 
 void app_wifi_set_softap_info(void)
 {
-    char softap_ssid[32];
+    char softap_ssid[33];
     uint8_t softap_mac[6];
     esp_wifi_get_mac(WIFI_IF_AP, softap_mac);
     memset(softap_ssid, 0x0, sizeof(softap_ssid));

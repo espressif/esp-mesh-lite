@@ -84,14 +84,18 @@ static void wifi_init(void)
     esp_bridge_wifi_set_config(WIFI_IF_STA, &wifi_config);
 
     // Softap
-    snprintf((char *)wifi_config.ap.ssid, sizeof(wifi_config.ap.ssid), "%s", CONFIG_BRIDGE_SOFTAP_SSID);
-    strlcpy((char *)wifi_config.ap.password, CONFIG_BRIDGE_SOFTAP_PASSWORD, sizeof(wifi_config.ap.password));
-    esp_bridge_wifi_set_config(WIFI_IF_AP, &wifi_config);
+    wifi_config_t wifi_softap_config = {
+        .ap = {
+            .ssid = CONFIG_BRIDGE_SOFTAP_SSID,
+            .password = CONFIG_BRIDGE_SOFTAP_PASSWORD,
+        },
+    };
+    esp_bridge_wifi_set_config(WIFI_IF_AP, &wifi_softap_config);
 }
 
 void app_wifi_set_softap_info(void)
 {
-    char softap_ssid[32];
+    char softap_ssid[33];
     char softap_psw[64];
     uint8_t softap_mac[6];
     size_t size = sizeof(softap_psw);
