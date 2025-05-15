@@ -1262,17 +1262,28 @@ esp_err_t esp_mesh_lite_msg_action_list_register(const esp_mesh_lite_msg_action_
 esp_err_t esp_mesh_lite_msg_action_list_unregister(const esp_mesh_lite_msg_action_t* msg_action);
 
 /**
-  * @brief This function initialize AES context and set key schedule (encryption or decryption).
-  *
-  * @param[in]  key      encryption key
-  * @param[in]  keybits  currently only supports 128
-  *
-  * @attention this function must be called before Mesh-Lite initialization.
-  *
-  * @return
-  *     - ESP_OK : successful
-  *     - Other  : fail
-  */
+ * @brief Initialize AES context and set the key schedule for encryption or decryption.
+ *
+ * @details This function configures the AES key schedule based on the provided key and key size.
+ *          If `key` is `NULL`, the system will operate in **no-encryption mode** (plaintext communication).
+ *          It must be called **before** initializing Mesh-Lite, as the AES context is used for secure communications.
+ *
+ * @param[in]  key      Pointer to the encryption/decryption key (must be 16, 24, or 32 bytes long).
+ *                      - If `NULL`, encryption is disabled.
+ * @param[in]  keybits  Key size in bits. Supported values:
+ *                      - `128` (16-byte key)
+ *                      - `192` (24-byte key)
+ *                      - `256` (32-byte key)
+ *                      - Ignored if `key` is `NULL`.
+ *
+ * @attention
+ *  - If `key` is `NULL`, Mesh-Lite will transmit data **unencrypted** (security risk).
+ *  - The key must remain valid during Mesh-Lite operation if encryption is enabled.
+ *
+ * @return
+ *     - `ESP_OK` Success, key schedule set (or no-encryption mode enabled).
+ *     - `MBEDTLS_ERR_PLATFORM_FEATURE_UNSUPPORTED`
+ */
 esp_err_t esp_mesh_lite_aes_set_key(const unsigned char* key, unsigned int keybits);
 
 /**
