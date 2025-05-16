@@ -11,6 +11,7 @@
 
 #### Mesh
 
+- 支持动态设置 Wi-Fi 重连间隔 ([803c8e9](https://github.com/espressif/esp-mesh-lite/commit/803c8e93e9df459fefe29794b66464ce0c21bf5f))
 - 新增对 ESP32-C61 的支持 ([4a2b7e4](https://github.com/espressif/esp-mesh-lite/commit/4a2b7e4b4c04b3c96c941f8b8e82758f0c5c4bfb))
 - 优化部分场景下的融合过程，缩短融合时间 ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
 - Mesh Lite 连接中，若待连接设备与当前连接设备相同，无需断开重连 ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
