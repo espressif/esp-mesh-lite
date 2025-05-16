@@ -602,6 +602,29 @@ void esp_mesh_lite_set_leaf_node_softap_status(esp_mesh_lite_leaf_node_softap_st
 esp_err_t esp_mesh_lite_set_fusion_config(esp_mesh_lite_fusion_config_t *config);
 
 /**
+ * @brief Configure WiFi reconnection behavior after station disconnection
+ *
+ * When the WiFi station disconnects, ESP-Mesh-Lite will perform the following recovery sequence:
+ *
+ * 1. First attempts to reconnect to the current parent node:
+ *    - Makes up to `retry_connect_parent_count` reconnection attempts (default: 2)
+ *    - Waits `retry_connect_parent_interval` seconds between each attempt (default: 5)
+ *
+ * 2. If all reconnection attempts fail:
+ *    - Begins scanning for new parent nodes
+ *    - Performs scans every `reconnect_interval` seconds (default: 10)
+ *
+ * All interval values are specified in seconds.
+ *
+ * @param retry_connect_parent_interval  Interval (in seconds) for attempting to connect to the parent node (default: 5)
+ * @param retry_connect_parent_count     Maximum number of reconnection attempts to current parent (default: 2)
+ * @param reconnect_interval             Interval (in seconds) between scanning attempts (default: 10)
+ */
+void esp_mesh_lite_set_wifi_reconnect_interval(uint32_t retry_connect_parent_interval,
+                                               uint32_t retry_connect_parent_count,
+                                               uint32_t reconnect_interval);
+
+/**
  * @brief  Get the mesh_lite_id
  *
  * @return

@@ -13,6 +13,7 @@
 
 #### Mesh
 
+- Support dynamically setting Wi-Fi reconnection intervals ([803c8e9](https://github.com/espressif/esp-mesh-lite/commit/803c8e93e9df459fefe29794b66464ce0c21bf5f))
 - Added support for ESP32-C61 ([4a2b7e4](https://github.com/espressif/esp-mesh-lite/commit/4a2b7e4b4c04b3c96c941f8b8e82758f0c5c4bfb))
 - Optimized: speed up fusion process for specific scenarios​ ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
 - Optimized: in Mesh Lite connections, skip disconnection/reconnection if the target device matches the currently connected one ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
