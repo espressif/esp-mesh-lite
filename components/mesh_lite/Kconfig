@@ -86,16 +86,16 @@ menu "ESP Wi-Fi Mesh Lite"
         depends on ESP_MESH_LITE_OTA_ENABLE
         config OTA_DATA_LEN
             int "Transmission data length of each packet"
-            default 1388
-            range 512 1388
+            default 1376
+            range 512 1376
             help
                 Setting a smaller default OTA_DATA_LEN size can save some RAM,
                 but the time spent by OTA will increase.
 
         config OTA_WND_DEFAULT
             int "Default receive window size"
-            default 8328
-            range OTA_DATA_LEN 8328
+            default 8256
+            range OTA_DATA_LEN 8256
             help
                 Must be a multiple of OTA_data_Len
 
