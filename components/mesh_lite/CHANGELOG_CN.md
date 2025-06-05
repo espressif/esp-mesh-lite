@@ -1,6 +1,6 @@
 # ChangeLog
 
-## v1.0.2 - 2025-4-21
+## v1.0.2 - 2025-5-29
 
 ### Breaking Change:
 
@@ -32,6 +32,7 @@
 
 #### Bugfix
 
+- 修复当通信数据通过 aes 加密时的 LAN OTA 升级以及文件传输失败的问题 ([70f5657](https://github.com/espressif/esp-mesh-lite/commit/70f5657e91e065546f2e626b8a4042de0a948f93))
 - 修复当前 RSSI 低于重新设置的父节点 RSSI 阈值时，未触发父节点变更的问题 ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
 - 修复设备设置为叶子节点后，其子节点未断开连接的问题 ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
 - 修复多个根节点 RSSI 值相同时进行融合，可能导致节点总数超过最大限制的问题 ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))

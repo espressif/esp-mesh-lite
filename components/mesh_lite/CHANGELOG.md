@@ -34,6 +34,7 @@
 
 #### Bugfix
 
+- Fixed: LAN OTA upgrade and file transfer failures when communication data is encrypted using AES ([70f5657](https://github.com/espressif/esp-mesh-lite/commit/70f5657e91e065546f2e626b8a4042de0a948f93))
 - Fixed: When multiple root nodes have the same RSSI value during fusion, it may cause the node number to exceed the max node number limit ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
 - Fixed: Disconnect all mesh nodes when setting device as leaf node ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
 - Fixed: Parent node change not triggered when current RSSI falls below newly set parent node RSSI threshold ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
