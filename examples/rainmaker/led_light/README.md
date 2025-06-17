@@ -1,7 +1,7 @@
 - [中文版本](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker/led_light/README_CN.md)
 
-| Supported Targets | ESP32 | ESP32-C3 | ESP32-S3 |
-| ----------------- | ----- | -------- | -------- |
+| Supported Targets | ESP32 | ESP32-C3 | ESP32-S3 | ESP32-C6 |
+| ----------------- | ----- | -------- | -------- | -------- |
 
 # LED Light Example(Nova Home)
 
