@@ -1,13 +1,14 @@
-# ESP RainMaker Config
-CONFIG_ESP_RMAKER_NO_CLAIM=y
+#
+# Use partition table which makes use of flash to the fullest
+# Can be used for other platforms as well. But please keep in mind that fctry partition address is
+# different than default, and the new address needs to be specified to `rainmaker.py claim`
+#
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions_4mb_optimised.csv"
 
-# ESP RainMaker App Wi-Fi Provisioning
-CONFIG_APP_WIFI_PROV_SHOW_QR=n
+# To accomodate security features
+CONFIG_PARTITION_TABLE_OFFSET=0xc000
 
 # Log output
 CONFIG_LOG_DEFAULT_LEVEL_INFO=y
 CONFIG_LOG_COLORS=y
-
-# Compiler options
-CONFIG_COMPILER_OPTIMIZATION_SIZE=y
-CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_SILENT=y
