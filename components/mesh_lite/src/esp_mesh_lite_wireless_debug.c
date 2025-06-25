@@ -12,11 +12,15 @@
 #include "esp_log.h"
 #include "esp_mac.h"
 #include "esp_wifi.h"
+#include "esp_rom_crc.h"
 #include "esp_mesh_lite.h"
 #include "esp_mesh_lite_log.h"
 
 #include "argtable3/argtable3.h"
 #include "esp_console.h"
+
+#define WIRELESS_DEBUG_VERSION                           (0x01)
+#define CRC_INIT_VALUE                                   (0xFFFFFFFF)
 
 typedef struct {
     uint8_t version: 4;                   // version
@@ -27,6 +31,11 @@ typedef struct {
     uint8_t payload[0];                   // Real payload of ESPNOW data.
 } __attribute__((packed)) wireless_debug_data_t;
 
+typedef struct {
+    uint32_t crc32;
+    char data[0];
+} __attribute__((packed)) wireless_debug_log_t;
+
 static const char *TAG = "Mesh-Lite-Wireless-Debug";
 
 #define LOG_COLOR_LEN                   (8)
@@ -35,7 +44,7 @@ static const char *TAG = "Mesh-Lite-Wireless-Debug";
 
 static char *output_buffer = NULL;
 static char *command_payload = NULL;
-static char *debug_log_buffer = NULL;
+static wireless_debug_log_t *debug_log_buffer = NULL;
 
 typedef struct {
     struct arg_int *channel;
@@ -166,13 +175,15 @@ static void wireless_debug_log_writev(esp_log_level_t level, const char *tag, co
     size_t new_format_length = strlen(tag) + strlen(format) + 30;
     char new_format[new_format_length];
     snprintf(new_format, new_format_length, "%s%c (%"PRIu32") [%s]: %s " LOG_RESET_COLOR "\n", log_color, letter, esp_log_timestamp(), tag, format);
-    vsnprintf(debug_log_buffer, ESPNOW_PAYLOAD_MAX_LEN, new_format, list);
+    vsnprintf(debug_log_buffer->data, ESPNOW_PAYLOAD_MAX_LEN, new_format, list);
 
     va_end(list);
 
+    debug_log_buffer->crc32 = esp_rom_crc32_le(CRC_INIT_VALUE, (uint8_t*)debug_log_buffer->data, strlen(debug_log_buffer->data));
+
     esp_err_t ret = wireless_debug_espnow_create_peer(last_dst_mac, last_response_channel);
     if (ret == ESP_OK) {
-        ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_WIRELESS_LOG, last_dst_mac, (uint8_t *)debug_log_buffer, strlen(debug_log_buffer));
+        ret = esp_mesh_lite_espnow_send(ESPNOW_DATA_TYPE_WIRELESS_LOG, last_dst_mac, (uint8_t*)debug_log_buffer, sizeof(wireless_debug_log_t) + strlen(debug_log_buffer->data));
         if (ret != ESP_OK) {
             ESP_LOGE(TAG, "Wireless log Send error: %d\r\n", ret);
         }
@@ -453,15 +464,6 @@ static void esp_mesh_lite_wireless_debug_task(void *pvParameter)
             espnow_recv_cb_t *recv_cb = &evt.info.recv_cb;
             wireless_debug_data_t *data = (wireless_debug_data_t *)recv_cb->data;
 
-            if ((recv_cb->data_len < sizeof(wireless_debug_data_t)) || (recv_cb->data_len > ESPNOW_PAYLOAD_MAX_LEN)) {
-                ESP_LOGD(TAG, "Received the wrong data len, len:%d", recv_cb->data_len);
-                goto cleanup;
-            }
-
-            if (data->mesh_id != esp_mesh_lite_get_mesh_id()) {
-                goto cleanup;
-            }
-
             memset(command_payload, 0x0, ESPNOW_PAYLOAD_MAX_LEN);
             if (data->is_rsp_payload) {
                 memcpy(command_payload, data->payload, recv_cb->data_len - sizeof(wireless_debug_data_t));
@@ -485,7 +487,7 @@ static void esp_mesh_lite_wireless_debug_task(void *pvParameter)
                             if (last_response_channel) {
                                 rsp_data->channel = last_response_channel;
                             }
-                            rsp_data->version = 1;
+                            rsp_data->version = WIRELESS_DEBUG_VERSION;
                             rsp_data->mesh_id = esp_mesh_lite_get_mesh_id();
                             rsp_data->is_rsp_payload = true;
                             ret = wireless_debug_espnow_create_peer(recv_cb->mac_addr, last_response_channel);
@@ -510,7 +512,6 @@ static void esp_mesh_lite_wireless_debug_task(void *pvParameter)
                     ESP_LOGI(TAG, "Internal error: %s\n", esp_err_to_name(err));
                 }
             }
-cleanup:
             free(recv_cb->data);
             recv_cb->data = NULL;
             break;
@@ -542,7 +543,7 @@ esp_err_t esp_mesh_lite_wireless_debug_send_command(uint8_t *dst_mac, char *comm
         return ESP_ERR_NO_MEM;
     }
     memset(pbuf, 0, length);
-    pbuf->version = 1;
+    pbuf->version = WIRELESS_DEBUG_VERSION;
     pbuf->channel = 11;
     pbuf->is_rsp_payload = false;
     pbuf->mesh_id = esp_mesh_lite_get_mesh_id();
@@ -557,26 +558,54 @@ esp_err_t esp_mesh_lite_wireless_debug_send_command(uint8_t *dst_mac, char *comm
     return ret;
 }
 
-static void wireless_log_process_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)
+static esp_err_t wireless_log_process_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)
 {
     if (mesh_lite_wireless_debug_task_handle == NULL) {
-        return;
+        return ESP_FAIL;
     }
 
     if (recv_info == NULL || data == NULL || len <= 0) {
         ESP_LOGD(TAG, "Receive cb arg error");
-        return;
+        return ESP_FAIL;
+    }
+
+    wireless_debug_log_t *wireless_debug_log = (wireless_debug_log_t *)data;
+    size_t data_len = strlen(wireless_debug_log->data);
+    if (wireless_debug_log->crc32 != esp_rom_crc32_le(CRC_INIT_VALUE, (uint8_t*)wireless_debug_log->data, data_len)) {
+        return ESP_FAIL;
     }
 
     if (cb_list.recv_debug_log_cb) {
-        cb_list.recv_debug_log_cb(recv_info, data, len);
+        cb_list.recv_debug_log_cb(recv_info, (uint8_t*)wireless_debug_log->data, data_len);
     }
+
+    return ESP_OK;
 }
 
-static void wireless_debug_process_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)
+static esp_err_t wireless_debug_data_parse(const uint8_t *data, uint16_t data_len)
+{
+    wireless_debug_data_t *wireless_debug_data = (wireless_debug_data_t *)data;
+
+    if ((data_len < sizeof(wireless_debug_data_t)) || (data_len > ESPNOW_PAYLOAD_MAX_LEN)) {
+        ESP_LOGD(TAG, "Received the wrong data len, len:%d", data_len);
+        return ESP_FAIL;
+    }
+
+    if (wireless_debug_data->version != WIRELESS_DEBUG_VERSION) {
+        return ESP_FAIL;
+    }
+
+    if (wireless_debug_data->mesh_id != esp_mesh_lite_get_mesh_id()) {
+        return ESP_FAIL;
+    }
+
+    return ESP_OK;
+}
+
+static esp_err_t wireless_debug_process_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)
 {
     if (mesh_lite_wireless_debug_task_handle == NULL) {
-        return;
+        return ESP_FAIL;
     }
 
     esp_mesh_lite_espnow_event_t evt;
@@ -585,7 +614,11 @@ static void wireless_debug_process_cb(const esp_now_recv_info_t *recv_info, cons
 
     if (mac_addr == NULL || data == NULL || len <= 0) {
         ESP_LOGD(TAG, "Receive cb arg error");
-        return;
+        return ESP_FAIL;
+    }
+
+    if (wireless_debug_data_parse(data, len) != ESP_OK) {
+        return ESP_FAIL;
     }
 
     evt.id = ESPNOW_RECV_CB;
@@ -593,7 +626,7 @@ static void wireless_debug_process_cb(const esp_now_recv_info_t *recv_info, cons
     recv_cb->data = malloc(len);
     if (recv_cb->data == NULL) {
         ESP_LOGE(TAG, "Malloc receive data fail");
-        return;
+        return ESP_FAIL;
     }
     memcpy(recv_cb->data, data, len);
     recv_cb->data_len = len;
@@ -602,7 +635,10 @@ static void wireless_debug_process_cb(const esp_now_recv_info_t *recv_info, cons
         ESP_LOGW(TAG, "Send receive queue fail");
         free(recv_cb->data);
         recv_cb->data = NULL;
+        return ESP_FAIL;
     }
+
+    return ESP_OK;
 }
 
 void esp_mesh_lite_wireless_debug_cb_register(esp_mesh_lite_wireless_debug_cb_list_t *cb)
@@ -629,7 +665,7 @@ void esp_mesh_lite_wireless_debug_init(void)
 
     output_buffer = (char*)malloc(ESPNOW_PAYLOAD_MAX_LEN);
     command_payload = (char*)malloc(ESPNOW_PAYLOAD_MAX_LEN);
-    debug_log_buffer = (char*)malloc(ESPNOW_PAYLOAD_MAX_LEN);
+    debug_log_buffer = (wireless_debug_log_t*)malloc(ESPNOW_PAYLOAD_MAX_LEN);
     memset(output_buffer, 0x0, ESPNOW_PAYLOAD_MAX_LEN);
     memset(command_payload, 0x0, ESPNOW_PAYLOAD_MAX_LEN);
     memset(debug_log_buffer, 0x0, ESPNOW_PAYLOAD_MAX_LEN);

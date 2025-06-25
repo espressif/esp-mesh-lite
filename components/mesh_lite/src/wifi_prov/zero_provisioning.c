@@ -70,7 +70,7 @@ static esp_err_t zero_prov_esp_now_init(void);
 static void zero_prov_broadcast_cb(void *arg);
 static void zero_prov_recieve_handle(void *arg);
 static void zero_prov_unicast_handle(void *arg);
-static int zero_prov_data_parse(uint8_t *data, uint16_t data_len);
+static int zero_prov_data_parse(const uint8_t *data, uint16_t data_len);
 
 zero_prov_table_t zero_prov_table[] = {
     {ZERO_PROV_SEND_BROADCAST, zero_prov_broadcast_cb},
@@ -298,13 +298,12 @@ esp_err_t __attribute__((weak)) zero_prov_device_info_validation(char *device_in
 
 static void zero_prov_recieve_handle(void *arg)
 {
-    int ret;
     zero_prov_event_t *evt = (zero_prov_event_t *)arg;
-    zero_prov_recv_cb_t *recv_cb = &evt->info.recv_cb;
-    ret = zero_prov_data_parse(recv_cb->data, recv_cb->data_len);
+    espnow_recv_cb_t *recv_cb = &evt->info.recv_cb;
+    int type = recv_cb->type;
     zero_prov_esp_now_data_t *recvbuf = (zero_prov_esp_now_data_t *)recv_cb->data;
 
-    if (ret == ESPNOW_DATA_BROADCAST) {
+    if (type == ESPNOW_DATA_BROADCAST) {
         if (!zero_provisioner || !flg_is_wifi_provisioning) {
             goto exit;
         }
@@ -386,7 +385,7 @@ static void zero_prov_recieve_handle(void *arg)
 #if ZERO_PROV_DEBUG
         ESP_LOGW(TAG, "Receive ESPNOW_DATA_BROADCAST END**********");
 #endif
-    } else if (ret == ESPNOW_DATA_UNICAST_INFO) {
+    } else if (type == ESPNOW_DATA_UNICAST_INFO) {
         if (!resend_timer) {
             goto exit;
         }
@@ -474,7 +473,7 @@ static void zero_prov_recieve_handle(void *arg)
 #if ZERO_PROV_DEBUG
         ESP_LOGW(TAG, "Receive ESPNOW_DATA_UNICAST_INFO END**********");
 #endif
-    } else if (ret == ESPNOW_DATA_UNICAST_CONFIRM) {
+    } else if (type == ESPNOW_DATA_UNICAST_CONFIRM) {
 #if ZERO_PROV_DEBUG
         ESP_LOGW(TAG, "Receive ESPNOW_DATA_UNICAST_CONFIRM unicast data from: "MACSTR", len: %d", MAC2STR(recv_cb->mac_addr), recv_cb->data_len);
 #endif
@@ -515,7 +514,7 @@ static void zero_prov_recieve_handle(void *arg)
 #if ZERO_PROV_DEBUG
         ESP_LOGW(TAG, "Receive ESPNOW_DATA_UNICAST_CONFIRM END**********");
 #endif
-    } else if (ret == ESPNOW_DATA_UNICAST_ACK) {
+    } else if (type == ESPNOW_DATA_UNICAST_ACK) {
         if (resend_timer != NULL) {
             if (xTimerIsTimerActive(resend_timer) != pdFALSE) {
                 // xTimer is active, stop it
@@ -553,7 +552,7 @@ static void zero_prov_unicast_handle(void *arg)
 {
 #if ZERO_PROV_DEBUG
     zero_prov_event_t *evt = (zero_prov_event_t *)arg;
-    zero_prov_send_cb_t *send_cb = &evt->info.send_cb;
+    espnow_send_cb_t *send_cb = &evt->info.send_cb;
     uint8_t g_channel;
     wifi_second_chan_t g_channel2;
     esp_wifi_get_channel(&g_channel, &g_channel2);
@@ -583,15 +582,15 @@ static void zero_prov_event_handle(zero_prov_act_t* pact, zero_prov_event_id_t e
     }
 }
 
-#if ESP_IDF_VERSION > ESP_IDF_VERSION_VAL(5, 4, 1)
+#if ESP_IDF_VERSION > ESP_IDF_VERSION_VAL(5, 4, 2)
 static void zero_prov_send_cb(const esp_now_send_info_t *tx_info, esp_now_send_status_t status)
 #else
 static void zero_prov_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status)
 #endif
 {
     zero_prov_event_t evt;
-    zero_prov_send_cb_t *send_cb = &evt.info.send_cb;
-#if ESP_IDF_VERSION > ESP_IDF_VERSION_VAL(5, 4, 1)
+    espnow_send_cb_t *send_cb = &evt.info.send_cb;
+#if ESP_IDF_VERSION > ESP_IDF_VERSION_VAL(5, 4, 2)
     const uint8_t *mac_addr = tx_info->des_addr;
     if (tx_info == NULL) {
 #else
@@ -616,7 +615,30 @@ static void zero_prov_send_cb(const uint8_t *mac_addr, esp_now_send_status_t sta
     }
 }
 
-static void zero_prov_recv_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)
+static int zero_prov_data_parse(const uint8_t *data, uint16_t data_len)
+{
+    zero_prov_esp_now_data_t *buf = (zero_prov_esp_now_data_t *)data;
+    uint16_t crc_cal = 0;
+
+    if (data_len < sizeof(zero_prov_esp_now_data_t)) {
+        ESP_LOGD(TAG, "Receive ESPNOW data too short, len:%d", data_len);
+        return -1;
+    }
+
+    uint8_t crc_zero[2];
+    memset(crc_zero, 0, 2);
+
+    crc_cal = esp_crc16_le(UINT16_MAX, (uint8_t const *)buf, 2);
+    crc_cal = esp_crc16_le(crc_cal, (uint8_t const *)crc_zero, 2);
+    crc_cal = esp_crc16_le(crc_cal, (uint8_t const *)buf->payload, data_len - 4);
+
+    if (crc_cal == buf->crc) {
+        return buf->type;
+    }
+    return -1;
+}
+
+static esp_err_t zero_prov_recv_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)
 {
     esp_mesh_lite_espnow_event_t evt;
     espnow_recv_cb_t *recv_cb = &evt.info.recv_cb;
@@ -624,47 +646,45 @@ static void zero_prov_recv_cb(const esp_now_recv_info_t *recv_info, const uint8_
 
     if (mac_addr == NULL || data == NULL || len <= 0) {
         ESP_LOGE(TAG, "Receive cb arg error");
-        return;
+        return ESP_FAIL;
+    }
+
+    int ret = zero_prov_data_parse(data, len);
+    if (ret == -1) {
+        return ESP_FAIL;
     }
 
     evt.id = ZERO_PROV_RECIVE_DATA;
+    evt.info.recv_cb.type = ret;
     memcpy(recv_cb->mac_addr, mac_addr, ESP_NOW_ETH_ALEN);
     recv_cb->data = malloc(len);
     if (recv_cb->data == NULL) {
         ESP_LOGE(TAG, "Malloc receive data fail. free heap: %"PRIu32"", esp_get_free_heap_size());
-        return;
+        return ESP_FAIL;
     }
 
     memcpy(recv_cb->data, data, len);
     recv_cb->data_len = len;
-    if (s_zero_prov_queue) {
-        if (xQueueSend(s_zero_prov_queue, &evt, ESPNOW_MAXDELAY) != pdTRUE) {
-            xQueueReset(s_zero_prov_queue);
-            ESP_LOGW(TAG, "Send receive queue fail");
-            free(recv_cb->data);
-            recv_cb->data = NULL;
-        }
-    }
-}
 
-static int zero_prov_data_parse(uint8_t *data, uint16_t data_len)
-{
-    zero_prov_esp_now_data_t *buf = (zero_prov_esp_now_data_t *)data;
-    uint16_t crc, crc_cal = 0;
-
-    if (data_len < sizeof(zero_prov_esp_now_data_t)) {
-        ESP_LOGE(TAG, "Receive ESPNOW data too short, len:%d", data_len);
-        return -1;
+    if (!s_zero_prov_queue) {
+        ESP_LOGE(TAG, "Receive queue is NULL");
+        goto err;
     }
-    crc = buf->crc;
-    buf->crc = 0;
 
-    crc_cal = esp_crc16_le(UINT16_MAX, (uint8_t const *)buf, buf->len);
-    if (crc_cal == crc) {
-        return buf->type;
+    if (xQueueSend(s_zero_prov_queue, &evt, ESPNOW_MAXDELAY) != pdTRUE) {
+        ESP_LOGW(TAG, "Send receive queue fail");
+        xQueueReset(s_zero_prov_queue);
+        goto err;
     }
-    ESP_LOGW(TAG,"Receive length :%d crc:%d crc_cal:%d" ,data_len,crc,crc_cal);
-    return -1;
+
+    return ESP_OK;
+
+err:
+    if (recv_cb->data) {
+        free(recv_cb->data);
+        recv_cb->data = NULL;
+    }
+    return ESP_FAIL;
 }
 
 static void zero_prov_task(void *pvParameter)
