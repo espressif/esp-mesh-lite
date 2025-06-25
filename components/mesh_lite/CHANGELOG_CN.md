@@ -1,6 +1,6 @@
 # ChangeLog
 
-## v1.0.2 - 2025-5-29
+## v1.0.2 - 2025-6-25
 
 ### Breaking Change:
 
@@ -32,6 +32,9 @@
 
 #### Bugfix
 
+- 修复原生 espnow API 发送的数据接收失败的问题 ([f176342](https://github.com/espressif/esp-mesh-lite/commit/f17634270d14c907e48611d084217c6514a85920))
+- 修复通信过程中偶现的内存泄漏问题 ([f176342](https://github.com/espressif/esp-mesh-lite/commit/f17634270d14c907e48611d084217c6514a85920))
+- 修复根节点重新设置 Mesh ID 后，与路由器断开重连的问题 ([f176342](https://github.com/espressif/esp-mesh-lite/commit/f17634270d14c907e48611d084217c6514a85920))
 - 修复当通信数据通过 aes 加密时的 LAN OTA 升级以及文件传输失败的问题 ([70f5657](https://github.com/espressif/esp-mesh-lite/commit/70f5657e91e065546f2e626b8a4042de0a948f93))
 - 修复当前 RSSI 低于重新设置的父节点 RSSI 阈值时，未触发父节点变更的问题 ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
 - 修复设备设置为叶子节点后，其子节点未断开连接的问题 ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
