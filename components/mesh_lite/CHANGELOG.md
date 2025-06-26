@@ -2,7 +2,7 @@
 
 # ChangeLog
 
-## v1.0.2 - 2025-4-21
+## v1.0.2 - 2025-6-25
 
 ### Breaking Change:
 
@@ -34,6 +34,9 @@
 
 #### Bugfix
 
+- Fixed: Failed to receive data sent by native espnow API ([f176342](https://github.com/espressif/esp-mesh-lite/commit/f17634270d14c907e48611d084217c6514a85920))
+- Fixed: Occasional memory leaks during communication ([f176342](https://github.com/espressif/esp-mesh-lite/commit/f17634270d14c907e48611d084217c6514a85920))
+- Fixed: Router disconnection and reconnection issue after root node resets Mesh ID ([f176342](https://github.com/espressif/esp-mesh-lite/commit/f17634270d14c907e48611d084217c6514a85920))
 - Fixed: LAN OTA upgrade and file transfer failures when communication data is encrypted using AES ([70f5657](https://github.com/espressif/esp-mesh-lite/commit/70f5657e91e065546f2e626b8a4042de0a948f93))
 - Fixed: When multiple root nodes have the same RSSI value during fusion, it may cause the node number to exceed the max node number limit ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))
 - Fixed: Disconnect all mesh nodes when setting device as leaf node ([d84f81b](https://github.com/espressif/esp-mesh-lite/commit/d84f81b2309b2ba1ba1819364a99d61f88c73af3))

@@ -6,6 +6,7 @@
 
 #include "esp_now.h"
 #include "sdkconfig.h"
+#include "esp_mesh_lite_espnow.h"
 
 #ifndef zero_prov_H
 #define zero_prov_H
@@ -39,20 +40,9 @@ enum {
     ESPNOW_DATA_MAX,
 };
 
-typedef struct {
-    uint8_t mac_addr[ESP_NOW_ETH_ALEN];
-    esp_now_send_status_t status;
-} zero_prov_send_cb_t;
-
-typedef struct {
-    uint8_t mac_addr[ESP_NOW_ETH_ALEN];
-    uint8_t *data;
-    int data_len;
-} zero_prov_recv_cb_t;
-
 typedef union {
-    zero_prov_send_cb_t send_cb;
-    zero_prov_recv_cb_t recv_cb;
+    espnow_send_cb_t send_cb;
+    espnow_recv_cb_t recv_cb;
 } zero_prov_event_info_t;
 
 typedef struct {

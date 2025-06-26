@@ -38,7 +38,7 @@ typedef struct esp_now_msg_send {
 static esp_now_msg_send_t* sent_msgs;
 
 /* Parse received ESPNOW data. */
-esp_err_t espnow_data_parse(uint8_t *data, uint16_t data_len, uint32_t *seq, uint8_t *payload)
+esp_err_t espnow_data_parse(uint8_t *data, uint16_t data_len)
 {
     app_espnow_data_t *buf = (app_espnow_data_t *)data;
 
@@ -47,9 +47,7 @@ esp_err_t espnow_data_parse(uint8_t *data, uint16_t data_len, uint32_t *seq, uin
         return ESP_FAIL;
     }
 
-    *seq = buf->seq;
     if (buf->mesh_id == ESPNOW_MESH_ID) {
-        memcpy(payload, buf->payload, data_len - ESPNOW_PAYLOAD_HEAD_LEN);
         return ESP_OK;
     }
 
@@ -189,7 +187,7 @@ static void espnow_send_cb(const uint8_t *mac_addr, esp_now_send_status_t status
 #endif
 }
 
-static void espnow_recv_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)
+static esp_err_t espnow_recv_cb(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len)
 {
     esp_mesh_lite_espnow_event_t evt;
     espnow_recv_cb_t *recv_cb = &evt.info.recv_cb;
@@ -197,7 +195,11 @@ static void espnow_recv_cb(const esp_now_recv_info_t *recv_info, const uint8_t *
 
     if (mac_addr == NULL || data == NULL || len <= 0) {
         ESP_LOGE(TAG, "Receive cb arg error");
-        return;
+        return ESP_FAIL;
+    }
+
+    if (espnow_data_parse(data, len) != ESP_OK) {
+        return ESP_FAIL;
     }
 
     evt.id = ESPNOW_RECV_CB;
@@ -205,7 +207,7 @@ static void espnow_recv_cb(const esp_now_recv_info_t *recv_info, const uint8_t *
     recv_cb->data = malloc(len);
     if (recv_cb->data == NULL) {
         ESP_LOGE(TAG, "Malloc receive data fail");
-        return;
+        return ESP_FAIL;
     }
     memcpy(recv_cb->data, data, len);
     recv_cb->data_len = len;
@@ -213,7 +215,9 @@ static void espnow_recv_cb(const esp_now_recv_info_t *recv_info, const uint8_t *
         ESP_LOGW(TAG, "Send receive queue fail");
         free(recv_cb->data);
         recv_cb->data = NULL;
+        return ESP_FAIL;
     }
+    return ESP_OK;
 }
 
 static void espnow_task(void *pvParameter)
@@ -226,11 +230,10 @@ static void espnow_task(void *pvParameter)
         switch (evt.id) {
             case ESPNOW_RECV_CB:
                 espnow_recv_cb_t *recv_cb = &evt.info.recv_cb;
-                uint32_t recv_seq;
+                app_espnow_data_t *buf = (app_espnow_data_t *)recv_cb->data;
+                uint32_t recv_seq = buf->seq;
                 memset(group_control_payload, 0x0, ESPNOW_PAYLOAD_MAX_LEN);
-                if (espnow_data_parse(recv_cb->data, recv_cb->data_len, &recv_seq, (uint8_t*)group_control_payload) != ESP_OK) {
-                    goto cleanup;
-                }
+                memcpy(group_control_payload, buf->payload, recv_cb->data_len - ESPNOW_PAYLOAD_HEAD_LEN);
 
                 cJSON *light_js = NULL;
                 cJSON *rmaker_data_js = cJSON_Parse((const char*)group_control_payload);

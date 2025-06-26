@@ -28,8 +28,7 @@ static inline esp_err_t esp_mesh_lite_espnow_recv_callback(uint8_t type, const e
     espnow_cb_register_t *current = esp_mesh_lite_espnow_cb_list;
     while (current != NULL) {
         if (current->type == type) {
-            current->esp_mesh_lite_espnow_recv_cb(recv_info, data, len);
-            ret = ESP_OK;
+            ret = current->recv_cb(recv_info, data, len);
             break;
         }
         current = current->next;
@@ -48,8 +47,7 @@ static void espnow_recv_cb(const esp_now_recv_info_t *recv_info, const uint8_t *
     }
 }
 
-esp_err_t esp_mesh_lite_espnow_recv_cb_register(esp_mesh_lite_espnow_data_type_t type,
-                                                void (*recv_cb)(const esp_now_recv_info_t *recv_info, const uint8_t *data, int len))
+esp_err_t esp_mesh_lite_espnow_recv_cb_register(esp_mesh_lite_espnow_data_type_t type, esp_mesh_lite_espnow_recv_cb_t recv_cb)
 {
     if (espnow_init == false) {
         return ESP_ERR_INVALID_STATE;
@@ -61,7 +59,7 @@ esp_err_t esp_mesh_lite_espnow_recv_cb_register(esp_mesh_lite_espnow_data_type_t
     }
 
     new_espnow_cb->type = type;
-    new_espnow_cb->esp_mesh_lite_espnow_recv_cb = recv_cb;
+    new_espnow_cb->recv_cb = recv_cb;
     new_espnow_cb->next = NULL;
 
     if (esp_mesh_lite_espnow_cb_list == NULL) {
