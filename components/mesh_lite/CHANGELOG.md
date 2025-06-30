@@ -2,7 +2,7 @@
 
 # ChangeLog
 
-## v1.0.2 - 2025-6-25
+## v1.0.2 - 2025-6-27
 
 ### Breaking Change:
 
@@ -34,6 +34,8 @@
 
 #### Bugfix
 
+- Fixed: The device self-recommendation function fails to work ([2f89a55](https://github.com/espressif/esp-mesh-lite/commit/2f89a55ccdd9713c1b13cb5ed98419a3bc48f7c7))
+- Fixed: When the root node is disconnected from the router, the secondary node cannot communicate with the root node normally ([2f89a55](https://github.com/espressif/esp-mesh-lite/commit/2f89a55ccdd9713c1b13cb5ed98419a3bc48f7c7))
 - Fixed: Failed to receive data sent by native espnow API ([f176342](https://github.com/espressif/esp-mesh-lite/commit/f17634270d14c907e48611d084217c6514a85920))
 - Fixed: Occasional memory leaks during communication ([f176342](https://github.com/espressif/esp-mesh-lite/commit/f17634270d14c907e48611d084217c6514a85920))
 - Fixed: Router disconnection and reconnection issue after root node resets Mesh ID ([f176342](https://github.com/espressif/esp-mesh-lite/commit/f17634270d14c907e48611d084217c6514a85920))

@@ -1,6 +1,6 @@
 # ChangeLog
 
-## v1.0.2 - 2025-6-25
+## v1.0.2 - 2025-6-27
 
 ### Breaking Change:
 
@@ -32,6 +32,8 @@
 
 #### Bugfix
 
+- 修复设备自荐功能失效的问题 ([2f89a55](https://github.com/espressif/esp-mesh-lite/commit/2f89a55ccdd9713c1b13cb5ed98419a3bc48f7c7))
+- 修复当根节点与路由器断开连接后，二级节点无法与根节点正常通信的问题 ([2f89a55](https://github.com/espressif/esp-mesh-lite/commit/2f89a55ccdd9713c1b13cb5ed98419a3bc48f7c7))
 - 修复原生 espnow API 发送的数据接收失败的问题 ([f176342](https://github.com/espressif/esp-mesh-lite/commit/f17634270d14c907e48611d084217c6514a85920))
 - 修复通信过程中偶现的内存泄漏问题 ([f176342](https://github.com/espressif/esp-mesh-lite/commit/f17634270d14c907e48611d084217c6514a85920))
 - 修复根节点重新设置 Mesh ID 后，与路由器断开重连的问题 ([f176342](https://github.com/espressif/esp-mesh-lite/commit/f17634270d14c907e48611d084217c6514a85920))
