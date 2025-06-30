@@ -88,6 +88,24 @@ typedef struct {
 esp_err_t zero_prov_init(char *cust_data, char *device_info);
 
 /**
+ * @brief Start the device in listening mode for Zero Provisioning to allow unconfigured devices
+ *        to join the network.
+ *
+ * This function puts the device into listening mode, allowing unconfigured devices to discover and
+ * join the network. The device will listen for a specified timeout period. This function should
+ * only be called after the first provisioning attempt has been completed and the listening mode
+ * has been stopped.
+ *
+ * @param[in] timeout_s Timeout period in seconds, specifying how long the device will remain
+ *                     in listening mode before timing out.
+ * @note
+ *     - The device will listen for the entire duration of the specified timeout.
+ *     - This function should only be called after the previous provisioning attempt has been
+ *       completed and listening mode has been stopped.
+ */
+void zero_prov_listening(uint64_t timeout_s);
+
+/**
  * @brief Stop the Zero Provisioning listening service.
  *
  * This function stops the Zero Provisioning module from listening for incoming provisioning requests.
