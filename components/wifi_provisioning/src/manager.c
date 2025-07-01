@@ -269,9 +269,16 @@ static cJSON* wifi_prov_get_info_json(void)
 
     /* Version field */
     cJSON_AddStringToObject(prov_info_json, "ver", prov_ctx->mgr_info.version);
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+
+    /* Security field */
+    int sec_ver = 0;
+    uint8_t sec_patch_ver = 0;
+
+    protocomm_get_sec_version(prov_ctx->pc, &sec_ver, &sec_patch_ver);
+    assert(sec_ver == prov_ctx->security);
     cJSON_AddNumberToObject(prov_info_json, "sec_ver", prov_ctx->security);
-#endif
+    cJSON_AddNumberToObject(prov_info_json, "sec_patch_ver", sec_patch_ver);
+
     /* Capabilities field */
     cJSON_AddItemToObject(prov_info_json, "cap", prov_capabilities);
 
@@ -318,19 +325,6 @@ static esp_err_t wifi_prov_mgr_start_service(const char *service_name, const cha
         return ret;
     }
 
-    /* Set version information / capabilities of provisioning service and application */
-    cJSON *version_json = wifi_prov_get_info_json();
-    char *version_str = cJSON_Print(version_json);
-    ret = protocomm_set_version(prov_ctx->pc, "proto-ver", version_str);
-    free(version_str);
-    cJSON_Delete(version_json);
-    if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to set version endpoint");
-        scheme->prov_stop(prov_ctx->pc);
-        protocomm_delete(prov_ctx->pc);
-        return ret;
-    }
-
     /* Set protocomm security type for endpoint */
     if (prov_ctx->security == 0) {
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
@@ -370,6 +364,21 @@ static esp_err_t wifi_prov_mgr_start_service(const char *service_name, const cha
     }
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to set security endpoint");
+        scheme->prov_stop(prov_ctx->pc);
+        protocomm_delete(prov_ctx->pc);
+        return ret;
+    }
+
+    /* Set version information / capabilities of provisioning service and application */
+    cJSON *version_json = wifi_prov_get_info_json();
+    char *version_str = cJSON_Print(version_json);
+    ESP_LOGD(TAG, "version_str :%s:", version_str);
+
+    ret = protocomm_set_version(prov_ctx->pc, "proto-ver", version_str);
+    free(version_str);
+    cJSON_Delete(version_json);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to set version endpoint");
         scheme->prov_stop(prov_ctx->pc);
         protocomm_delete(prov_ctx->pc);
         return ret;
@@ -587,6 +596,16 @@ static void prov_stop_and_notify(bool is_async)
         uint32_t cleanup_delay = prov_ctx->cleanup_delay > 100 ? prov_ctx->cleanup_delay : 100;
         vTaskDelay(cleanup_delay / portTICK_PERIOD_MS);
     }
+
+    protocomm_remove_endpoint(prov_ctx->pc, "prov-ctrl");
+
+    protocomm_remove_endpoint(prov_ctx->pc, "prov-scan");
+
+    protocomm_remove_endpoint(prov_ctx->pc, "prov-config");
+
+    protocomm_unset_security(prov_ctx->pc, "prov-session");
+
+    protocomm_unset_version(prov_ctx->pc, "proto-ver");
 
     /* All the extra application added endpoints are also
      * removed automatically when prov_stop is called */
@@ -911,6 +930,7 @@ static esp_err_t update_wifi_scan_results(void)
     prov_ctx->ap_list[curr_channel] = (wifi_ap_record_t *) calloc(get_count, sizeof(wifi_ap_record_t));
     if (!prov_ctx->ap_list[curr_channel]) {
         ESP_LOGE(TAG, "Failed to allocate memory for AP list");
+        esp_wifi_clear_ap_list();
         goto exit;
     }
     if (esp_wifi_scan_get_ap_records(&get_count, prov_ctx->ap_list[curr_channel]) != ESP_OK) {
@@ -1069,7 +1089,6 @@ static void wifi_prov_mgr_event_handler_internal(
 
         /* Set code corresponding to the reason for disconnection */
         switch (disconnected->reason) {
-        case WIFI_REASON_AUTH_EXPIRE:
         case WIFI_REASON_4WAY_HANDSHAKE_TIMEOUT:
         case WIFI_REASON_AUTH_FAIL:
         case WIFI_REASON_HANDSHAKE_TIMEOUT:
@@ -1325,6 +1344,11 @@ esp_err_t wifi_prov_mgr_is_provisioned(bool *provisioned)
         debug_print_wifi_credentials(wifi_cfg.sta, "Found");
     }
     return ESP_OK;
+}
+
+bool wifi_prov_mgr_is_sm_idle(void)
+{
+    return (prov_ctx->prov_state == WIFI_PROV_STATE_IDLE);
 }
 
 static void wifi_connect_timer_cb(void *arg)
