@@ -2,7 +2,7 @@
 
 # ChangeLog
 
-## v1.0.2 - 2025-6-27
+## v1.0.2 - 2025-7-2
 
 ### Breaking Change:
 
@@ -27,6 +27,13 @@
 - optimize wifi reconnect logic ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - feat: Redefine the interface for obtaining the total number of nodes ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - In the `mesh_lite_espnow` receive callback, more Wi-Fi packet information can be obtained, such as CSI ([eaf4e0a](https://github.com/espressif/esp-mesh-lite/commit/eaf4e0aa47da2a4d93c4d058395f67575d33161b))
+
+#### Zero Provisioning
+
+- Open zero_prov_listening API, allowing devices to enter listening state at any time for zero-configuration provisioning of newly powered devices ([c99d261](https://github.com/espressif/esp-mesh-lite/commit/c99d261f71b6c1528cde00a75d87bb8d72b7bdcc))
+- Support repeated triggering of zero-provisioning function (requires CONFIG_PROV_RELEASE_BLE_MEMORY_AFTER_PROVISIONED=false) ([c99d261](https://github.com/espressif/esp-mesh-lite/commit/c99d261f71b6c1528cde00a75d87bb8d72b7bdcc))
+- Optimize primary provisioning device execution logic to prevent zero-provisioning failure of all devices due to primary device being too far from router ([c99d261](https://github.com/espressif/esp-mesh-lite/commit/c99d261f71b6c1528cde00a75d87bb8d72b7bdcc))
+- Automatically adapt available broadcast channels based on country code ([c99d261](https://github.com/espressif/esp-mesh-lite/commit/c99d261f71b6c1528cde00a75d87bb8d72b7bdcc))
 
 #### Wi-Fi Provisioning
 

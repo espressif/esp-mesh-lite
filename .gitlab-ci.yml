@@ -45,7 +45,6 @@ default:
         git clean -xdff
         echo -e "\nCONFIG_MESH_LITE_NODE_INFO_REPORT=y" >> sdkconfig.defaults.${idf_target}
         echo -e "\nCONFIG_ESP_MESH_LITE_OTA_ENABLE=y" >> sdkconfig.defaults.${idf_target}
-        echo -e "\nCONFIG_MESH_LITE_PROV_ENABLE=y" >> sdkconfig.defaults.${idf_target}
         echo -e "\nCONFIG_MESH_LITE_WIRELESS_DEBUG=y" >> sdkconfig.defaults.${idf_target}
       fi
 

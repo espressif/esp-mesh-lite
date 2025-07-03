@@ -1,6 +1,6 @@
 # ChangeLog
 
-## v1.0.2 - 2025-6-27
+## v1.0.2 - 2025-7-2
 
 ### Breaking Change:
 
@@ -25,6 +25,13 @@
 - 优化 wifi 重连逻辑 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - 重新定义获取节点总数接口 ([8f8f9a1](https://github.com/espressif/esp-mesh-lite/commit/8f8f9a164905f6f90b59c1f6c4db599b81c09eb7))
 - 扩展 esp_mesh_lite_espnow_recv_cb 的参数以适应更多场景 ([eaf4e0a](https://github.com/espressif/esp-mesh-lite/commit/eaf4e0aa47da2a4d93c4d058395f67575d33161b))
+
+#### Zero Provisioning
+
+- 开放 zero_prov_listening API，支持设备随时进入监听状态，实现新上电设备的零配入网 ([c99d261](https://github.com/espressif/esp-mesh-lite/commit/c99d261f71b6c1528cde00a75d87bb8d72b7bdcc))
+- 支持重复触发零配功能（需配置 CONFIG_PROV_RELEASE_BLE_MEMORY_AFTER_PROVISIONED=false）([c99d261](https://github.com/espressif/esp-mesh-lite/commit/c99d261f71b6c1528cde00a75d87bb8d72b7bdcc))
+- 优化主配设备执行逻辑，避免主配设备因距离路由器过远导致所有设备零配失败 ([c99d261](https://github.com/espressif/esp-mesh-lite/commit/c99d261f71b6c1528cde00a75d87bb8d72b7bdcc))
+- 根据国家码自动适配广播时可用信道 ([c99d261](https://github.com/espressif/esp-mesh-lite/commit/c99d261f71b6c1528cde00a75d87bb8d72b7bdcc))
 
 #### Wi-Fi Provisioning
 

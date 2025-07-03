@@ -32,6 +32,8 @@
 #define WIFI_MAC_ADDR_LEN       (6)
 #define MAX_PASSWORD_LEN        (64)
 
+#define ZERO_PROV_PER_CHANNEL_BROADCAST_COUNT 4
+
 static const char *TAG = "zero";
 
 static uint8_t s_broadcast_mac[ESP_NOW_ETH_ALEN] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
@@ -134,26 +136,6 @@ esp_err_t zero_prov_connect_ap(wifi_config_t *wifi_cfg)
     return ESP_OK;
 }
 
-static void zero_prov_restart_softap(void)
-{
-    wifi_mode_t mode = WIFI_MODE_NULL;
-    esp_wifi_get_mode(&mode);
-    if (mode == WIFI_MODE_STA) {
-        esp_wifi_set_mode(WIFI_MODE_APSTA);
-        ESP_LOGW(TAG, "Restart Softap");
-    }
-}
-
-static void zero_prov_stop_softap(void)
-{
-    wifi_mode_t mode = WIFI_MODE_NULL;
-    esp_wifi_get_mode(&mode);
-    if (mode == WIFI_MODE_APSTA) {
-        esp_wifi_set_mode(WIFI_MODE_STA);
-        ESP_LOGW(TAG, "Stop Softap");
-    }
-}
-
 static void zero_prov_del_peer(void)
 {
     esp_now_peer_num_t current_peer_num;
@@ -198,8 +180,6 @@ esp_err_t zero_prov_br_stop(void)
         g_timer_handle = NULL;
     }
 
-    zero_prov_restart_softap();
-
     if (esp_now_data) {
         free(esp_now_data);
         esp_now_data = NULL;
@@ -209,28 +189,35 @@ esp_err_t zero_prov_br_stop(void)
 
 static void zero_prov_broadcast_cb(void *arg)
 {
+    wifi_country_t country;
+    memset(&country, 0x0, sizeof(country));
+    esp_wifi_get_country(&country);
+
     esp_now_peer_info_t peer;
     memset(&peer, 0x0, sizeof(peer));
-    static int g_channel_time = 0;
-    static uint8_t g_channel_num = 1;
+    static int broadcast_count = 0;
+    static uint8_t channel_num = 0;
+    if (channel_num == 0) {
+        channel_num = country.schan;
+    }
 
-    if (g_channel_time > 4) {
-        g_channel_time = 0;
-        if (g_channel_num == 14) {
-            g_channel_num = 1;
+    if (broadcast_count >= ZERO_PROV_PER_CHANNEL_BROADCAST_COUNT) {
+        broadcast_count = 0;
+        if (channel_num == country.nchan) {
+            channel_num = country.schan;
         } else {
-            g_channel_num ++;
+            channel_num++;
         }
-        esp_wifi_set_channel(g_channel_num, 0);
+        esp_wifi_set_channel(channel_num, 0);
         esp_now_get_peer(s_broadcast_mac, &peer);
-        peer.channel = g_channel_num;
+        peer.channel = channel_num;
         esp_now_mod_peer(&peer);
     }
-    g_channel_time ++;
+    broadcast_count++;
 
     esp_timer_start_once(g_timer_handle, 400 * 1000);
 #if ZERO_PROV_DEBUG
-    ESP_LOGI(TAG, "Send br to channel[%d] free heap: %"PRIu32"", g_channel_num, esp_get_free_heap_size());
+    ESP_LOGI(TAG, "Send br to channel[%d] free heap: %"PRIu32"", channel_num, esp_get_free_heap_size());
 #endif
 }
 
@@ -532,10 +519,7 @@ static void zero_prov_recieve_handle(void *arg)
             xQueueReset(s_zero_prov_queue);
         }
 
-        zero_prov_restart_softap();
-
         if (!zero_prov_done) {
-            esp_mesh_lite_set_disallowed_level(1);
             zero_prov_connect_ap(router_cfg);
         }
 
@@ -703,9 +687,6 @@ static void zero_prov_task(void *pvParameter)
 
 void zero_prov_listening_stop(void)
 {
-    esp_mesh_lite_set_allowed_level(0);
-    esp_mesh_lite_set_disallowed_level(0);
-
     zero_provisioner = false;
 
     zero_prov_deinit();
@@ -727,15 +708,15 @@ static void listen_timer_cb(void *arg)
 
 void zero_prov_listening(uint64_t timeout_s)
 {
-    ESP_LOGI(TAG, "start once: %"PRIu64"", timeout_s*1000*1000);
-    if (timeout_s*1000*1000 <= 0) {
+    if (g_listen_timer) {
         return;
     }
 
-    zero_prov_esp_now_init();
-    ESP_LOGI(TAG,"Start listening.");
+    ESP_LOGI(TAG, "Start zero prov listening, %"PRIu64" timeout", timeout_s);
 
-    zero_provisioner = true;
+    if (timeout_s*1000*1000 <= 0) {
+        return;
+    }
 
     if(g_listen_timer == NULL){
         esp_timer_create_args_t timer;
@@ -745,6 +726,10 @@ void zero_prov_listening(uint64_t timeout_s)
         timer.name = "ft_listen";
         esp_timer_create(&timer, &g_listen_timer);
     }
+
+    zero_prov_esp_now_init();
+
+    zero_provisioner = true;
 
     esp_timer_start_once(g_listen_timer, timeout_s*1000*1000);
 }
@@ -786,7 +771,6 @@ esp_err_t zero_prov_br_start(void)
     esp_timer_create(&timer, &g_timer_handle);
     esp_timer_start_once(g_timer_handle, 100*1000);
     ESP_LOGI(TAG,"Start broadcast timer");
-    zero_prov_stop_softap();
     return ESP_OK;
 }
 
@@ -803,6 +787,30 @@ static void zero_prov_event_handler(void* arg, esp_event_base_t event_base, int3
         TimerHandle_t wifi_prov_stop_timer = xTimerCreate("wifi_prov_stop_timer", pdMS_TO_TICKS(200), pdTRUE,
                 NULL, wifi_prov_stop_timer_cb);
         xTimerStart(wifi_prov_stop_timer, portMAX_DELAY);
+
+        zero_prov_listening(ZERO_PROV_LISTENING_TIMEOUT);
+    }
+
+    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
+        wifi_event_sta_disconnected_t* disconnected = (wifi_event_sta_disconnected_t*) event_data;
+        switch (disconnected->reason) {
+        case WIFI_REASON_NO_AP_FOUND:
+            zero_prov_listening(ZERO_PROV_LISTENING_TIMEOUT);
+            break;
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 3, 0)
+        case WIFI_REASON_NO_AP_FOUND_W_COMPATIBLE_SECURITY:
+            zero_prov_listening(ZERO_PROV_LISTENING_TIMEOUT);
+            break;
+        case WIFI_REASON_NO_AP_FOUND_IN_AUTHMODE_THRESHOLD:
+            zero_prov_listening(ZERO_PROV_LISTENING_TIMEOUT);
+            break;
+        case WIFI_REASON_NO_AP_FOUND_IN_RSSI_THRESHOLD:
+            zero_prov_listening(ZERO_PROV_LISTENING_TIMEOUT);
+            break;
+#endif
+        default:
+            break;
+        }
     }
 
     if (event_base == WIFI_PROV_EVENT && event_id == WIFI_PROV_CRED_RECV) {
@@ -810,22 +818,12 @@ static void zero_prov_event_handler(void* arg, esp_event_base_t event_base, int3
         is_use_zero_prov = false;
         flg_is_wifi_provisioning = true;
         zero_prov_br_stop();
-        zero_prov_deinit();
-        esp_mesh_lite_set_allowed_level(1);
     } else if (event_base == WIFI_PROV_EVENT && event_id == WIFI_PROV_START) {
         ESP_LOGW(TAG, "WIFI_PROV_START");
         zero_prov_br_start();
     } else if (event_base == WIFI_PROV_EVENT && event_id == WIFI_PROV_END) {
         ESP_LOGW(TAG, "WIFI_PROV_END");
         zero_prov_br_stop();
-        zero_prov_deinit();
-
-        // Start ZeroProvision
-        uint32_t timeout = ZERO_PROV_LISTENING_TIMEOUT;
-        ESP_LOGI(TAG, "Start zero prov listening, %"PRIu32" timeout", timeout);
-        ESP_LOGW(TAG, "The timeout time to %"PRIu32"s **", timeout);
-
-        zero_prov_listening(timeout);
     }
 }
 
@@ -837,6 +835,7 @@ static esp_err_t zero_prov_esp_now_init(void)
     }
     esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &zero_prov_event_handler, NULL);
     esp_event_handler_register(WIFI_PROV_EVENT, ESP_EVENT_ANY_ID, &zero_prov_event_handler, NULL);
+    esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, &zero_prov_event_handler, NULL);
 
     s_zero_prov_queue = xQueueCreate(ZERO_PROV_QUEUE_SIZE, sizeof(zero_prov_event_t));
     if (s_zero_prov_queue == NULL) {
@@ -893,6 +892,7 @@ esp_err_t zero_prov_init(char *cust_data, char *device_info)
                                 true, NULL, resend_timer_timercb);
 
     zero_prov_esp_now_init();
+    zero_prov_done = false;
     ESP_LOGW(TAG,"fast wifi network init");
 
 exit:
@@ -907,6 +907,8 @@ static void zero_prov_deinit(void)
     }
 
     esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, &zero_prov_event_handler);
+    esp_event_handler_unregister(WIFI_PROV_EVENT, ESP_EVENT_ANY_ID, &zero_prov_event_handler);
+    esp_event_handler_unregister(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, &zero_prov_event_handler);
     esp_mesh_lite_espnow_recv_cb_unregister(ESPNOW_DATA_TYPE_ZERO_PROV);
     esp_now_unregister_send_cb();
 
