@@ -2,7 +2,7 @@
 
 # ChangeLog
 
-## v1.0.2 - 2025-7-2
+## v1.0.2 - 2025-7-4
 
 ### Breaking Change:
 
@@ -13,6 +13,7 @@
 
 #### Mesh
 
+- Optimize the internal scanning time of mesh lite after station disconnects
 - Support dynamically setting Wi-Fi reconnection intervals ([803c8e9](https://github.com/espressif/esp-mesh-lite/commit/803c8e93e9df459fefe29794b66464ce0c21bf5f))
 - Added support for ESP32-C61 ([4a2b7e4](https://github.com/espressif/esp-mesh-lite/commit/4a2b7e4b4c04b3c96c941f8b8e82758f0c5c4bfb))
 - Optimized: speed up fusion process for specific scenarios​ ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
@@ -41,6 +42,7 @@
 
 #### Bugfix
 
+- Fixed: Occasional Wi-Fi reconnection after calling `esp_mesh_lite_disconnect`
 - Fixed: The device self-recommendation function fails to work ([2f89a55](https://github.com/espressif/esp-mesh-lite/commit/2f89a55ccdd9713c1b13cb5ed98419a3bc48f7c7))
 - Fixed: When the root node is disconnected from the router, the secondary node cannot communicate with the root node normally ([2f89a55](https://github.com/espressif/esp-mesh-lite/commit/2f89a55ccdd9713c1b13cb5ed98419a3bc48f7c7))
 - Fixed: Failed to receive data sent by native espnow API ([f176342](https://github.com/espressif/esp-mesh-lite/commit/f17634270d14c907e48611d084217c6514a85920))

@@ -1,6 +1,6 @@
 # ChangeLog
 
-## v1.0.2 - 2025-7-2
+## v1.0.2 - 2025-7-4
 
 ### Breaking Change:
 
@@ -11,6 +11,7 @@
 
 #### Mesh
 
+- 优化 Station 断开后，mesh lite 内部的扫描时间
 - 支持动态设置 Wi-Fi 重连间隔 ([803c8e9](https://github.com/espressif/esp-mesh-lite/commit/803c8e93e9df459fefe29794b66464ce0c21bf5f))
 - 新增对 ESP32-C61 的支持 ([4a2b7e4](https://github.com/espressif/esp-mesh-lite/commit/4a2b7e4b4c04b3c96c941f8b8e82758f0c5c4bfb))
 - 优化部分场景下的融合过程，缩短融合时间 ([544b925](https://github.com/espressif/esp-mesh-lite/commit/544b925c705b80acf823216f8236bf57339c7b9f))
@@ -39,6 +40,7 @@
 
 #### Bugfix
 
+- 修复调用 esp_mesh_lite_disconnect 后，偶现仍触发 Wi-Fi 重连的问题
 - 修复设备自荐功能失效的问题 ([2f89a55](https://github.com/espressif/esp-mesh-lite/commit/2f89a55ccdd9713c1b13cb5ed98419a3bc48f7c7))
 - 修复当根节点与路由器断开连接后，二级节点无法与根节点正常通信的问题 ([2f89a55](https://github.com/espressif/esp-mesh-lite/commit/2f89a55ccdd9713c1b13cb5ed98419a3bc48f7c7))
 - 修复原生 espnow API 发送的数据接收失败的问题 ([f176342](https://github.com/espressif/esp-mesh-lite/commit/f17634270d14c907e48611d084217c6514a85920))
