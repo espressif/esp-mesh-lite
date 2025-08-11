@@ -2,6 +2,7 @@
 
 # ESP Wi-Fi Mesh Lite
 
+**The Support policy for ESP-MESH-LITE**: [SUPPORT_POLICY](https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/components/mesh_lite/SUPPORT_POLICY.md)
 This document provides an introduction to the Mesh-Lite protocol.
 
 ## Overview
@@ -35,8 +36,8 @@ ESP-Mesh-Lite is supported by various Espressif chips, as shown in the table bel
 | ESP32-S3 | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
 | ESP32-C2 | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
 | ESP32-C6 |                        | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
-| ESP32-C5 |                        |                        |                        |                        | ![alt text][supported] |
-| ESP32-C61|                        |                        |                        |                        | ![alt text][supported] |
+| ESP32-C5 |                        |                        |                        |                        | ![alt text][supported](See [SUPPORT_POLICY](https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/components/mesh_lite/SUPPORT_POLICY.md)) |
+| ESP32-C61|                        |                        |                        |                        | ![alt text][supported](See [SUPPORT_POLICY](https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/components/mesh_lite/SUPPORT_POLICY.md)) |
 
 [supported]: https://img.shields.io/badge/-supported-green "supported"
 
