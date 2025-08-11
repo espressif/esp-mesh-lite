@@ -2,6 +2,7 @@
 
 # ESP-MESH-LITE
 
+**ESP-MESH-LITE 的支持策略**：[SUPPORT_POLICY](https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/components/mesh_lite/SUPPORT_POLICY.md)
 本指南提供有关 Mesh-Lite 协议的介绍。
 
 ## 概述
@@ -35,8 +36,8 @@ ESP-MESH-LITE 是一套建立在 Wi-Fi 协议之上的网络协议。ESP-MESH-LI
 | ESP32-S3 | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
 | ESP32-C2 | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
 | ESP32-C6 |                        | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] | ![alt text][supported] |
-| ESP32-C5 |                        |                        |                        |                        | ![alt text][supported] |
-| ESP32-C61|                        |                        |                        |                        | ![alt text][supported] |
+| ESP32-C5 |                        |                        |                        |                        | ![alt text][supported](见 [SUPPORT_POLICY](https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/components/mesh_lite/SUPPORT_POLICY.md)) |
+| ESP32-C61|                        |                        |                        |                        | ![alt text][supported](见 [SUPPORT_POLICY](https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/components/mesh_lite/SUPPORT_POLICY.md)) |
 
 [supported]: https://img.shields.io/badge/-%E6%94%AF%E6%8C%81-green "supported"
 
