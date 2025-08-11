@@ -1,4 +1,4 @@
-- [English Version](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/User_Guide.md)
+- [English Version](https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/components/mesh_lite/User_Guide.md)
 
 # ESP-MESH-LITE
 
@@ -138,7 +138,7 @@ ESP-MESH-LITE 中能够形成下行连接的每个节点（即具有 SoftAP 接�
 
 **备注**
 
-> 用户还可以通过 `esp_mesh_lite_set_allowed_level` 和 `esp_mesh_lite_set_disallowed_level` 自行定义选择节点固定哪个层级或者禁用哪个层级（见 [Mesh-Lite API 详解](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/include/esp_mesh_lite_core.h)）。
+> 用户还可以通过 `esp_mesh_lite_set_allowed_level` 和 `esp_mesh_lite_set_disallowed_level` 自行定义选择节点固定哪个层级或者禁用哪个层级（见 [Mesh-Lite API 详解](https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/components/mesh_lite/include/esp_mesh_lite_core.h)）。
 
 
 ## 建立网络
@@ -147,7 +147,7 @@ ESP-MESH-LITE 中能够形成下行连接的每个节点（即具有 SoftAP 接�
 
 警告
 
-ESP-MESH-LITE 正式开始构建网络前，必须确保网络中所有节点具有相同的配置（见 [`esp_mesh_lite_config_t`](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/include/esp_mesh_lite_core.h)）。每个节点必须配置 **相同 MESH_LITE 网络 ID、最大层级数量和 SoftAP 配置**。
+ESP-MESH-LITE 正式开始构建网络前，必须确保网络中所有节点具有相同的配置（见 [`esp_mesh_lite_config_t`](https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/components/mesh_lite/include/esp_mesh_lite_core.h)）。每个节点必须配置 **相同 MESH_LITE 网络 ID、最大层级数量和 SoftAP 配置**。
 
 ESP-MESH-LITE 网络将首先选择根节点，然后逐层形成下行连接，直到所有节点均加入网络。网络的布局可能取决于诸如根节点选择、父节点选择和异步上电复位等因素。但简单来说，一个 ESP-MESH-LITE 网络的构建过程可以概括为以下步骤：
 
@@ -482,7 +482,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 
 **备注**
 
-> 具体配网代码修改请参考 [Wi-Fi Provisioning](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker/led_light/components/app_wifi/app_wifi.c)
+> 具体配网代码修改请参考 [Wi-Fi Provisioning](https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/examples/rainmaker/led_light/components/app_wifi/app_wifi.c)
 >
 > 除了配网连接部分的修改，其余的网络应用（Socket、MQTT、HTTP 等）均不需要修改
 
@@ -491,6 +491,6 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 ## 更多注意事项
 
 - 数据传输使用 Wi-Fi WPA2-PSK 加密（SoftAP 需设置密码）
-- Mesh 网络内部节点间通信可以通过 `esp_mesh_lite_aes_set_key` 选择使用 AES128 加密（见 [Mesh-Lite API 详解](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/include/esp_mesh_lite_core.h)）
+- Mesh 网络内部节点间通信可以通过 `esp_mesh_lite_aes_set_key` 选择使用 AES128 加密（见 [Mesh-Lite API 详解](https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/components/mesh_lite/include/esp_mesh_lite_core.h)）
 
 本文图片中使用的路由器与互联网图标来自 [www.flaticon.com](https://smashicons.com/) 的 [Smashicons](https://smashicons.com/)。

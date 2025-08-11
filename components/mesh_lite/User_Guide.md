@@ -1,4 +1,4 @@
-- [中文版本](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/User_Guide_CN.md)
+- [中文版本](https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/components/mesh_lite/User_Guide_CN.md)
 
 # ESP Wi-Fi Mesh Lite
 
@@ -138,7 +138,7 @@ If more than one candidate parent node exists on the same layer, the one with th
 
 **Notes**
 
-> Users can also define which layers are fixed or disabled for the selected nodes through `esp_mesh_lite_set_allowed_level` and `esp_mesh_lite_set_disallowed_level` (see [Mesh-Lite API Reference](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/include/esp_mesh_lite_core.h)).
+> Users can also define which layers are fixed or disabled for the selected nodes through `esp_mesh_lite_set_allowed_level` and `esp_mesh_lite_set_disallowed_level` (see [Mesh-Lite API Reference](https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/components/mesh_lite/include/esp_mesh_lite_core.h)).
 
 
 ## Establish Network
@@ -147,7 +147,7 @@ If more than one candidate parent node exists on the same layer, the one with th
 
 Warning
 
-Before ESP-MESH-LITE officially starts building the network, please ensure that all nodes in the network share the same configuration (see [`esp_mesh_lite_config_t`](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/include/esp_mesh_lite_core.h)). Each node must be configured with **the same MESH_LITE network ID, maximum number of layers, and SoftAP**.
+Before ESP-MESH-LITE officially starts building the network, please ensure that all nodes in the network share the same configuration (see [`esp_mesh_lite_config_t`](https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/components/mesh_lite/include/esp_mesh_lite_core.h)). Each node must be configured with **the same MESH_LITE network ID, maximum number of layers, and SoftAP**.
 
 The ESP-MESH-LITE network will first select the root node and then establish downstream connections layer by layer until all nodes have joined the network. The layout of the network may depend on factors such as root node selection, parent node selection, and asynchronous power-up reset. But in short, the process of building an ESP-MESH-LITE network can be summarized in the following steps:
 
@@ -479,7 +479,7 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 
 **Notes**
 
-> For specific provisioning code modification, please refer to [Wi-Fi Provisioning](https://github.com/espressif/esp-mesh-lite/blob/master/examples/rainmaker/led_light/components/app_wifi/app_wifi.c).
+> For specific provisioning code modification, please refer to [Wi-Fi Provisioning](https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/examples/rainmaker/led_light/components/app_wifi/app_wifi.c).
 >
 > Except for the provisioning connection part, the rest of the network applications (Socket, MQTT, HTTP, etc.) do not need to be modified.
 
@@ -488,6 +488,6 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 ## Further Notes
 
 - Data transmission is encrypted using Wi-Fi WPA2-PSK (password required for SoftAP)
-- Communication between nodes within a Mesh network can be encrypted with AES128 using `esp_mesh_lite_aes_set_key` (see [Mesh-Lite API Reference](https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/include/esp_mesh_lite_core.h))
+- Communication between nodes within a Mesh network can be encrypted with AES128 using `esp_mesh_lite_aes_set_key` (see [Mesh-Lite API Reference](https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/components/mesh_lite/include/esp_mesh_lite_core.h))
 
 The router and Internet icons used in the images in this document are from [Smashicons](https://smashicons.com/) of [www.flaticon.com](https://smashicons.com/).

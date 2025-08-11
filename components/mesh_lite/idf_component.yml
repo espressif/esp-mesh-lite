@@ -2,7 +2,7 @@ version: "1.0.2"
 description: A lite version Wi-Fi Mesh, each node can access the network over the IP layer.
 url: https://github.com/espressif/esp-mesh-lite/tree/master/components/mesh_lite
 repository: https://github.com/espressif/esp-mesh-lite.git
-documentation: https://github.com/espressif/esp-mesh-lite/blob/master/components/mesh_lite/User_Guide.md
+documentation: https://github.com/espressif/esp-mesh-lite/blob/release/v1.0/components/mesh_lite/User_Guide.md
 issues: https://github.com/espressif/esp-mesh-lite/issues
 dependencies:
   idf: ">=5.0"
