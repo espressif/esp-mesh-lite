@@ -569,14 +569,20 @@ static esp_err_t wireless_log_process_cb(const esp_now_recv_info_t *recv_info, c
         return ESP_FAIL;
     }
 
+    if (len < (int)sizeof(wireless_debug_log_t)) {
+        ESP_LOGD(TAG, "Data too short: %d < %zu", len, sizeof(wireless_debug_log_t));
+        return ESP_FAIL;
+    }
+
     wireless_debug_log_t *wireless_debug_log = (wireless_debug_log_t *)data;
-    size_t data_len = strlen(wireless_debug_log->data);
-    if (wireless_debug_log->crc32 != esp_rom_crc32_le(CRC_INIT_VALUE, (uint8_t*)wireless_debug_log->data, data_len)) {
+    size_t actual_data_len = len - sizeof(wireless_debug_log_t);
+
+    if (wireless_debug_log->crc32 != esp_rom_crc32_le(CRC_INIT_VALUE, (uint8_t*)wireless_debug_log->data, actual_data_len)) {
         return ESP_FAIL;
     }
 
     if (cb_list.recv_debug_log_cb) {
-        cb_list.recv_debug_log_cb(recv_info, (uint8_t*)wireless_debug_log->data, data_len);
+        cb_list.recv_debug_log_cb(recv_info, (uint8_t*)wireless_debug_log->data, actual_data_len);
     }
 
     return ESP_OK;
