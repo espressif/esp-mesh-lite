@@ -24,7 +24,7 @@
 #define UART_PORT     UART_NUM_2
 #define UART_TX_PIN   17
 #define UART_RX_PIN   16
-#define UART_BAUD     115200
+#define UART_BAUD     9600            // <-- changed from 115200 to 9600
 #define UART_RXBUF_SZ (16 * 1024)
 #define LINE_MAX      128
 
@@ -150,6 +150,9 @@ static void child_uart_forward_task(void *arg)
             int to_read = pos + 1; if (to_read > (int)sizeof(line)-1) to_read = sizeof(line)-1;
             int n = uart_read_bytes(UART_PORT, line, to_read, pdMS_TO_TICKS(20));
             if (n <= 0) continue;
+
+            // DEBUG: hex dump raw bytes so we can confirm ASCII vs noise
+            ESP_LOG_BUFFER_HEXDUMP(TAG, line, n, ESP_LOG_INFO);   // <-- added
 
             // trim CR/LF
             while (n && (line[n-1]=='\n' || line[n-1]=='\r')) n--;
