@@ -1,0 +1,58 @@
+# .github/workflows/build-idf.yml
+name: build-idf
+
+on:
+  push:
+    paths:
+      - "mesh_root/**"
+      - "mesh_leaf/**"
+      - ".github/workflows/build-idf.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: espressif/idf:v5.2.1
+      options: --user 0
+    strategy:
+      fail-fast: false
+      matrix:
+        app:
+          - { name: mesh_root, path: "mesh_root" }
+          - { name: mesh_leaf, path: "mesh_leaf" }
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Optional: cache ccache to speed up subsequent builds
+      - name: Set up ccache
+        run: |
+          apt-get update && apt-get install -y ccache
+          echo 'export CCACHE_DIR=/github/home/.ccache' >> $GITHUB_ENV
+          echo 'export PATH="/usr/lib/ccache:$PATH"' >> $GITHUB_ENV
+
+      - name: Build ${{ matrix.app.name }}
+        shell: bash
+        run: |
+          set -e
+          cd "${{ matrix.app.path }}"
+          # Ensure target is ESP32-S3 (change if you use another chip)
+          idf.py set-target esp32s3
+          idf.py build
+          mkdir -p "../../artifacts/${{ matrix.app.name }}"
+          cp -v build/bootloader/bootloader.bin "../../artifacts/${{ matrix.app.name }}/"
+          cp -v build/partition_table/partition-table.bin "../../artifacts/${{ matrix.app.name }}/"
+          # app binary (name varies by project)
+          cp -v build/*.bin "../../artifacts/${{ matrix.app.name }}/" || true
+          # helpful extras
+          cp -v build/*.elf "../../artifacts/${{ matrix.app.name }}/" || true
+          cp -v build/*.map "../../artifacts/${{ matrix.app.name }}/" || true
+          echo "Contents of artifact:"
+          ls -lah "../../artifacts/${{ matrix.app.name }}"
+
+      - name: Upload ${{ matrix.app.name }} artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app.name }}-bins
+          path: artifacts/${{ matrix.app.name }}
