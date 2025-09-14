@@ -205,3 +205,4 @@ void app_main()
                                        true, NULL, print_system_info_timercb);
     xTimerStart(timer, 0);
 }
+
