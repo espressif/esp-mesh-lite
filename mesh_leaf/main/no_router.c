@@ -24,7 +24,7 @@
 #define UART_PORT     UART_NUM_2
 #define UART_TX_PIN   17
 #define UART_RX_PIN   16
-#define UART_BAUD     9600            // <-- changed from 115200 to 9600
+#define UART_BAUD     9600
 #define UART_RXBUF_SZ (16 * 1024)
 #define LINE_MAX      128
 
@@ -32,7 +32,7 @@
 
 static const char *TAG = "no_router";
 
-/* ---------- periodic mesh info print (unchanged) ---------- */
+/* ---------- periodic mesh info print ---------- */
 static void print_system_info_timercb(TimerHandle_t timer)
 {
     uint8_t primary=0, sta_mac[6]={0};
@@ -59,7 +59,6 @@ static void print_system_info_timercb(TimerHandle_t timer)
         node = node->next;
     }
 }
-/* ---------------------------------------------------------- */
 
 static esp_err_t esp_storage_init(void)
 {
@@ -73,11 +72,9 @@ static esp_err_t esp_storage_init(void)
 
 static void wifi_init(void)
 {
-    // STA
     wifi_config_t wifi_config; memset(&wifi_config, 0, sizeof(wifi_config));
     esp_bridge_wifi_set_config(WIFI_IF_STA, &wifi_config);
 
-    // SoftAP (backhaul for children)
     wifi_config_t ap_cfg = {
         .ap = {
             .ssid     = CONFIG_BRIDGE_SOFTAP_SSID,
@@ -132,7 +129,6 @@ static void child_uart_init(void)
 
 static void child_uart_forward_task(void *arg)
 {
-    // UDP socket (broadcast)
     int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sock < 0) { ESP_LOGE(TAG, "UDP socket create failed"); vTaskDelete(NULL); return; }
     int yes=1; setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &yes, sizeof(yes));
@@ -147,17 +143,20 @@ static void child_uart_forward_task(void *arg)
     for (;;) {
         int pos = uart_pattern_pop_pos(UART_PORT);
         if (pos >= 0) {
-            int to_read = pos + 1; if (to_read > (int)sizeof(line)-1) to_read = sizeof(line)-1;
+            int to_read = pos + 1;
+            if (to_read > (int)sizeof(line)-1) to_read = sizeof(line)-1;
+
             int n = uart_read_bytes(UART_PORT, line, to_read, pdMS_TO_TICKS(20));
             if (n <= 0) continue;
 
-            // DEBUG: hex dump raw bytes so we can confirm ASCII vs noise
-            ESP_LOG_BUFFER_HEXDUMP(TAG, line, n, ESP_LOG_INFO);   // <-- added
+            // Trim CR/LF and null-terminate so it's a real C string
+            while (n && (line[n-1] == '\n' || line[n-1] == '\r')) n--;
+            line[n] = '\0';
 
-            // trim CR/LF
-            while (n && (line[n-1]=='\n' || line[n-1]=='\r')) n--;
-            line[n] = 0;
             if (n == 0) continue;
+
+            // SHOW exactly what we will send over the mesh
+            ESP_LOGI(TAG, "UART line -> mesh: %s", (char*)line);
 
             // forward single line
             sendto(sock, line, n, 0, (struct sockaddr*)&dest, sizeof(dest));
