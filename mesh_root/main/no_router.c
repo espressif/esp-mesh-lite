@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText: 2022-2024 Espressif Systems (Shanghai) CO LTD
+ * SPDX-FileCopyrightText: 2022-2024 Espressif Systems (Shanghai)
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -17,6 +17,12 @@
 #include "esp_mac.h"
 #include "esp_bridge.h"
 #include "esp_mesh_lite.h"
+
+// --- Added for UDP listener ---
+#include "lwip/sockets.h"
+// ------------------------------
+
+#define FORCE_ROOT 1   // set 1 = root, 0 = child
 
 static const char *TAG = "no_router";
 
@@ -53,7 +59,8 @@ static void print_system_info_timercb(TimerHandle_t timer)
     for (uint32_t loop = 0; (loop < size) && (node != NULL); loop++) {
         struct in_addr ip_struct;
         ip_struct.s_addr = node->node->ip_addr;
-        printf("%ld: %d, "MACSTR", %s\r\n" , loop + 1, node->node->level, MAC2STR(node->node->mac_addr), inet_ntoa(ip_struct));
+        printf("%ld: %d, "MACSTR", %s\r\n" , loop + 1, node->node->level,
+               MAC2STR(node->node->mac_addr), inet_ntoa(ip_struct));
         node = node->next;
     }
 }
@@ -63,8 +70,6 @@ static esp_err_t esp_storage_init(void)
     esp_err_t ret = nvs_flash_init();
 
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-        // NVS partition was truncated and needs to be erased
-        // Retry nvs_flash_init
         ESP_ERROR_CHECK(nvs_flash_erase());
         ret = nvs_flash_init();
     }
@@ -79,14 +84,14 @@ static void wifi_init(void)
     memset(&wifi_config, 0x0, sizeof(wifi_config_t));
     esp_bridge_wifi_set_config(WIFI_IF_STA, &wifi_config);
 
-    // Softap
+    // SoftAP
     wifi_config_t wifi_softap_config = {
-                                           .ap = {
-                                                     .ssid = CONFIG_BRIDGE_SOFTAP_SSID,
-                                                     .password = CONFIG_BRIDGE_SOFTAP_PASSWORD,
-                                                     .channel = CONFIG_MESH_CHANNEL,
-                                                 },
-                                       };
+        .ap = {
+            .ssid = CONFIG_BRIDGE_SOFTAP_SSID,
+            .password = CONFIG_BRIDGE_SOFTAP_PASSWORD,
+            .channel = CONFIG_MESH_CHANNEL,
+        },
+    };
     esp_bridge_wifi_set_config(WIFI_IF_AP, &wifi_softap_config);
 }
 
@@ -105,7 +110,9 @@ void app_wifi_set_softap_info(void)
         ESP_LOGI(TAG, "Get ssid from nvs: %s", softap_ssid);
     } else {
 #ifdef CONFIG_BRIDGE_SOFTAP_SSID_END_WITH_THE_MAC
-        snprintf(softap_ssid, sizeof(softap_ssid), "%.25s_%02x%02x%02x", CONFIG_BRIDGE_SOFTAP_SSID, softap_mac[3], softap_mac[4], softap_mac[5]);
+        snprintf(softap_ssid, sizeof(softap_ssid), "%.25s_%02x%02x%02x",
+                 CONFIG_BRIDGE_SOFTAP_SSID,
+                 softap_mac[3], softap_mac[4], softap_mac[5]);
 #else
         snprintf(softap_ssid, sizeof(softap_ssid), "%.32s", CONFIG_BRIDGE_SOFTAP_SSID);
 #endif
@@ -122,32 +129,64 @@ void app_wifi_set_softap_info(void)
     esp_mesh_lite_set_softap_info(softap_ssid, softap_psw);
 }
 
+// --- Added: UDP listener for BLE lines ---
+static void root_udp_task(void *arg) {
+    int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (sock < 0) {
+        ESP_LOGE("root_udp", "socket create failed");
+        vTaskDelete(NULL);
+        return;
+    }
+
+    struct sockaddr_in addr = {0};
+    addr.sin_family = AF_INET;
+    addr.sin_port   = htons(3333);
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    if (bind(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+        ESP_LOGE("root_udp", "bind failed");
+        close(sock);
+        vTaskDelete(NULL);
+        return;
+    }
+
+    ESP_LOGI("root_udp", "Listening on UDP :3333");
+
+    uint8_t buf[256];
+    while (1) {
+        int n = recv(sock, buf, sizeof(buf)-1, 0);
+        if (n > 0) {
+            buf[n] = 0;
+            ESP_LOGI("root_udp", "BLE: %s", (char*)buf);
+        }
+    }
+}
+// ------------------------------------------
+
 void app_main()
 {
-    // Set the log level for serial port printing.
     esp_log_level_set("*", ESP_LOG_INFO);
 
     esp_storage_init();
-
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
     esp_bridge_create_all_netif();
-
     wifi_init();
 
     esp_mesh_lite_config_t mesh_lite_config = ESP_MESH_LITE_DEFAULT_INIT();
     mesh_lite_config.join_mesh_ignore_router_status = true;
-#if CONFIG_MESH_ROOT
+
+#if FORCE_ROOT
     mesh_lite_config.join_mesh_without_configured_wifi = false;
 #else
     mesh_lite_config.join_mesh_without_configured_wifi = true;
 #endif
-    esp_mesh_lite_init(&mesh_lite_config);
 
+    esp_mesh_lite_init(&mesh_lite_config);
     app_wifi_set_softap_info();
 
-#if CONFIG_MESH_ROOT
+#if FORCE_ROOT
     ESP_LOGI(TAG, "Root node");
     esp_mesh_lite_set_allowed_level(1);
 #else
@@ -156,6 +195,11 @@ void app_main()
 #endif
 
     esp_mesh_lite_start();
+
+#if FORCE_ROOT
+    // start UDP listener on root
+    xTaskCreate(root_udp_task, "root_udp", 4096, NULL, 5, NULL);
+#endif
 
     TimerHandle_t timer = xTimerCreate("print_system_info", 10000 / portTICK_PERIOD_MS,
                                        true, NULL, print_system_info_timercb);
