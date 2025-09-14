@@ -17,7 +17,7 @@
 #include "lwip/inet.h"
 #include "lwip/sockets.h"
 #include "driver/uart.h"
-#include "driver/gpio.h"   // <-- for RX pull-up
+#include "driver/gpio.h"   // RX pull-up
 
 #define FORCE_ROOT 0   // child build
 
@@ -31,6 +31,11 @@
 
 /* ---- UDP port used by root listener ---- */
 #define UDP_PORT      3333
+
+/* ---- Debug: dump every UART chunk (hex + ascii) ---- */
+#define UART_DUMP     1
+/* Limit dump length so logs don’t explode */
+#define DUMP_MAX      64
 
 static const char *TAG = "no_router";
 
@@ -151,6 +156,31 @@ static void child_uart_init(void)
     ESP_LOGI(TAG, "UART ready @%d (TX=%d RX=%d)", UART_BAUD, UART_TX_PIN, UART_RX_PIN);
 }
 
+/* ---- helper: dump a UART chunk as hex & ascii ---- */
+static inline void dump_uart(const uint8_t *b, int n)
+{
+#if UART_DUMP
+    int m = (n > DUMP_MAX) ? DUMP_MAX : n;
+
+    char hex[3 * DUMP_MAX + 1];
+    int p = 0;
+    for (int i = 0; i < m && p < (int)sizeof(hex) - 3; ++i) {
+        p += snprintf(&hex[p], sizeof(hex) - p, "%02X ", b[i]);
+    }
+    hex[p] = 0;
+
+    char asc[DUMP_MAX + 1];
+    for (int i = 0; i < m; ++i) {
+        uint8_t c = b[i];
+        asc[i] = (c >= 32 && c <= 126) ? (char)c : '.';
+    }
+    asc[m] = 0;
+
+    ESP_LOGI(TAG, "UART RX (%d): %s%s", n, hex, (n > m) ? "..." : "");
+    ESP_LOGI(TAG, "UART RX ASCII : %s%s", asc, (n > m) ? "..." : "");
+#endif
+}
+
 /* ---------- UART -> UDP forwarder (robust line builder) ---------- */
 static void child_uart_forward_task(void *arg)
 {
@@ -179,6 +209,7 @@ static void child_uart_forward_task(void *arg)
         uint32_t now = (uint32_t)(esp_timer_get_time() / 1000); // ms
 
         if (r > 0) {
+            dump_uart(buf, r);          // <--- print what we just read
             last_byte_ms = now;
 
             for (int i = 0; i < r; ++i) {
