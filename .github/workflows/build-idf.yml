@@ -1,49 +1,43 @@
-# .github/workflows/build-idf.yml
-name: build-idf
-
+name: build-root
 on:
   push:
     paths:
       - "mesh_root/**"
-      - "mesh_leaf/**"
-      - ".github/workflows/build-idf.yml"
+      - ".github/workflows/build-root.yml"
   workflow_dispatch:
 
 jobs:
-  build:
+  build_root:
     runs-on: ubuntu-latest
     container:
       image: espressif/idf:v5.2.1
       options: --user 0
-    strategy:
-      fail-fast: false
-      matrix:
-        app:
-          - { name: mesh_root, path: "mesh_root" }
-          - { name: mesh_leaf, path: "mesh_leaf" }
-
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive   # ← important for ESP-IDF components
 
-      - name: Build ${{ matrix.app.name }}
+      - name: Make git workspace safe (avoids 'dubious ownership')
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Build mesh_root
         shell: bash
         run: |
           set -e
-          source /opt/esp/idf/export.sh     # ← puts idf.py on PATH
-          cd "${{ matrix.app.path }}"
+          source /opt/esp/idf/export.sh
+          cd mesh_root
           idf.py set-target esp32s3
+          idf.py --version
           idf.py build
 
-          mkdir -p "../../artifacts/${{ matrix.app.name }}"
-          cp -v build/bootloader/bootloader*.bin "../../artifacts/${{ matrix.app.name }}/"
-          cp -v build/partition_table/partition-table.bin "../../artifacts/${{ matrix.app.name }}/"
-          cp -v build/*.bin "../../artifacts/${{ matrix.app.name }}/" || true
-          cp -v build/*.elf "../../artifacts/${{ matrix.app.name }}/" || true
-          cp -v build/*.map "../../artifacts/${{ matrix.app.name }}/" || true
+          mkdir -p ../artifacts/mesh_root
+          cp -v build/bootloader/bootloader*.bin ../artifacts/mesh_root/ || true
+          cp -v build/partition_table/partition-table*.bin ../artifacts/mesh_root/ || true
+          # copy the app .bin (exclude bootloader/partition)
+          find build -maxdepth 1 -type f -name "*.bin" \
+            ! -name "bootloader*.bin" ! -name "partition-table*.bin" \
+            -exec cp -v {} ../artifacts/mesh_root/ \;
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload root artifacts
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.app.name }}-bins
-          path: artifacts/${{ matrix.app.name }}
+          name: mesh_root-bins
+          path: artifacts/mesh_root
