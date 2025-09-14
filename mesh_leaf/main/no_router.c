@@ -17,16 +17,17 @@
 #include "lwip/inet.h"
 #include "lwip/sockets.h"
 #include "driver/uart.h"
+#include "driver/gpio.h"   // <-- for RX pull-up
 
 #define FORCE_ROOT 0   // child build
 
 /* ---- UART config (sender TX=17 -> leaf RX=16) ---- */
 #define UART_PORT     UART_NUM_2
-#define UART_TX_PIN   17          // not used by leaf, but set anyway
+#define UART_TX_PIN   17          // not used by leaf for TX, but set anyway
 #define UART_RX_PIN   16          // connect sender TX here
 #define UART_BAUD     9600        // MUST match the sender
 #define UART_RXBUF_SZ (16 * 1024)
-#define LINE_MAX      128
+#define LINE_MAX      256         // larger line buffer
 
 /* ---- UDP port used by root listener ---- */
 #define UDP_PORT      3333
@@ -136,10 +137,21 @@ static void child_uart_init(void)
     ESP_ERROR_CHECK(uart_param_config(UART_PORT, &cfg));
     ESP_ERROR_CHECK(uart_set_pin(UART_PORT, UART_TX_PIN, UART_RX_PIN,
                                  UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
+
+    // Keep RX line pulled high when idle to reduce noise
+    gpio_config_t io = {
+        .pin_bit_mask = 1ULL << UART_RX_PIN,
+        .mode         = GPIO_MODE_INPUT,
+        .pull_up_en   = 1,
+        .pull_down_en = 0,
+        .intr_type    = GPIO_INTR_DISABLE
+    };
+    gpio_config(&io);
+
     ESP_LOGI(TAG, "UART ready @%d (TX=%d RX=%d)", UART_BAUD, UART_TX_PIN, UART_RX_PIN);
 }
 
-/* ---------- UART -> UDP forwarder (line builder) ---------- */
+/* ---------- UART -> UDP forwarder (robust line builder) ---------- */
 static void child_uart_forward_task(void *arg)
 {
     // UDP socket (broadcast to root listener)
@@ -157,37 +169,52 @@ static void child_uart_forward_task(void *arg)
     dest.sin_port        = htons(UDP_PORT);
     dest.sin_addr.s_addr = inet_addr("255.255.255.255");
 
-    uint8_t line[LINE_MAX];
-    size_t  n = 0;
+    uint8_t  line[LINE_MAX];
+    size_t   n = 0;
+    uint32_t last_byte_ms = 0;
 
     for (;;) {
         uint8_t buf[64];
         int r = uart_read_bytes(UART_PORT, buf, sizeof(buf), pdMS_TO_TICKS(50));
+        uint32_t now = (uint32_t)(esp_timer_get_time() / 1000); // ms
+
         if (r > 0) {
+            last_byte_ms = now;
+
             for (int i = 0; i < r; ++i) {
                 uint8_t c = buf[i];
 
-                if (c == '\n') {                 // end-of-line found
-                    // trim CR/LF and null-terminate
+                if (c == '\n') {                   // end-of-line
                     while (n && (line[n-1] == '\r' || line[n-1] == '\n')) n--;
                     line[n] = '\0';
-
                     if (n > 0) {
-                        // Show exactly what we forward
                         ESP_LOGI(TAG, "UART line -> mesh: %s", (char *)line);
                         sendto(sock, line, n, 0, (struct sockaddr *)&dest, sizeof(dest));
                     }
-                    n = 0;                        // reset for next line
+                    n = 0;
+                    continue;
+                }
+
+                // accept printable ASCII and CR; drop noise bytes
+                bool printable = (c >= 32 && c <= 126) || c == '\r';
+                if (!printable) {
+                    if (n) { ESP_LOGW(TAG, "UART non-ASCII, dropping partial"); n = 0; }
+                    continue;
+                }
+
+                if (n < sizeof(line) - 1) {
+                    line[n++] = c;
                 } else {
-                    if (n < sizeof(line) - 1) {   // accumulate safely
-                        line[n++] = c;
-                    } else {
-                        ESP_LOGW(TAG, "UART line overflow, dropping partial");
-                        n = 0;
-                    }
+                    ESP_LOGW(TAG, "UART line overflow, dropping partial");
+                    n = 0;   // reset if somehow a line gets too long
                 }
             }
         } else {
+            // Idle timeout: if we started a line but no newline for 300 ms, drop it
+            if (n && (now - last_byte_ms) > 300) {
+                ESP_LOGW(TAG, "UART idle timeout, dropping partial");
+                n = 0;
+            }
             vTaskDelay(pdMS_TO_TICKS(5));
         }
     }
