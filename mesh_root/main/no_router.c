@@ -9,7 +9,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/timers.h"
-#include "root_udp.h"
+#include "root_udp.h"     // ✅ only use our new UDP module
 #include "esp_wifi.h"
 #include "nvs_flash.h"
 #include <sys/socket.h>
@@ -17,10 +17,6 @@
 #include "esp_mac.h"
 #include "esp_bridge.h"
 #include "esp_mesh_lite.h"
-
-// --- Added for UDP listener ---
-#include "lwip/sockets.h"
-// ------------------------------
 
 #define FORCE_ROOT 1   // set 1 = root, 0 = child
 
@@ -44,10 +40,15 @@ static void print_system_info_timercb(TimerHandle_t timer)
     esp_wifi_ap_get_sta_list(&wifi_sta_list);
     esp_wifi_get_channel(&primary, &second);
 
-    ESP_LOGI(TAG, "System information, channel: %d, layer: %d, self mac: " MACSTR ", parent bssid: " MACSTR
-             ", parent rssi: %d, free heap: %"PRIu32"", primary,
-             esp_mesh_lite_get_level(), MAC2STR(sta_mac), MAC2STR(ap_info.bssid),
-             (ap_info.rssi != 0 ? ap_info.rssi : -120), esp_get_free_heap_size());
+    ESP_LOGI(TAG,
+             "System information, channel: %d, layer: %d, self mac: " MACSTR
+             ", parent bssid: " MACSTR
+             ", parent rssi: %d, free heap: %"PRIu32"",
+             primary,
+             esp_mesh_lite_get_level(),
+             MAC2STR(sta_mac), MAC2STR(ap_info.bssid),
+             (ap_info.rssi != 0 ? ap_info.rssi : -120),
+             esp_get_free_heap_size());
 
     for (int i = 0; i < wifi_sta_list.num; i++) {
         ESP_LOGI(TAG, "Child mac: " MACSTR, MAC2STR(wifi_sta_list.sta[i].mac));
@@ -59,8 +60,10 @@ static void print_system_info_timercb(TimerHandle_t timer)
     for (uint32_t loop = 0; (loop < size) && (node != NULL); loop++) {
         struct in_addr ip_struct;
         ip_struct.s_addr = node->node->ip_addr;
-        printf("%ld: %d, "MACSTR", %s\r\n" , loop + 1, node->node->level,
-               MAC2STR(node->node->mac_addr), inet_ntoa(ip_struct));
+        printf("%ld: %d, "MACSTR", %s\r\n",
+               loop + 1, node->node->level,
+               MAC2STR(node->node->mac_addr),
+               inet_ntoa(ip_struct));
         node = node->next;
     }
 }
@@ -129,40 +132,6 @@ void app_wifi_set_softap_info(void)
     esp_mesh_lite_set_softap_info(softap_ssid, softap_psw);
 }
 
-// --- Added: UDP listener for BLE lines ---
-static void root_udp_task(void *arg) {
-    int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (sock < 0) {
-        ESP_LOGE("root_udp", "socket create failed");
-        vTaskDelete(NULL);
-        return;
-    }
-
-    struct sockaddr_in addr = {0};
-    addr.sin_family = AF_INET;
-    addr.sin_port   = htons(3333);
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-    if (bind(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        ESP_LOGE("root_udp", "bind failed");
-        close(sock);
-        vTaskDelete(NULL);
-        return;
-    }
-
-    ESP_LOGI("root_udp", "Listening on UDP :3333");
-
-    uint8_t buf[256];
-    while (1) {
-        int n = recv(sock, buf, sizeof(buf)-1, 0);
-        if (n > 0) {
-            buf[n] = 0;
-            ESP_LOGI("root_udp", "BLE: %s", (char*)buf);
-        }
-    }
-}
-// ------------------------------------------
-
 void app_main()
 {
     esp_log_level_set("*", ESP_LOG_INFO);
@@ -197,11 +166,10 @@ void app_main()
     esp_mesh_lite_start();
 
 #if FORCE_ROOT
-    root_udp_start(3333);
+    root_udp_start(3333);   // ✅ call the new helper
 #endif
 
     TimerHandle_t timer = xTimerCreate("print_system_info", 10000 / portTICK_PERIOD_MS,
                                        true, NULL, print_system_info_timercb);
     xTimerStart(timer, 0);
 }
-
