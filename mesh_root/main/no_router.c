@@ -9,7 +9,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/timers.h"
-
+#include "root_udp.h"
 #include "esp_wifi.h"
 #include "nvs_flash.h"
 #include <sys/socket.h>
@@ -197,8 +197,7 @@ void app_main()
     esp_mesh_lite_start();
 
 #if FORCE_ROOT
-    // start UDP listener on root
-    xTaskCreate(root_udp_task, "root_udp", 4096, NULL, 5, NULL);
+    root_udp_start(3333);
 #endif
 
     TimerHandle_t timer = xTimerCreate("print_system_info", 10000 / portTICK_PERIOD_MS,
