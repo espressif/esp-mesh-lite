@@ -9,6 +9,8 @@
 #include "freertos/task.h"
 #include "esp_mesh_lite.h"
 #include "esp_mac.h"          // for MACSTR / MAC2STR
+#include <stdbool.h>
+#include <unistd.h>
 
 static const char *TAG = "root_udp";
 
