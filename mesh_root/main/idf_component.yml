@@ -2,4 +2,6 @@ dependencies:
   idf: ">=5.2"
   mesh_lite:
     version: "*"
-  espressif/esp_lvgl_port: "^2"   # adds LVGL and glue for esp_lcd
+  espressif/esp_lvgl_port: "^2"
+  # Optional but highly recommended for this board:
+  espressif/esp-bsp: "^1"
