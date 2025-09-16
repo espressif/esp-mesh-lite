@@ -1,3 +1,5 @@
 dependencies:
-  idf: ">=5.0"
-  lvgl/lvgl: "^8.3.11"
+  idf: ">=5.2"
+  mesh_lite:
+    version: "*"
+  espressif/esp_lvgl_port: "^2"   # adds LVGL and glue for esp_lcd
