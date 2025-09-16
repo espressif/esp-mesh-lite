@@ -165,6 +165,8 @@ void app_main()
 
     esp_mesh_lite_start();
 
+    ui_display_init();
+
 #if FORCE_ROOT
     root_udp_start(3333);   // ✅ call the new helper
 #endif
