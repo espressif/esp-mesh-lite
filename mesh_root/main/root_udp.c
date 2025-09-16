@@ -1,20 +1,19 @@
 #include "root_udp.h"
 
 #include <string.h>
-#include <stdbool.h>
 #include <sys/socket.h>
-#include <unistd.h>
-
 #include "lwip/sockets.h"
 #include "lwip/inet.h"
-
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
 #include "esp_mesh_lite.h"
-#include "esp_mac.h"          // MACSTR / MAC2STR
-#include "ui_display.h"       // ui_display_init(), ui_display_append()
+#include "esp_mac.h"          // for MACSTR / MAC2STR
+#include <stdbool.h>
+#include <unistd.h>
+#include <stdio.h>
+
+#include "ui_display.h"       // our UI shim
 
 static const char *TAG = "root_udp";
 
@@ -22,14 +21,14 @@ static const char *TAG = "root_udp";
    Returns true if found. */
 static bool find_mac_by_ip(uint32_t ip_be, uint8_t out_mac[6], int *out_level)
 {
-    if (out_mac)   memset(out_mac, 0, 6);
+    if (out_mac) memset(out_mac, 0, 6);
     if (out_level) *out_level = -1;
 
     uint32_t n = 0;
     const node_info_list_t *node = esp_mesh_lite_get_nodes_list(&n);
     while (node) {
         if (node->node && node->node->ip_addr == ip_be) {
-            if (out_mac)   memcpy(out_mac, node->node->mac_addr, 6);
+            if (out_mac) memcpy(out_mac, node->node->mac_addr, 6);
             if (out_level) *out_level = node->node->level;
             return true;
         }
@@ -50,8 +49,8 @@ static void udp_task(void *arg)
     }
 
     struct sockaddr_in addr = {0};
-    addr.sin_family      = AF_INET;
-    addr.sin_port        = htons(port);
+    addr.sin_family = AF_INET;
+    addr.sin_port   = htons(port);
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
@@ -82,23 +81,30 @@ static void udp_task(void *arg)
         char ipstr[16] = {0};
         inet_ntop(AF_INET, &from.sin_addr, ipstr, sizeof(ipstr));
 
-        // Build a single line for both UI and log (bounded)
-        char msg[256];  // big enough to avoid truncation warnings
+        // --- Build one line safely: header then bounded payload ---
+        char msg[256];
+        size_t payload_len = (size_t)n;
 
+        int hdr = 0;
         if (known) {
-            // [ip lvlX aa:bb:cc:dd:ee:ff] payload
-            int m = snprintf(
+            hdr = snprintf(
                 msg, sizeof(msg),
-                "[%s lvl%d %02x:%02x:%02x:%02x:%02x:%02x] %s",
+                "[%s lvl%d %02x:%02x:%02x:%02x:%02x:%02x] ",
                 ipstr, level,
-                mac[0], mac[1], mac[2], mac[3], mac[4], mac[5],
-                (char *)buf
+                mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]
             );
-            (void)m; // silence unused-warning if -Wall -Wextra
         } else {
-            int m = snprintf(msg, sizeof(msg), "[%s] %s", ipstr, (char *)buf);
-            (void)m;
+            hdr = snprintf(msg, sizeof(msg), "[%s] ", ipstr);
         }
+
+        if (hdr < 0) hdr = 0;
+        if ((size_t)hdr >= sizeof(msg)) hdr = (int)sizeof(msg) - 1;
+
+        size_t cap = sizeof(msg) - (size_t)hdr - 1;
+        if (payload_len > cap) payload_len = cap;
+
+        memcpy(msg + hdr, buf, payload_len);
+        msg[hdr + payload_len] = '\0';
 
         // Show on “UI” shim and log
         ui_display_append(msg);
@@ -108,9 +114,6 @@ static void udp_task(void *arg)
 
 int root_udp_start(uint16_t port)
 {
-    // optional: ensure UI is ready (no-op if already init’d)
-    ui_display_init();
-
     if (xTaskCreate(udp_task, "root_udp", 4096, (void *)(uintptr_t)port, 5, NULL) != pdPASS) {
         ESP_LOGE(TAG, "failed to create udp_task");
         return -1;                 // not ESP_OK
