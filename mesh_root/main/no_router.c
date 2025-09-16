@@ -17,6 +17,7 @@
 #include "esp_mac.h"
 #include "esp_bridge.h"
 #include "esp_mesh_lite.h"
+#include "ui_display.h"
 
 #define FORCE_ROOT 1   // set 1 = root, 0 = child
 
