@@ -1,6 +1,7 @@
 #include "root_udp.h"
 
 #include <string.h>
+#include <stdbool.h>
 #include <sys/socket.h>
 #include "lwip/sockets.h"
 #include "lwip/inet.h"
@@ -9,8 +10,8 @@
 #include "freertos/task.h"
 #include "esp_mesh_lite.h"
 #include "esp_mac.h"          // for MACSTR / MAC2STR
-#include <stdbool.h>
-#include <unistd.h>
+
+#include "ui_display.h"       // <<< add this to print on the LCD
 
 static const char *TAG = "root_udp";
 
@@ -78,12 +79,16 @@ static void udp_task(void *arg)
         char ipstr[16] = {0};
         inet_ntop(AF_INET, &from.sin_addr, ipstr, sizeof(ipstr));
 
+        // build one printable line and send it to both serial and LCD
+        char line[160];
         if (known) {
-            ESP_LOGI(TAG, "[%s lvl%d " MACSTR "] %s",
+            snprintf(line, sizeof(line), "[%s lvl%d " MACSTR "] %s",
                      ipstr, level, MAC2STR(mac), (char *)buf);
         } else {
-            ESP_LOGI(TAG, "[%s] %s", ipstr, (char *)buf);
+            snprintf(line, sizeof(line), "[%s] %s", ipstr, (char *)buf);
         }
+        ESP_LOGI(TAG, "%s", line);
+        ui_display_append(line);   // <<< push to the on-screen log
     }
 }
 
