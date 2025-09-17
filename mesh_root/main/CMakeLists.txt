@@ -1,6 +1,14 @@
-dependencies:
-  idf: ">=5.2"
-  mesh_lite:
-    version: "*"           # you’re already in the mesh-lite tree
-  espressif/esp_lvgl_port: "^2.4.6"    # pulls LVGL and glue
-  espressif/esp_lcd_touch: "^1.1.1"    # GT911 driver lives here
+idf_component_register(
+    SRCS
+        "no_router.c"
+        "root_udp.c"
+        "ui_display.c"
+        "panel_rgb.c"       # (we’ll add next)
+        "touch_gt911.c"     # (we’ll add next)
+    INCLUDE_DIRS "."
+    REQUIRES
+        esp_timer
+        esp_lcd
+        esp_lcd_touch
+        esp_lvgl_port
+)
