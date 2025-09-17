@@ -3,4 +3,4 @@ dependencies:
   mesh_lite:
     version: "*"
   esp_lvgl_port: "^2"
-  # If you later add touch, we can add a touch driver here (e.g., espressif/esp_lcd_touch_gt911)
+  espressif/esp-iot-bridge: "*"
