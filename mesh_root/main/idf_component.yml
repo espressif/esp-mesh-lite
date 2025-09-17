@@ -2,6 +2,5 @@ dependencies:
   idf: ">=5.2"
   mesh_lite:
     version: "*"
-  espressif/esp_lvgl_port: "^2"
-  # Optional but highly recommended for this board:
-  espressif/esp-bsp: "^1"
+  esp_lvgl_port: "^2"
+  # If you later add touch, we can add a touch driver here (e.g., espressif/esp_lcd_touch_gt911)
