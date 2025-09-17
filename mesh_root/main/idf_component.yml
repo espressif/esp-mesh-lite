@@ -3,3 +3,4 @@ dependencies:
   mesh_lite:
     version: "*"
   espressif/esp_lvgl_port: "^2.4"
+  espressif/esp_lcd_touch: "^1.2"
