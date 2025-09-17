@@ -2,6 +2,4 @@ dependencies:
   idf: ">=5.2"
   mesh_lite:
     version: "*"
-  lvgl/lvgl: "^8.3.11"
-  espressif/esp_lvgl_port: "^2"
-  espressif/esp-bsp: "^1"
+  espressif/esp_lvgl_port: "^2.4"
