@@ -1,6 +1,7 @@
 dependencies:
   idf: ">=5.2"
-  mesh_lite:
-    version: "*"
-  espressif/esp_lvgl_port: "^2.4"
-  espressif/esp_lcd_touch: "^1.2"
+  mesh_lite: "*"
+
+  # LVGL + LCD support
+  espressif/esp_lvgl_port: "*"
+  espressif/esp_lcd_touch: "*"
