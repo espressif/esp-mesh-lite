@@ -1,38 +1,34 @@
 /*
  * SPDX-FileCopyrightText: 2022-2024 Espressif Systems (Shanghai)
- *
  * SPDX-License-Identifier: Apache-2.0
  */
 
 #include <inttypes.h>
+#include <sys/socket.h>
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/timers.h"
-#include "root_udp.h"     // ✅ only use our new UDP module
-#include "esp_wifi.h"
 #include "nvs_flash.h"
-#include <sys/socket.h>
-
+#include "esp_wifi.h"
 #include "esp_mac.h"
-#include "esp_bridge.h"
+
 #include "esp_mesh_lite.h"
+#include "root_udp.h"
 #include "ui_display.h"
 
-#define FORCE_ROOT 1   // set 1 = root, 0 = child
+#define FORCE_ROOT 1   // 1 = root, 0 = child
 
 static const char *TAG = "no_router";
 
-/**
- * @brief Timed printing system information
- */
+/* ---- periodic system info ---- */
 static void print_system_info_timercb(TimerHandle_t timer)
 {
-    uint8_t primary                 = 0;
-    uint8_t sta_mac[6]              = {0};
-    wifi_ap_record_t ap_info        = {0};
-    wifi_second_chan_t second       = 0;
-    wifi_sta_list_t wifi_sta_list   = {0x0};
+    uint8_t primary = 0;
+    uint8_t sta_mac[6] = {0};
+    wifi_ap_record_t ap_info = {0};
+    wifi_second_chan_t second = 0;
+    wifi_sta_list_t wifi_sta_list = {0};
 
     if (esp_mesh_lite_get_level() > 1) {
         esp_wifi_sta_get_ap_info(&ap_info);
@@ -43,10 +39,8 @@ static void print_system_info_timercb(TimerHandle_t timer)
 
     ESP_LOGI(TAG,
              "System information, channel: %d, layer: %d, self mac: " MACSTR
-             ", parent bssid: " MACSTR
-             ", parent rssi: %d, free heap: %"PRIu32"",
-             primary,
-             esp_mesh_lite_get_level(),
+             ", parent bssid: " MACSTR ", parent rssi: %d, free heap: %" PRIu32,
+             primary, esp_mesh_lite_get_level(),
              MAC2STR(sta_mac), MAC2STR(ap_info.bssid),
              (ap_info.rssi != 0 ? ap_info.rssi : -120),
              esp_get_free_heap_size());
@@ -61,62 +55,43 @@ static void print_system_info_timercb(TimerHandle_t timer)
     for (uint32_t loop = 0; (loop < size) && (node != NULL); loop++) {
         struct in_addr ip_struct;
         ip_struct.s_addr = node->node->ip_addr;
-        printf("%ld: %d, "MACSTR", %s\r\n",
+        printf("%ld: %d, " MACSTR ", %s\r\n",
                loop + 1, node->node->level,
-               MAC2STR(node->node->mac_addr),
-               inet_ntoa(ip_struct));
+               MAC2STR(node->node->mac_addr), inet_ntoa(ip_struct));
         node = node->next;
     }
 }
 
+/* ---- NVS ---- */
 static esp_err_t esp_storage_init(void)
 {
     esp_err_t ret = nvs_flash_init();
-
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK(nvs_flash_erase());
         ret = nvs_flash_init();
     }
-
     return ret;
 }
 
-static void wifi_init(void)
-{
-    // Station
-    wifi_config_t wifi_config;
-    memset(&wifi_config, 0x0, sizeof(wifi_config_t));
-    esp_bridge_wifi_set_config(WIFI_IF_STA, &wifi_config);
-
-    // SoftAP
-    wifi_config_t wifi_softap_config = {
-        .ap = {
-            .ssid = CONFIG_BRIDGE_SOFTAP_SSID,
-            .password = CONFIG_BRIDGE_SOFTAP_PASSWORD,
-            .channel = CONFIG_MESH_CHANNEL,
-        },
-    };
-    esp_bridge_wifi_set_config(WIFI_IF_AP, &wifi_softap_config);
-}
-
+/* Optional: keep SoftAP SSID/PSW helpers (no bridge needed) */
 void app_wifi_set_softap_info(void)
 {
     char softap_ssid[33];
     char softap_psw[64];
     uint8_t softap_mac[6];
     size_t ssid_size = sizeof(softap_ssid);
-    size_t psw_size = sizeof(softap_psw);
+    size_t psw_size  = sizeof(softap_psw);
+
     esp_wifi_get_mac(WIFI_IF_AP, softap_mac);
-    memset(softap_ssid, 0x0, sizeof(softap_ssid));
-    memset(softap_psw, 0x0, sizeof(softap_psw));
+    memset(softap_ssid, 0, sizeof(softap_ssid));
+    memset(softap_psw,  0, sizeof(softap_psw));
 
     if (esp_mesh_lite_get_softap_ssid_from_nvs(softap_ssid, &ssid_size) == ESP_OK) {
         ESP_LOGI(TAG, "Get ssid from nvs: %s", softap_ssid);
     } else {
 #ifdef CONFIG_BRIDGE_SOFTAP_SSID_END_WITH_THE_MAC
         snprintf(softap_ssid, sizeof(softap_ssid), "%.25s_%02x%02x%02x",
-                 CONFIG_BRIDGE_SOFTAP_SSID,
-                 softap_mac[3], softap_mac[4], softap_mac[5]);
+                 CONFIG_BRIDGE_SOFTAP_SSID, softap_mac[3], softap_mac[4], softap_mac[5]);
 #else
         snprintf(softap_ssid, sizeof(softap_ssid), "%.32s", CONFIG_BRIDGE_SOFTAP_SSID);
 #endif
@@ -133,7 +108,8 @@ void app_wifi_set_softap_info(void)
     esp_mesh_lite_set_softap_info(softap_ssid, softap_psw);
 }
 
-void app_main()
+/* ---- app_main ---- */
+void app_main(void)
 {
     esp_log_level_set("*", ESP_LOG_INFO);
 
@@ -141,8 +117,8 @@ void app_main()
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    esp_bridge_create_all_netif();
-    wifi_init();
+    // NO: esp_bridge_create_all_netif();
+    // NO: wifi_init();
 
     esp_mesh_lite_config_t mesh_lite_config = ESP_MESH_LITE_DEFAULT_INIT();
     mesh_lite_config.join_mesh_ignore_router_status = true;
@@ -169,10 +145,11 @@ void app_main()
     ui_display_init();
 
 #if FORCE_ROOT
-    root_udp_start(3333);   // ✅ call the new helper
+    root_udp_start(3333);
 #endif
 
-    TimerHandle_t timer = xTimerCreate("print_system_info", 10000 / portTICK_PERIOD_MS,
+    TimerHandle_t timer = xTimerCreate("print_system_info",
+                                       10000 / portTICK_PERIOD_MS,
                                        true, NULL, print_system_info_timercb);
     xTimerStart(timer, 0);
 }
