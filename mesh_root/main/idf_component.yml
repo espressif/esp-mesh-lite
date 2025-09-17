@@ -3,4 +3,3 @@ dependencies:
   mesh_lite:
     version: "*"
   esp_lvgl_port: "^2"
-  espressif/esp-iot-bridge: "*"
