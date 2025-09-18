@@ -2,23 +2,24 @@
 
 #include <string.h>
 #include <sys/socket.h>
-#include "lwip/sockets.h"
-#include "lwip/inet.h"
-#include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_mesh_lite.h"
-#include "esp_mac.h"          // for MACSTR / MAC2STR
 #include <stdbool.h>
 #include <unistd.h>
 #include <stdio.h>
 
-#include "ui_display.h"       // our UI shim
+#include "lwip/sockets.h"
+#include "lwip/inet.h"
+
+#include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_mesh_lite.h"
+#include "esp_mac.h"
+
+#include "ui_display.h"
+#include "uart_bridge.h"
 
 static const char *TAG = "root_udp";
 
-/* Find a node by BE IP (Mesh-Lite stores ip_addr in BE) and return MAC + level.
-   Returns true if found. */
 static bool find_mac_by_ip(uint32_t ip_be, uint8_t out_mac[6], int *out_level)
 {
     if (out_mac) memset(out_mac, 0, 6);
@@ -73,7 +74,6 @@ static void udp_task(void *arg)
 
         buf[n] = '\0';
 
-        // lookup sender MAC & level
         uint8_t mac[6] = {0};
         int level = -1;
         bool known = find_mac_by_ip(from.sin_addr.s_addr, mac, &level);
@@ -81,21 +81,15 @@ static void udp_task(void *arg)
         char ipstr[16] = {0};
         inet_ntop(AF_INET, &from.sin_addr, ipstr, sizeof(ipstr));
 
-        // --- Build one line safely: header then bounded payload ---
         char msg[256];
         size_t payload_len = (size_t)n;
 
-        int hdr = 0;
-        if (known) {
-            hdr = snprintf(
-                msg, sizeof(msg),
-                "[%s lvl%d %02x:%02x:%02x:%02x:%02x:%02x] ",
-                ipstr, level,
-                mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]
-            );
-        } else {
-            hdr = snprintf(msg, sizeof(msg), "[%s] ", ipstr);
-        }
+        int hdr = known
+            ? snprintf(msg, sizeof(msg),
+                       "[%s lvl%d %02x:%02x:%02x:%02x:%02x:%02x] ",
+                       ipstr, level,
+                       mac[0], mac[1], mac[2], mac[3], mac[4], mac[5])
+            : snprintf(msg, sizeof(msg), "[%s] ", ipstr);
 
         if (hdr < 0) hdr = 0;
         if ((size_t)hdr >= sizeof(msg)) hdr = (int)sizeof(msg) - 1;
@@ -103,11 +97,11 @@ static void udp_task(void *arg)
         size_t cap = sizeof(msg) - (size_t)hdr - 1;
         if (payload_len > cap) payload_len = cap;
 
-        memcpy(msg + hdr, buf, payload_len);
+        memcpy(msg + hdr, (const char *)buf, payload_len);
         msg[hdr + payload_len] = '\0';
 
-        // Show on “UI” shim and log
         ui_display_append(msg);
+        uart_bridge_send_line(msg);
         ESP_LOGI(TAG, "%s", msg);
     }
 }
@@ -116,7 +110,7 @@ int root_udp_start(uint16_t port)
 {
     if (xTaskCreate(udp_task, "root_udp", 4096, (void *)(uintptr_t)port, 5, NULL) != pdPASS) {
         ESP_LOGE(TAG, "failed to create udp_task");
-        return -1;                 // not ESP_OK
+        return -1;
     }
-    return 0;                      // ESP_OK
+    return 0;
 }
