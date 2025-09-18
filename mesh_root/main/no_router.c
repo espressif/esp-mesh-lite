@@ -6,8 +6,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
-#include <arpa/inet.h>          // inet_ntoa
 #include <sys/socket.h>
+
+#include "lwip/inet.h"              // inet_ntoa
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -19,10 +20,12 @@
 #include "esp_netif.h"
 #include "esp_mac.h"
 #include "esp_wifi.h"
+#include "esp_system.h"             // esp_get_free_heap_size
 #include "nvs_flash.h"
 
 #include "esp_mesh_lite.h"
 #include "root_udp.h"
+#include "uart_bridge.h"
 #include "ui_display.h"
 
 // 1 = force this device to be the root, 0 = allow becoming a child
@@ -32,9 +35,7 @@
 
 static const char *TAG = "no_router";
 
-/* ----------------------------------------------------------
- * NVS
- * ---------------------------------------------------------- */
+/* ---- NVS ---- */
 static esp_err_t esp_storage_init(void)
 {
     esp_err_t ret = nvs_flash_init();
@@ -45,9 +46,7 @@ static esp_err_t esp_storage_init(void)
     return ret;
 }
 
-/* ----------------------------------------------------------
- * SoftAP helpers (SSID / password come from sdkconfig.defaults)
- * ---------------------------------------------------------- */
+/* ---- SoftAP helpers (SSID/PSW come from sdkconfig.defaults) ---- */
 static void app_wifi_set_softap_info(void)
 {
     char    softap_ssid[33];
@@ -83,9 +82,7 @@ static void app_wifi_set_softap_info(void)
     esp_mesh_lite_set_softap_info(softap_ssid, softap_psw);
 }
 
-/* ----------------------------------------------------------
- * Periodic system info -> log + UI
- * ---------------------------------------------------------- */
+/* ---- periodic system info -> log + UI ---- */
 static void print_system_info_timercb(TimerHandle_t timer)
 {
     (void)timer;
@@ -116,23 +113,9 @@ static void print_system_info_timercb(TimerHandle_t timer)
 
     ui_display_append(line);
     ESP_LOGI(TAG, "%s", line);
-
-    // Dump known Mesh-Lite nodes (to the log)
-    uint32_t size = 0;
-    const node_info_list_t *node = esp_mesh_lite_get_nodes_list(&size);
-    ESP_LOGI(TAG, "MeshLite nodes count: %" PRIu32, size);
-    for (uint32_t i = 0; (i < size) && node; ++i) {
-        struct in_addr ip;
-        ip.s_addr = node->node->ip_addr;
-        ESP_LOGI(TAG, "#%" PRIu32 " lvl %d mac " MACSTR " ip %s",
-                 i + 1, node->node->level, MAC2STR(node->node->mac_addr), inet_ntoa(ip));
-        node = node->next;
-    }
 }
 
-/* ----------------------------------------------------------
- * app_main
- * ---------------------------------------------------------- */
+/* ---- app_main ---- */
 void app_main(void)
 {
     esp_log_level_set("*", ESP_LOG_INFO);
@@ -141,7 +124,6 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    // Mesh-Lite config (no esp_bridge, no custom Wi-Fi init)
     esp_mesh_lite_config_t cfg = ESP_MESH_LITE_DEFAULT_INIT();
     cfg.join_mesh_ignore_router_status = true;
 
@@ -164,16 +146,19 @@ void app_main(void)
 
     ESP_ERROR_CHECK(esp_mesh_lite_start());
 
-    // Bring up the “UI” shim (currently logs; LVGL/lcd binding added later)
+    // minimal “UI” shim (currently just logs)
     ui_display_init();
-    ui_display_append("Hello, world!");
+    ui_display_append("Mesh root started");
+
+    // bring up UART bridge (for DevKit UI host)
+    uart_bridge_init();
 
 #if FORCE_ROOT
-    // Start UDP listener on the root so we can receive logs/messages from children.
+    // UDP listener for mesh-child messages → we’ll forward to UART inside
     (void)root_udp_start(3333);
 #endif
 
-    // Periodic system report every 10 seconds
+    // periodic system report every 10s
     TimerHandle_t t = xTimerCreate("sysinfo",
                                    10000 / portTICK_PERIOD_MS,
                                    pdTRUE, NULL, print_system_info_timercb);
