@@ -31,13 +31,13 @@ config UART_BRIDGE_BAUD
 
 config UART_BRIDGE_TX_PIN
     int "TX GPIO"
-    default 43
+    default 17
     help
       GPIO used for UART TX (from mesh_root to DevKit).
 
 config UART_BRIDGE_RX_PIN
     int "RX GPIO"
-    default 44
+    default 18
     help
       GPIO used for UART RX (from DevKit back to mesh_root, if needed).
 
