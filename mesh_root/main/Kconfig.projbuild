@@ -14,4 +14,18 @@ menu "Example Configuration"
         help
             Mesh network channel.
 
+menu "UART Bridge"
+config UART_BRIDGE_PORT
+    int "UART port number"
+    range 0 2
+    default 1
+config UART_BRIDGE_BAUD
+    int "Baud rate"
+    default 115200
+config UART_BRIDGE_TX_PIN
+    int "TX GPIO"
+    default 43
+config UART_BRIDGE_RX_PIN
+    int "RX GPIO"
+    default 44
 endmenu
