@@ -1,4 +1,12 @@
+// uart_bridge.h
 #pragma once
-#include "esp_err.h"
-esp_err_t uart_bridge_init(void);
-void      uart_bridge_write_line(const char *line);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void uart_bridge_init(void);
+void uart_bridge_send_line(const char *s);
+
+#ifdef __cplusplus
+}
+#endif
