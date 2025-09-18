@@ -133,7 +133,8 @@ void app_main(void)
     cfg.join_mesh_without_configured_wifi = true;
 #endif
 
-    ESP_ERROR_CHECK(esp_mesh_lite_init(&cfg));
+    // NOTE: these are void functions in this Mesh-Lite version
+    esp_mesh_lite_init(&cfg);
     app_wifi_set_softap_info();
 
 #if FORCE_ROOT
@@ -144,7 +145,7 @@ void app_main(void)
     esp_mesh_lite_set_disallowed_level(1);
 #endif
 
-    ESP_ERROR_CHECK(esp_mesh_lite_start());
+    esp_mesh_lite_start();
 
     // minimal “UI” shim (currently just logs)
     ui_display_init();
@@ -154,7 +155,6 @@ void app_main(void)
     uart_bridge_init();
 
 #if FORCE_ROOT
-    // UDP listener for mesh-child messages → we’ll forward to UART inside
     (void)root_udp_start(3333);
 #endif
 
