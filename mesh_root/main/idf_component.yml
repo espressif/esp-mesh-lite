@@ -1,3 +1,2 @@
 dependencies:
   idf: ">=5.2"
-  espressif/esp-mesh-lite: "1.0.2"   # known-good; you can loosen later
