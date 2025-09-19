@@ -2,3 +2,5 @@ dependencies:
   idf: ">=5.2"
   mesh_lite:
     version: "*"
+  esp_bridge:
+    version: "*"
