@@ -1,4 +1,7 @@
-// no_router.c (safe-start version)
+/*
+ * Root node: Mesh-Lite + UDP listener + UART bridge + log-only UI
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -20,13 +23,15 @@
 #include "esp_wifi.h"
 #include "nvs_flash.h"
 
+#include "esp_bridge.h"        // <-- for esp_bridge_create_all_netif()
 #include "esp_mesh_lite.h"
+
 #include "root_udp.h"
 #include "uart_bridge.h"
 #include "ui_display.h"
 
 #ifndef FORCE_ROOT
-#define FORCE_ROOT 1
+#define FORCE_ROOT 1          // this build is the ROOT
 #endif
 
 static const char *TAG = "no_router";
@@ -51,11 +56,7 @@ static void app_wifi_set_softap_info(void)
     size_t  ssid_size = sizeof(softap_ssid);
     size_t  psw_size  = sizeof(softap_psw);
 
-    esp_err_t er = esp_wifi_get_mac(WIFI_IF_AP, softap_mac);
-    if (er != ESP_OK) {
-        ESP_LOGW(TAG, "esp_wifi_get_mac(WIFI_IF_AP) not ready yet (%s)", esp_err_to_name(er));
-        return; // will be called again after Wi-Fi is confirmed ready
-    }
+    ESP_ERROR_CHECK(esp_wifi_get_mac(WIFI_IF_AP, softap_mac));
 
     memset(softap_ssid, 0, sizeof(softap_ssid));
     memset(softap_psw,  0, sizeof(softap_psw));
@@ -112,19 +113,6 @@ static void print_system_info_timercb(TimerHandle_t timer)
     ESP_LOGI(TAG, "%s", line);
 }
 
-/* ---------------- wait helpers ---------------- */
-static esp_err_t wait_for_wifi_ready(TickType_t ticks)
-{
-    TickType_t start = xTaskGetTickCount();
-    for (;;) {
-        uint8_t mac[6];
-        esp_err_t er = esp_wifi_get_mac(WIFI_IF_AP, mac);
-        if (er == ESP_OK) return ESP_OK;
-        if ((xTaskGetTickCount() - start) >= ticks) return er;
-        vTaskDelay(pdMS_TO_TICKS(100));
-    }
-}
-
 /* ---------------- app_main ---------------- */
 void app_main(void)
 {
@@ -134,6 +122,9 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
+    /* Create STA/AP netifs up front so Mesh-Lite/Wi-Fi are safe to touch */
+    ESP_ERROR_CHECK(esp_bridge_create_all_netif());
+
     esp_mesh_lite_config_t cfg = ESP_MESH_LITE_DEFAULT_INIT();
     cfg.join_mesh_ignore_router_status = true;
 #if FORCE_ROOT
@@ -142,9 +133,8 @@ void app_main(void)
     cfg.join_mesh_without_configured_wifi = true;
 #endif
 
-    // NOTE: current Mesh-Lite returns void here
-    esp_mesh_lite_init(&cfg);
-
+    /* Mesh-Lite init/start */
+    esp_mesh_lite_init(&cfg);          // returns void in this version
 #if FORCE_ROOT
     ESP_LOGI(TAG, "Configured as ROOT node");
     esp_mesh_lite_set_allowed_level(1);
@@ -152,29 +142,22 @@ void app_main(void)
     ESP_LOGI(TAG, "Configured as CHILD node");
     esp_mesh_lite_set_disallowed_level(1);
 #endif
-
-    // Start mesh first
     esp_mesh_lite_start();
 
-    // Now wait until Wi-Fi really exists before touching it
-    esp_err_t er = wait_for_wifi_ready(pdMS_TO_TICKS(5000));
-    if (er != ESP_OK) {
-        ESP_LOGW(TAG, "Wi-Fi not ready after 5s (%s). Continuing anyway.", esp_err_to_name(er));
-    } else {
-        app_wifi_set_softap_info();
-    }
+    /* Set SoftAP SSID/PSK once Wi-Fi is alive */
+    app_wifi_set_softap_info();
 
-    // Minimal “UI” (log only)
+    /* Minimal “UI” (logs only for now) */
     ui_display_init();
     ui_display_append("Mesh root started");
 
-    // UART bridge for DevKit WS UI
+    /* UART bridge for DevKit host + UDP listener for leaf messages */
     uart_bridge_init();
-
 #if FORCE_ROOT
     (void)root_udp_start(3333);
 #endif
 
+    /* Periodic system report every 10 s */
     TimerHandle_t t = xTimerCreate("sysinfo",
                                    10000 / portTICK_PERIOD_MS,
                                    pdTRUE, NULL, print_system_info_timercb);
