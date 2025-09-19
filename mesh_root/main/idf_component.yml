@@ -1,4 +1,0 @@
-dependencies:
-  idf: ">=5.2"
-  espressif/esp-mesh-lite: "^1.0.2"
-  espressif/esp-bridge: "^2.3.0"
