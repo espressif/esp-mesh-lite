@@ -1,6 +1,6 @@
 dependencies:
   idf: ">=5.2"
-  mesh_lite:
-    version: "*"
-  esp_bridge:
-    version: "*"
+
+  # Correct package names for the Component Manager:
+  espressif/esp-mesh-lite: "*"   # (or pin: "^1.0.2")
+  espressif/esp-bridge: "*"      # (or pin: ">=2.3.0,<3.0.0")
