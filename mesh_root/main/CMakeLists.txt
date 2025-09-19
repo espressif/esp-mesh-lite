@@ -1,3 +1,4 @@
+# Minimal component for the mesh_root app.
 idf_component_register(
   SRCS
     "no_router.c"
@@ -12,6 +13,5 @@ idf_component_register(
     nvs_flash
     driver
     esp_timer
-    mesh_lite
-    esp_bridge
+    esp_mesh_lite     # <- CMake component name exported by esp-mesh-lite
 )
