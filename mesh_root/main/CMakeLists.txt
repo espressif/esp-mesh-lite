@@ -1,10 +1,9 @@
-# Minimal component for the mesh_root app.
 idf_component_register(
   SRCS
     "no_router.c"
     "root_udp.c"
-    "ui_display.c"
     "uart_bridge.c"
+    "ui_display.c"
   INCLUDE_DIRS "."
   REQUIRES
     esp_wifi
@@ -13,5 +12,6 @@ idf_component_register(
     nvs_flash
     driver
     esp_timer
-    esp_mesh_lite     # <- CMake component name exported by esp-mesh-lite
+    esp_mesh_lite
+    esp_bridge      # <--- add this
 )
