@@ -1,0 +1,57 @@
+name: build-all
+
+on:
+  push:                # run on any push to this branch
+  workflow_dispatch:   # allow manual runs from the Actions tab
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: espressif/idf:v5.2.1
+      options: --user 0
+    strategy:
+      fail-fast: false
+      matrix:
+        app:
+          - { name: mesh_root, path: "mesh_root" }
+          - { name: mesh_leaf, path: "mesh_leaf" }
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Avoid 'dubious ownership' when IDF does git ops inside the container
+      - name: Make git workspace safe
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - name: Build ${{ matrix.app.name }}
+        shell: bash
+        run: |
+          set -e
+          source /opt/esp/idf/export.sh
+          cd "${{ matrix.app.path }}"
+
+          # Target (change if not ESP32-S3)
+          idf.py set-target esp32s3
+
+          # Build
+          idf.py build
+
+          # Collect artifacts
+          mkdir -p "../artifacts/${{ matrix.app.name }}"
+          cp -v build/bootloader/bootloader*.bin "../artifacts/${{ matrix.app.name }}/" || true
+          cp -v build/partition_table/partition-table*.bin "../artifacts/${{ matrix.app.name }}/" || true
+          # app .bin (exclude bootloader/partition)
+          find build -maxdepth 1 -type f -name "*.bin" \
+            ! -name "bootloader*.bin" ! -name "partition-table*.bin" \
+            -exec cp -v {} "../artifacts/${{ matrix.app.name }}/" \; || true
+          # optional debug outputs
+          cp -v build/*.elf "../artifacts/${{ matrix.app.name }}/" || true
+          cp -v build/*.map "../artifacts/${{ matrix.app.name }}/" || true
+
+      - name: Upload ${{ matrix.app.name }} artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.app.name }}-bins
+          path: artifacts/${{ matrix.app.name }}
